@@ -1,4 +1,6 @@
 import asyncio
+import glob
+import re
 import json
 import os
 import sys
@@ -16,6 +18,23 @@ from llm_client import LLMClient
 async def call_mcp_tool(session, name, args):
   """Calls an MCP tool and traces it with DeepEval."""
   return await session.call_tool(name, arguments=args)
+
+def parse_skill_md(file_path):
+  try:
+    with open(file_path, "r") as f:
+      content = f.read()
+      match = re.search(r"^---\s*\n(.*?)\n---\s*\n", content, re.DOTALL | re.MULTILINE)
+      if match:
+        frontmatter = match.group(1)
+        name_match = re.search(r"^name:\s*(.*?)\s*$", frontmatter, re.MULTILINE)
+        desc_match = re.search(r"^description:\s*(.*?)\s*$", frontmatter, re.MULTILINE)
+        
+        name = name_match.group(1).strip().strip('"').strip("'") if name_match else None
+        description = desc_match.group(1).strip().strip('"').strip("'") if desc_match else None
+        return name, description, content
+  except Exception as e:
+    print(f"Error parsing skill file {file_path}: {e}")
+  return None, None, None
 
 
 async def process_query(
@@ -46,15 +65,25 @@ async def process_query(
     call_id = function_call.get("id")
 
     try:
-      tool_result = await mcp_client.call_tool(name, args)
+      # Check if it is a skill tool
+      if hasattr(mcp_client, "skill_resources") and name in mcp_client.skill_resources:
+        file_path = mcp_client.skill_resources[name]
+        print(f"Calling skill tool {name} for file {file_path}")
+        try:
+          with open(file_path, "r") as f:
+            result_text = f.read()
+        except Exception as e:
+          result_text = f"Error reading skill file {file_path}: {e}"
+      else:
+        tool_result = await mcp_client.call_tool(name, args)
 
-      result_text = (
-          tool_result.content[0].text
-          if hasattr(tool_result, "content")
-          and tool_result.content
-          and hasattr(tool_result.content[0], "text")
-          else str(tool_result)
-      )
+        result_text = (
+            tool_result.content[0].text
+            if hasattr(tool_result, "content")
+            and tool_result.content
+            and hasattr(tool_result.content[0], "text")
+            else str(tool_result)
+        )
       
       contents.append({
           "role": "tool",
@@ -151,10 +180,35 @@ async def _run_agent_loop(goal, tools, mcp_client, llm_client, system_instructio
 @observe(span_type="LLM")
 async def run_api_agent(goal, mcp_server_path, llm_client: LLMClient, bench_use_mcp=True, system_instruction=None):
   """Runs an agent that optionally connects to an MCP server."""
+  class ToolInfo:
+    def __init__(self, name, description, inputSchema=None):
+      self.name = name
+      self.description = description
+      self.inputSchema = inputSchema
+
   if bench_use_mcp:
     async with MCPClient(mcp_server_path) as mcp_client:
-      result = await mcp_client.list_tools()
-      tools = result.tools
+      tools_result = await mcp_client.list_tools()
+      tools = list(tools_result.tools)
+
+      # Load skills from local files in gke-mcp repo
+      mcp_client.skill_resources = {}
+      skills_dir = "third_party/gke-mcp/skills"
+      if os.path.exists(skills_dir):
+        skill_files = glob.glob(os.path.join(skills_dir, "**/SKILL.md"), recursive=True)
+        for file_path in skill_files:
+          skill_name, description, _ = parse_skill_md(file_path)
+          if skill_name:
+            normalized_name = "skill_" + skill_name.replace("-", "_")
+            skill_tool = ToolInfo(
+                name=normalized_name,
+                description=description or f"Exposes skill: {skill_name}",
+            )
+            tools.append(skill_tool)
+            mcp_client.skill_resources[normalized_name] = file_path
+            print(f"Loaded local skill as tool: {normalized_name} -> {file_path}")
+      else:
+        print(f"Skills directory not found: {skills_dir}")
       return await _run_agent_loop(goal, tools, mcp_client, llm_client, system_instruction=system_instruction)
   else:
     print("Running without MCP tools.")
