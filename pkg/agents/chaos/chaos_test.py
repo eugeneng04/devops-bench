@@ -19,20 +19,19 @@ class TestChaosAgent(unittest.TestCase):
         mock_chat = MagicMock()
         mock_client.chats.create.return_value = mock_chat
         
+        agent = ChaosAgent()
+
         # Simulate LLM tool call in the mock
-        from pkg.agents.chaos.chaos import _run_command
-        
         def fake_send_message(goal):
+            # The LLM is strictly instructed to target http://localhost:8080
             cmd = '~/go/bin/fortio load -qps 100 -t 10s -c 2 http://localhost:8080'
-            _run_command(cmd)
+            agent._run_command(cmd)
             
             mock_response = MagicMock()
             mock_response.text = "Disruption complete"
             return mock_response
             
         mock_chat.send_message.side_effect = fake_send_message
-        
-        agent = ChaosAgent()
         action_spec = {
             "type": "generate_load",
             "target": {

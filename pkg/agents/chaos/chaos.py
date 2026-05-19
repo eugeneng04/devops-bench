@@ -5,34 +5,32 @@ import datetime
 from google import genai
 from google.genai import types
 
-_chaos_active_event = None
-
 def log(msg):
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
     print(f"[{timestamp}] {msg}", flush=True)
 
-def _run_command(command: str) -> str:
+class ChaosAgent:
+  """Injects chaos faults."""
+
+  def __init__(self):
+    self._chaos_active_event = None
+
+  def _run_command(self, command: str) -> str:
     """Executes a shell command."""
-    global _chaos_active_event
     try:
         log(f"[ChaosAgent/Tool] Running command: {command}")
         
-        # Intercept the actual load spike to signal the main thread
-        if _chaos_active_event and "fortio load" in command:
+        if self._chaos_active_event and "fortio load" in command:
             log("[ChaosAgent/Tool] Load spike detected. Signaling main thread...")
-            _chaos_active_event.set()
+            self._chaos_active_event.set()
             
         res = subprocess.run(command, shell=True, capture_output=True, text=True, timeout=40)
         return f"Stdout:\n{res.stdout}\nStderr:\n{res.stderr}"
     except Exception as e:
         return f"Error: {e}"
 
-class ChaosAgent:
-  """Injects GKE planned chaos faults using an autonomous LLM agent loop."""
-
   def inject_fault(self, spec: dict):
-    global _chaos_active_event
-    _chaos_active_event = getattr(self, "chaos_active_event", None)
+    self._chaos_active_event = getattr(self, "chaos_active_event", None)
     
     action_type = spec.get("type")
     
@@ -42,13 +40,12 @@ class ChaosAgent:
       
     log(f"[ChaosAgent] Activating LLM Planned mode for action type '{action_type}'...")
     
-    # Build an extensible, generic goal prompt for the LLM agent
     goal = (
         f"Your goal is to execute the following GKE planned chaos engineering disruption action:\n"
         f"```json\n{json.dumps(spec, indent=2)}\n```\n\n"
         f"Guidelines for execution:\n"
-        f"1. Use the 'fortio' tool to inject traffic into GKE.\n"
-        f"2. Note: GKE service target URLs (like *.svc.cluster.local) are port-forwarded to localhost:8080 on the host, so run fortio against http://localhost:8080 instead.\n"
+        f"1. Use the 'fortio' tool (located at ~/go/bin/fortio) to inject traffic into GKE.\n"
+        f"2. Note: GKE service target URLs (like *.svc.cluster.local) are port-forwarded to 'http://localhost:8080' on the host, so run fortio against http://localhost:8080 instead.\n"
         f"Use your run_command tool to execute this disruption safely and effectively."
     )
     
@@ -70,7 +67,7 @@ class ChaosAgent:
         "Once the single load command is executed, analyze the output, write your final performance summary, and exit immediately.\n"
         "- Safety First: Only inject transient, safe, and recoverable faults (e.g. killing pods, scaling deployments, "
         "generating traffic spikes). Do NOT permanently destroy GKE clusters, namespaces, or nodes.\n"
-        "- Traffic Generation: For load spikes, use the 'fortio' binary. Since GKE internal "
+        "- Traffic Generation: For load spikes, use the 'fortio' binary located at '~/go/bin/fortio'. Since GKE internal "
         "service URLs (*.svc.cluster.local) are port-forwarded to the host, you MUST target 'http://localhost:8080' instead.\n"
         "- Analysis & Clarity: Analyze command outputs carefully, report stdout/stderr accurately, and confirm in your "
         "final response when the disruption has been successfully completed."
@@ -80,7 +77,7 @@ class ChaosAgent:
     chat = client.chats.create(
         model=model_name,
         config=types.GenerateContentConfig(
-            tools=[_run_command],
+            tools=[self._run_command],
             system_instruction=system_instruction,
             temperature=0.0
         )
