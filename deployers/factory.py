@@ -15,20 +15,29 @@ def get_deployer(
 
     Enforces GCP_LOCATION as the standard environment variable for location.
     """
-    deployer_type = infra_config.get("deployer", "kubetest2")
+    # Check if CLOUD_PROVIDER environment variable overrides the task-level deployer
+    cloud_provider = os.environ.get("CLOUD_PROVIDER", "").lower()
+    deployer_type = cloud_provider if cloud_provider else infra_config.get("deployer", "terraform")
 
     # Resolve Location with strict precedence: argument then GCP_LOCATION env var
     location = global_location or os.environ.get("GCP_LOCATION", "us-central1-a")
 
     if deployer_type == "terraform":
-
-        stack = infra_config.get("stack") or "prebuilt/minimum"
+        stack = infra_config.get("stack") or "prebuilt/kind"
         variables = infra_config.get("variables", {})
 
-        # Ensure critical variables are present, defaulting to globals
-        variables.setdefault("project_id", global_project_id)
-        variables.setdefault("cluster_name", global_cluster_name)
-        variables.setdefault("location", location)
+        if stack == "prebuilt/kind":
+            cluster_name = global_cluster_name or "devops-bench-kind"
+            variables.setdefault("cluster_name", cluster_name)
+            variables.setdefault("location", "local")
+            import pathlib
+            kubeconfig_path = os.environ.get("KUBECONFIG") or str(pathlib.Path("~/.kube/config").expanduser().resolve())
+            variables.setdefault("kubeconfig_path", kubeconfig_path)
+        else:
+            # Ensure critical variables are present, defaulting to globals
+            variables.setdefault("project_id", global_project_id)
+            variables.setdefault("cluster_name", global_cluster_name)
+            variables.setdefault("location", location)
 
         return TerraformDeployer(tf_dir=stack, variables=variables)
 
@@ -36,6 +45,6 @@ def get_deployer(
     return GCPDeployer(
         project=global_project_id,
         location=location,
-
         cluster_name=global_cluster_name
     )
+

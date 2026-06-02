@@ -856,12 +856,14 @@ def main():
         except Exception as e:
             print(f"Critical error during task {item['name']}: {e}")
         finally:
-            if infra_config.get("teardown", True):
+            global_no_teardown = os.environ.get("BENCH_NO_TEARDOWN", "false").lower() == "true"
+            if infra_config.get("teardown", True) and not global_no_teardown:
                 print(f"--- Tearing Down Infrastructure for: {item['name']} ---")
                 try:
                     deployer.down()
                 except Exception as teardown_err:
                     print(f"Teardown failed (potential resource leak): {teardown_err}")
+
 
         expected_output_raw = item.get("expected_output", "")
         detailed_results[-1]["expected_output"] = replace_placeholders(
