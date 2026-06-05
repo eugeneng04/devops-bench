@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: db-secret-viewer
-  namespace: "{{NAMESPACE}}"
+  namespace: {{ .Values.namespace | quote }}
   labels:
     app: db-secret-viewer
 spec:
@@ -46,15 +46,15 @@ spec:
             - containerPort: 8080
           volumeMounts:
             - name: secret-volume
-              mountPath: /etc/db-credentials
+              mountPath: "/etc/db-credentials"
               readOnly: true
           resources:
             requests:
-              cpu: "50m"
-              memory: "64Mi"
+              cpu: 50m
+              memory: 64Mi
             limits:
-              cpu: "200m"
-              memory: "128Mi"
+              cpu: 200m
+              memory: 128Mi
           readinessProbe:
             httpGet:
               path: /
@@ -71,15 +71,3 @@ spec:
         - name: secret-volume
           secret:
             secretName: db-credentials
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: db-secret-viewer
-  namespace: "{{NAMESPACE}}"
-spec:
-  ports:
-    - port: 8080
-      targetPort: 8080
-  selector:
-    app: db-secret-viewer
