@@ -4,6 +4,9 @@ __pycache__/
 third_party/
 results/
 .deepeval/
+# Python tooling (uv / ruff)
+.venv/
+.ruff_cache/
 # TF metadata directories
 **/.terraform
 *.tfstate
@@ -15,3 +18,6 @@ results/
 # Local temp and binary files
 *-rendered.yaml
 tofu
+
+# For the devs using macOS
+.DS_Store
