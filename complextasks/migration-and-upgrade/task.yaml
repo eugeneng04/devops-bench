@@ -7,14 +7,10 @@ infrastructure:
 prompt: |
   You are a Kubernetes platform engineer responsible for the cluster '{{CLUSTER_NAME}}'.
 
-  Your goal is to safely upgrade the cluster to the next minor Kubernetes version. The
-  application manifests are version-controlled in a git repository at '~/migration-repo.git'.
-
-  Before upgrading, make sure none of those manifests rely on Kubernetes APIs that are
-  deprecated or removed in the target version: audit them, migrate any you find to their stable
-  equivalents, and commit the changes back to the repository. Validate that the updated
-  manifests work on the target version before rolling the change out, then apply them and
-  complete the cluster upgrade.
+  Safely upgrade the cluster to the next minor Kubernetes version, keeping the running
+  applications healthy across the upgrade. The application manifests live in a git repository at
+  '~/migration-repo.git' — treat it as the source of truth and keep it up to date with any
+  changes you make along the way.
 
   When you're done, verify the cluster is healthy and write a status report to
   'production-readiness.md'.
