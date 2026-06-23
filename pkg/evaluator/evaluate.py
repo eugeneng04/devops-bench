@@ -762,7 +762,14 @@ def main():
     detailed_results = []
 
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    run_dir = f"results/run_{timestamp}"
+    run_name = f"run_{timestamp}"
+    # The timestamp has 1-second resolution; append the (process-unique) run id
+    # so two evaluator processes started in the same second do not collide on a
+    # single results/run_<ts>/ directory.
+    run_id = os.environ.get("RUN_ID")
+    if run_id:
+        run_name = f"{run_name}_{re.sub(r'[^A-Za-z0-9_-]', '-', run_id)}"
+    run_dir = f"results/{run_name}"
     os.makedirs(run_dir, exist_ok=True)
 
     for item in eval_data:
