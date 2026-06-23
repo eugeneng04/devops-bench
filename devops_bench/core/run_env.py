@@ -155,6 +155,11 @@ class RunEnv:
         os.environ["KUBECONFIG"] = self.kubeconfig_path  # type: ignore[assignment]
         os.environ["CLOUDSDK_CONFIG"] = self.gcloud_config_path  # type: ignore[assignment]
         os.environ["TF_DATA_DIR"] = self.tf_data_dir  # type: ignore[assignment]
+        # Publish the run id + scratch dir so run-aware components that spawn
+        # their own subprocesses (e.g. the OpenClaw agent isolating its state
+        # dir) can locate per-run paths without re-deriving them.
+        os.environ["RUN_ID"] = self.run_id
+        os.environ["BENCH_RUN_DIR"] = str(self.run_dir)
         _log.info(
             "run isolation active (run_id=%s): KUBECONFIG=%s CLOUDSDK_CONFIG=%s TF_DATA_DIR=%s",
             self.run_id,
