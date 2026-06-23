@@ -34,6 +34,7 @@ from pkg.agents.runner.api.llm_adapters import (
 
 from pkg.agents.runner.api.api import run_api_agent
 from pkg.agents.runner.gcli import run_cli_agent
+from pkg.runenv import RunEnv, parallel_enabled
 from pkg.evaluator.loader import (
     load_from_tasks_dir,
     safe_parse_yaml,
@@ -306,6 +307,13 @@ def load_configuration_context():
     if not project_id or not cluster_name:
         print("Error: PROJECT_ID (or GCP_PROJECT_ID) and CLUSTER_NAME (or GKE_CLUSTER_NAME) must be set.")
         sys.exit(1)
+
+    # Establish per-run isolation BEFORE any provisioning so every gcloud /
+    # kubectl / tofu / agent subprocess inherits the run-scoped kubeconfig,
+    # gcloud config, and tofu data dir. A no-op unless BENCH_PARALLEL is set.
+    run_env = RunEnv.create(parallel=parallel_enabled())
+    run_env.apply()
+    cluster_name = run_env.cluster_name(cluster_name)
 
     bench_use_mcp = os.environ.get("BENCH_USE_MCP", "true")
     mcp_server_path = os.environ.get("MCP_SERVER_PATH", "third_party/gke-mcp/gke-mcp")
