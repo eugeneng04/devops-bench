@@ -186,6 +186,33 @@ wait
 # then: python3 scripts/compare_results.py --legacy <A>/results.json --refactor <B>/results.json
 ```
 
+### Matrix runs (Task × Model × AgentConfig)
+
+`scripts/bastion/run_matrix.sh` runs this from your **workstation**: given the
+bastion connection env, it expands a `MATRIX_TASKS × MATRIX_MODELS ×
+MATRIX_AGENT_CONFIGS` matrix, launches each combo as an isolated `--parallel`
+run on the bastion (bounded by `MAX_PARALLEL`, each combo its own cluster),
+and copies every run's `results.json` + logs back to `RESULTS_DIR`. Agent-config
+presets are `<oc|gcli>[+mcp][+skills]`. The three canonical CUJs:
+
+```bash
+# 1) one task, many models, one agent config
+MATRIX_TASKS="complextasks/secret-rotation/task.yaml" \
+MATRIX_MODELS="gemini-3.1-pro gemini-3.5-flash" \
+MATRIX_AGENT_CONFIGS="gcli+mcp+skills" \
+GCP_PROJECT_ID=<proj> scripts/bastion/run_matrix.sh
+
+# 2) one task, one model, many agent configs
+MATRIX_AGENT_CONFIGS="oc oc+mcp+skills gcli gcli+mcp+skills" ... run_matrix.sh
+
+# 3) all tasks, one model, one agent config
+MATRIX_TASKS=ALL MATRIX_MODELS="gemini-3.1-pro" MATRIX_AGENT_CONFIGS="oc+mcp+skills" ... run_matrix.sh
+```
+
+`DRY_RUN=1` prints the expanded matrix + per-combo env without provisioning.
+It drives the refactored arm (per-run MCP/skills via env), so combos are fully
+independent; `gcli` configs require the `gemini` CLI on the bastion.
+
 ### MCP + skills for OpenClaw
 
 - **Refactored arm** reads `AGENT_MCP_SERVER` (the `gke-mcp` binary) and
