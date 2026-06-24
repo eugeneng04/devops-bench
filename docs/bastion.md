@@ -149,3 +149,67 @@ bump `NAMESPACE` per run; or skip provisioning entirely with `--no-infra`.
   provision eval infra. Keep it in a non-production / sandbox project. The agent's
   model key lives in openclaw's config on the VM (per your chosen API-key auth);
   promoting it to Secret Manager is a tracked follow-up.
+
+## Parallel comparison runs (legacy vs refactored)
+
+Both pipeline arms can run **concurrently on the bastion**, each provisioning its
+own cluster, via the per-run isolation (`--parallel` / `BENCH_PARALLEL=true`).
+Each run gets its own `KUBECONFIG`, `CLOUDSDK_CONFIG`, `TF_DATA_DIR`, OpenTofu
+state, and a run-unique cluster name; results go to per-run dirs.
+
+Launch the two arms with **distinct `RUN_ID` and `NAMESPACE`** (same key for the
+agent model + judge):
+
+```bash
+source ~/secrets.env   # GEMINI_API_KEY (mirrored to GOOGLE/AGENT/JUDGE_API_KEY)
+common=( GCP_PROJECT_ID=<proj> GKE_CLUSTER_NAME=secret-rot GCP_LOCATION=us-central1-a
+         AGENT_PROVIDER=google AGENT_MODEL=gemini-3.1-pro-preview
+         JUDGE_PROVIDER=google JUDGE_MODEL=gemini-3.1-pro-preview
+         BENCH_PARALLEL=true BENCH_NO_TEARDOWN=true BENCH_USE_MCP=true
+         AGENT_TARGET=oc OPENCLAW_BIN=oc OPENCLAW_AGENT=main )
+
+# Arm A — legacy (MCP+skills come from the GLOBAL ~/.openclaw config)
+env "${common[@]}" RUN_ID=legacy-$(date +%s) NAMESPACE=legacyrot \
+    BENCH_AGENT_TYPE=cli OPENCLAW_LOCAL=true \
+    python3 pkg/evaluator/evaluate.py complextasks/secret-rotation/task.yaml &
+
+# Arm B — refactored (MCP+skills via env -> isolated openclaw.json)
+env "${common[@]}" RUN_ID=refac-$(date +%s) NAMESPACE=refacrot \
+    BENCH_AGENT_TYPE=openclaw AGENT_MCP_SERVER="$HOME/gke-mcp" AGENT_SKILLS_PATHS="$HOME/oc-skills" \
+    python3 -m devops_bench --parallel complextasks/secret-rotation/task.yaml \
+      --project <proj> --cluster secret-rot --results-root results/refac &
+wait
+# then: python3 scripts/compare_results.py --legacy <A>/results.json --refactor <B>/results.json
+```
+
+### MCP + skills for OpenClaw
+
+- **Refactored arm** reads `AGENT_MCP_SERVER` (the `gke-mcp` binary) and
+  `AGENT_SKILLS_PATHS` (a tree of `<name>/SKILL.md` files), writes an *isolated*
+  `openclaw.json`, and materializes skills under its per-run state dir.
+- **Legacy arm** ignores those vars — it only uses the **global** `~/.openclaw`
+  config. Wire it once: `oc mcp add gke-mcp --command ~/gke-mcp` and
+  `oc skills install <dir> --global` for each skill dir. (Skill markdowns must be
+  named `SKILL.md` inside a per-skill directory; the repo's `skills/*-skill.md`
+  must be reshaped into `<name>/SKILL.md` first.)
+- The configured agent profile is **`main`** on current openclaw builds; set
+  `OPENCLAW_AGENT=main` (both arms default to it).
+
+### Per-task isolation requirements
+
+The secret-rotation stack names resources by **namespace** (`sa-${namespace}`,
+`db-credentials-${namespace}`), so concurrent runs **must use distinct
+namespaces** — the run-unique *cluster name* alone is not enough. The stack also
+adds a **project-level** IAM binding (`openclaw-vm-sa` → `secretmanager.admin`)
+shared by every run; use `BENCH_NO_TEARDOWN=true` and tear the runs down
+sequentially afterwards so one run's teardown does not revoke it mid-run for
+another.
+
+### Known limitation: shared OpenTofu working directory
+
+Per-run isolation covers `TF_DATA_DIR` and the state file (written *beside*
+`TF_DATA_DIR`, never at the reserved `<TF_DATA_DIR>/terraform.tfstate`), but both
+arms still run `tofu` in the **same stack working directory**
+(`tf/prebuilt/<stack>`), so `.terraform.lock.hcl` is shared. It is benign in
+practice (identical provider locks), but the fully robust fix is a **per-run copy
+of the stack directory**; tracked as a follow-up.
