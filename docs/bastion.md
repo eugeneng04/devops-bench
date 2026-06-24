@@ -199,11 +199,19 @@ wait
 
 The secret-rotation stack names resources by **namespace** (`sa-${namespace}`,
 `db-credentials-${namespace}`), so concurrent runs **must use distinct
-namespaces** — the run-unique *cluster name* alone is not enough. The stack also
-adds a **project-level** IAM binding (`openclaw-vm-sa` → `secretmanager.admin`)
-shared by every run; use `BENCH_NO_TEARDOWN=true` and tear the runs down
-sequentially afterwards so one run's teardown does not revoke it mid-run for
-another.
+namespaces** — the run-unique *cluster name* alone is not enough.
+
+The stack also adds a **project-level** IAM binding (`openclaw-vm-sa` →
+`secretmanager.admin`, plus `container.admin`) that every run's state owns.
+Concurrent *creates* are idempotent, but every run's *destroy* removes that
+shared binding — so the first arm's teardown revokes `secretmanager.admin` from
+the VM SA and the second arm's teardown then fails to delete its own secret.
+Sequential teardown does **not** avoid this. Mitigations: re-grant the role
+between teardowns (`gcloud projects add-iam-policy-binding … --role=roles/secretmanager.admin`),
+or delete each GKE cluster directly and `tofu state rm` the in-cluster
+(helm/kubernetes) resources before destroying the rest, or hoist that
+project-level binding out of the per-run stack. Run with `BENCH_NO_TEARDOWN=true`
+and tear down deliberately afterwards.
 
 ### Known limitation: shared OpenTofu working directory
 
