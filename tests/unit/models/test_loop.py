@@ -23,7 +23,7 @@ from typing import Any
 import pytest
 
 from devops_bench.models.base import LLMClient
-from devops_bench.models.loop import LoopResult, run_tool_loop
+from devops_bench.models.utils.loop import LoopResult, run_tool_loop
 
 
 @dataclass
@@ -115,7 +115,7 @@ async def test_turn_cap_warns_and_stops_at_max_turns(caplog):
     client = FakeLLMClient(turns)
     dispatch, _ = _dispatcher_recording({"t": "ok"})
 
-    with caplog.at_level("WARNING", logger="devops_bench.models.loop"):
+    with caplog.at_level("WARNING", logger="devops_bench.models.utils.loop"):
         result = await run_tool_loop(
             client=client,
             goal="g",
@@ -325,7 +325,7 @@ async def test_loop_with_zero_max_turns_yields_empty_result(caplog):
     client = FakeLLMClient([])
     dispatch, _ = _dispatcher_recording({})
 
-    with caplog.at_level("WARNING", logger="devops_bench.models.loop"):
+    with caplog.at_level("WARNING", logger="devops_bench.models.utils.loop"):
         result = await run_tool_loop(
             client=client,
             goal="g",
@@ -357,7 +357,7 @@ def test_loop_import_pulls_no_provider_sdk():
     script = textwrap.dedent(
         """
         import sys
-        import devops_bench.models.loop  # noqa: F401
+        import devops_bench.models.utils.loop  # noqa: F401
 
         forbidden = ("google.genai", "anthropic", "openai", "ollama")
         leaked = sorted(
@@ -376,5 +376,5 @@ def test_loop_import_pulls_no_provider_sdk():
         timeout=30,
     )
     assert result.returncode == 0, (
-        f"provider SDK leaked into devops_bench.models.loop: {result.stderr}"
+        f"provider SDK leaked into devops_bench.models.utils.loop: {result.stderr}"
     )

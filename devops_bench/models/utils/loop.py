@@ -38,7 +38,7 @@ from devops_bench.models.base import LLMClient
 
 __all__ = ["LoopResult", "ToolDispatcher", "run_tool_loop"]
 
-_log = get_logger("models.loop")
+_log = get_logger("models.utils.loop")
 
 #: Dispatch a tool call to its implementation.
 #:
