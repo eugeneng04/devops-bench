@@ -10,7 +10,7 @@
 # independent. CUJs:
 #
 #   1) one task, many models, one config
-#      MATRIX_TASKS="complextasks/secret-rotation/task.yaml" \
+#      MATRIX_TASKS="tasks/gcp/secret-rotation/task.yaml" \
 #      MATRIX_MODELS="gemini-3.1-pro gemini-3.5-flash" \
 #      MATRIX_AGENT_CONFIGS="gcli+mcp+skills" GCP_PROJECT_ID=<proj> run_matrix.sh
 #
@@ -54,7 +54,7 @@ while IFS= read -r task; do
   for model in ${MATRIX_MODELS}; do
     for preset in ${MATRIX_AGENT_CONFIGS}; do
       cfg="$(agent_config_env "${preset}")" || exit 1
-      kvs="AGENT_MODEL=${model};AGENT_PROVIDER=${AGENT_PROVIDER};${cfg}"
+      kvs="AGENT_MODEL=${model};AGENT_PROVIDER=${AGENT_PROVIDER};${cfg}$(task_extra_env "${task}")"
       rid="$(sanitize "${tname}")__$(sanitize "${model}")__$(sanitize "${preset}")"
       COMBOS+=("${rid}|${task}|${kvs}|refactored")
     done

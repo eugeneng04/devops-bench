@@ -1,0 +1,130 @@
+---
+task_id: 13
+name: "lustre-csi-deployment"
+infrastructure:
+  deployer: "tofu"
+  stack: "prebuilt/lustre-csi"
+  teardown: true
+  variables:
+    node_count: 1
+    machine_type: "g2-standard-4"
+prompt: |
+  Deploy a live vLLM inference server for Gemma 4 12B SFP8 onto the GKE cluster
+  {{GKE_CLUSTER_NAME}} in project {{GCP_PROJECT_ID}}.
+  A Managed Lustre instance named 'lustre-{{GKE_CLUSTER_NAME}}' has been
+  pre-provisioned in zone 'us-central1-a'.
+
+  Objectives:
+  1. Create a PersistentVolume named `gemma-pv` referencing the pre-provisioned
+     Managed Lustre instance `lustre-{{GKE_CLUSTER_NAME}}` in zone
+     `us-central1-a` via the Managed Lustre CSI driver. The instance's mount IP
+     and filesystem name must be queried from the instance (e.g.
+     `gcloud lustre instances describe`).
+  2. Create a PVC named `gemma-pvc` referencing `gemma-pv`.
+  3. Deploy `gemma-inference-staging` using `nginx:alpine` (simulating serving)
+     that:
+     - Requests 1 GPU accelerator (`nvidia.com/gpu: 1`).
+     - Mounts the Lustre volume at `/models`.
+  4. Create a ClusterIP Service named `gemma-service` exposing port 8000.
+expected_output: |
+  critical requirements:
+  - Expected Tool Call: generate_manifest
+  - Create a PersistentVolume with driver lustre.csi.storage.gke.io referencing the existing instance.
+  - Set the PV volumeHandle to {{GCP_PROJECT_ID}}/us-central1-a/lustre-{{GKE_CLUSTER_NAME}}.
+  - Query the Lustre instance mount point and specify the IP and filesystem in the PV volumeAttributes.
+  - Create a PersistentVolumeClaim named gemma-pvc referencing the gemma-pv volume.
+  - Deploy gemma-inference-staging using nginx:alpine.
+  - Configure the deployment to request 1 GPU (nvidia.com/gpu: 1) and mount gemma-pvc at /models.
+  - Create a ClusterIP Service named gemma-service exposing port 8000.
+
+  Expected Manifest Generated:
+  apiVersion: v1
+  kind: PersistentVolume
+  metadata:
+    name: gemma-pv
+  spec:
+    storageClassName: lustre-sc
+    capacity:
+      storage: 18000Gi
+    accessModes:
+    - ReadWriteMany
+    persistentVolumeReclaimPolicy: Retain
+    volumeMode: Filesystem
+    csi:
+      driver: lustre.csi.storage.gke.io
+      volumeHandle: {{GCP_PROJECT_ID}}/us-central1-a/lustre-{{GKE_CLUSTER_NAME}}
+      volumeAttributes:
+        ip: <instance-mount-point-ip>
+        filesystem: lustrefs
+  ---
+  apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: gemma-pvc
+    namespace: default
+  spec:
+    accessModes:
+    - ReadWriteMany
+    storageClassName: lustre-sc
+    volumeName: gemma-pv
+    resources:
+      requests:
+        storage: 18000Gi
+  ---
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: gemma-inference-staging
+    namespace: default
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: gemma
+    template:
+      metadata:
+        labels:
+          app: gemma
+      spec:
+        containers:
+        - name: gemma-container
+          image: nginx:alpine
+          volumeMounts:
+          - name: model-volume
+            mountPath: /models
+          resources:
+            limits:
+              nvidia.com/gpu: 1
+        volumes:
+        - name: model-volume
+          persistentVolumeClaim:
+            claimName: gemma-pvc
+  ---
+  apiVersion: v1
+  kind: Service
+  metadata:
+    name: gemma-service
+    namespace: default
+  spec:
+    type: ClusterIP
+    ports:
+    - port: 8000
+      targetPort: 80
+    selector:
+      app: gemma
+
+documentation:
+  - doc_name: "GKE Managed Lustre CSI Driver Guide (existing instance)"
+    url: "https://cloud.google.com/kubernetes-engine/docs/how-to/persistent-volumes/lustre-csi-driver-existing-instance"
+    constraints:
+      - text: "driver: lustre.csi.storage.gke.io"
+        critical: true
+      - text: "volumeHandle format: PROJECT_ID/LOCATION/INSTANCE_NAME"
+        critical: true
+      - text: "volumeAttributes must include ip (from the instance mountPoint) and filesystem"
+        critical: true
+  - doc_name: "GKE GPU Setup Docs"
+    url: "https://docs.cloud.google.com/kubernetes-engine/docs/how-to/gpus"
+    constraints:
+      - text: "nvidia.com/gpu resource limit of 1"
+        critical: true

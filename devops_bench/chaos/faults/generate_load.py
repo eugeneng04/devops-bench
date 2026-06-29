@@ -41,7 +41,7 @@ from devops_bench.chaos.base import FAULTS, ChaosResult, Fault
 from devops_bench.core import get_logger
 from devops_bench.core.context import RunContext
 from devops_bench.core.subprocess import run
-from devops_bench.k8s import port_forward
+from devops_bench.k8s import port_forward, rollout_status
 
 __all__ = [
     "GenerateLoadFault",
@@ -78,14 +78,22 @@ _ENV_SKIP_PORT_FORWARD = "CHAOS_SKIP_PORT_FORWARD"
 # fault binds the port-forward's local side here and points the load URL at it.
 _ENV_LOCAL_PORT = "CHAOS_LOCAL_PORT"
 
+# Seconds to wait for the target deployment's rollout to finish before opening
+# the port-forward. The agent often mutates the deployment (e.g. adds resource
+# limits) just before the spike, triggering a rolling update; without this wait
+# the port-forward can race a not-yet-Ready pod and exit early (code 1).
+_TARGET_READY_TIMEOUT_SEC = 120
+
 
 def build_system_instruction(target_url: str = _DEFAULT_TARGET_URL) -> str:
     """Build the SRE system instruction, targeting ``target_url`` for load.
 
     Args:
         target_url: URL fortio load should be directed at. Flows from the
-            fault's ``target.service_url`` (rewritten by the harness to the
-            local port-forward), defaulting to :data:`_DEFAULT_TARGET_URL`.
+            fault's ``target.service_url`` — the harness rewrites this to the
+            target Service's external LoadBalancer URL on a real cluster, or to
+            a local port-forward URL as the fallback; defaults to
+            :data:`_DEFAULT_TARGET_URL`.
 
     Returns:
         The system instruction string with the target URL injected.
@@ -104,7 +112,7 @@ def build_system_instruction(target_url: str = _DEFAULT_TARGET_URL) -> str:
         Strict Guidelines for Execution:
         - Single Execution Policy: You MUST execute exactly one tool call to run the planned 'fortio' load generation spike. Do NOT attempt to rerun, adjust, or tune the load generation if the target service saturates or returns timeouts. Once the single load command is executed, analyze the output, write your final performance summary, and exit immediately.
         - Safety First: Only inject transient, safe, and recoverable faults (e.g. killing pods, scaling deployments, generating traffic spikes). Do NOT permanently destroy GKE clusters, namespaces, or nodes.
-        - Traffic Generation: For load spikes, use the 'fortio' binary. Since GKE internal service URLs (*.svc.cluster.local) are port-forwarded to the host, you MUST target '{target_url}' instead.
+        - Traffic Generation: For load spikes, use the 'fortio' binary. Target '{target_url}' directly — this is the workload's reachable URL (an external LoadBalancer or a local tunnel, depending on the runner). Do NOT use *.svc.cluster.local URLs from outside the cluster.
         - Analysis & Clarity: Analyze command outputs carefully, report stdout/stderr accurately, and confirm in your final response when the disruption has been successfully completed."""
     )
 
@@ -133,6 +141,8 @@ RUN_COMMAND_TOOL = SimpleNamespace(
 def run_chaos_command(
     command: str,
     chaos_active_event: threading.Event | None = None,
+    *,
+    load_result: dict[str, Any] | None = None,
 ) -> str:
     """Execute a single chaos command and return its combined output.
 
@@ -146,6 +156,12 @@ def run_chaos_command(
     Args:
         command: Single command to execute (no shell pipelines or redirection).
         chaos_active_event: Optional event signaled when a load spike starts.
+        load_result: Optional mutable dict the caller reads to learn whether the
+            load spike actually ran and exited 0. When the command is a load
+            spike (:data:`_LOAD_MARKER`), the keys ``attempted`` (bool),
+            ``returncode`` (int), and ``ok`` (bool) are written. Lets the fault
+            fail closed instead of reporting success for a spike that never
+            reached the workload.
 
     Returns:
         A string combining stdout and stderr, or an ``"Error: ..."`` string if
@@ -154,6 +170,7 @@ def run_chaos_command(
     if not command.strip():
         return "Error: command string is empty"
 
+    is_load = _LOAD_MARKER in command
     try:
         _log.info("running chaos command: %s", command)
 
@@ -166,13 +183,24 @@ def run_chaos_command(
         # Signal "load active" only once the command parses cleanly and we are
         # about to execute it, so a parse failure never falsely tells the
         # harness that load is live.
-        if chaos_active_event is not None and _LOAD_MARKER in command:
+        if chaos_active_event is not None and is_load:
             _log.info("load spike detected; signaling harness via chaos event")
             chaos_active_event.set()
 
         completed = run(argv, check=False, timeout=_COMMAND_TIMEOUT)
+        if is_load and load_result is not None:
+            # Record the spike's real exit status so the fault can fail closed:
+            # a non-zero fortio exit means it could not reach the workload.
+            load_result["attempted"] = True
+            load_result["returncode"] = completed.returncode
+            load_result["ok"] = completed.returncode == 0
         return f"Stdout:\n{completed.stdout}\nStderr:\n{completed.stderr}"
     except Exception as exc:  # noqa: BLE001 - surface any failure back to the LLM
+        if is_load and load_result is not None:
+            load_result["attempted"] = True
+            load_result["returncode"] = None
+            load_result["ok"] = False
+            load_result["error"] = f"{type(exc).__name__}: {exc}"
         return f"Error: {exc}"
 
 
@@ -241,7 +269,7 @@ class GenerateLoadFault(Fault):
 
             Guidelines for execution:
             1. Use the 'fortio' tool to inject traffic into GKE.
-            2. Note: GKE service target URLs (like *.svc.cluster.local) are port-forwarded to '{target_url}' on the host, so run fortio against {target_url} instead.
+            2. Run fortio against {target_url} directly — that is the workload's reachable URL for this run.
             Use your run_command tool to execute this disruption safely and effectively."""
         )
         return template.format(spec_json=spec_json, target_url=target_url)
@@ -287,6 +315,23 @@ class GenerateLoadFault(Fault):
         # Open the fault's own tunnel only when a target deployment is named and
         # the caller did not opt out; otherwise run against the existing URL.
         if deployment and not skip_port_forward:
+            # Wait for the deployment to be rolled out (a Ready pod exists)
+            # before forwarding, so the port-forward does not race a rolling
+            # update the agent may have just triggered. Best-effort: a failure
+            # here (e.g. no such deployment) should not abort the fault — the
+            # port-forward attempt below surfaces the real problem.
+            try:
+                rollout_status(
+                    f"deployment/{deployment}",
+                    timeout_sec=_TARGET_READY_TIMEOUT_SEC,
+                    namespace=namespace,
+                )
+            except Exception as exc:  # noqa: BLE001 - wait is best-effort
+                _log.warning(
+                    "rollout wait for deployment/%s did not complete: %s",
+                    deployment,
+                    exc,
+                )
             forward = port_forward(
                 f"deployment/{deployment}",
                 local_port,
@@ -298,9 +343,12 @@ class GenerateLoadFault(Fault):
             forward = contextlib.nullcontext()
             local_url = None
 
+        # Populated by ``run_chaos_command`` with the spike's real exit status so
+        # the fault can fail closed when load never reached the workload.
+        load_result: dict[str, Any] = {}
         try:
             with forward:
-                output = self._run_agent_loop(local_url, chaos_active_event)
+                output = self._run_agent_loop(local_url, chaos_active_event, load_result)
         except Exception as exc:  # noqa: BLE001 - one fault must never abort the run
             elapsed = time.monotonic() - start
             _log.exception("generate_load fault crashed")
@@ -312,6 +360,28 @@ class GenerateLoadFault(Fault):
                 error=f"{type(exc).__name__}: {exc}",
             )
         elapsed = time.monotonic() - start
+
+        # Fail closed: a clean agent loop does not mean the spike landed. Treat
+        # "no fortio load ran" and "fortio exited non-zero" (could not reach the
+        # workload) as failures so a no-op spike never passes as a measured one.
+        if not load_result.get("attempted"):
+            return ChaosResult(
+                success=False,
+                injected_fault=self.type,
+                output=output,
+                elapsed_time=elapsed,
+                error="no fortio load command was executed",
+            )
+        if not load_result.get("ok"):
+            rc = load_result.get("returncode")
+            detail = load_result.get("error") or f"fortio load exited with code {rc}"
+            return ChaosResult(
+                success=False,
+                injected_fault=self.type,
+                output=output,
+                elapsed_time=elapsed,
+                error=f"load did not reach the workload: {detail}",
+            )
         return ChaosResult(
             success=True,
             injected_fault=self.type,
@@ -323,6 +393,7 @@ class GenerateLoadFault(Fault):
         self,
         local_url: str | None,
         chaos_active_event: threading.Event | None,
+        load_result: dict[str, Any],
     ) -> str:
         """Drive the chaos agent against the effective target URL.
 
@@ -337,6 +408,8 @@ class GenerateLoadFault(Fault):
             local_url: Local port-forward URL to target, or ``None`` to use the
                 target's own ``service_url``.
             chaos_active_event: Optional event signaled when load goes active.
+            load_result: Mutable dict the tool handler records the spike's exit
+                status into, so the caller can fail closed.
 
         Returns:
             The agent's final summary string.
@@ -344,6 +417,12 @@ class GenerateLoadFault(Fault):
         # Lazy import keeps the agent + models chain out of sys.modules until a
         # fault actually injects; registering the fault only needs the class.
         from devops_bench.chaos.agent import ChaosAgent
+
+        # Bind ``load_result`` into the handler so each tool call records the
+        # spike's exit status without changing the ``(command, event)`` handler
+        # signature the agent invokes.
+        def tool_handler(command: str, event: threading.Event | None) -> str:
+            return run_chaos_command(command, event, load_result=load_result)
 
         original_url = self.target.service_url
         if local_url is not None:
@@ -353,7 +432,7 @@ class GenerateLoadFault(Fault):
             agent = ChaosAgent(
                 system_instruction=system_instruction,
                 tool=RUN_COMMAND_TOOL,
-                tool_handler=run_chaos_command,
+                tool_handler=tool_handler,
                 chaos_active_event=chaos_active_event,
             )
             return agent.run(self.goal())

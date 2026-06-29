@@ -1,0 +1,48 @@
+task_id: 12
+name: "hpa-renamed-metric"
+# Manifest-generation task: judged on the YAML produced by generate_manifest,
+# never applied to a cluster. deployer: noop skips provisioning so it does not
+# fall back to the default prebuilt/kind stack and is trivially parallel-safe.
+infrastructure:
+  deployer: "noop"
+prompt: "Generate the Kubernetes manifest for an HPA that scales on a Prometheus metric renamed during export via the prometheusMetricName field in its GKE AutoscalingMetric definition. Output the manifest only; do not apply it to a cluster."
+expected_output: |
+  critical requirements:
+
+  - Expected Tool Call: generate_manifest
+  - Create a GKE AutoscalingMetric resource that renames the metric via the prometheusMetricName field (maps the Prometheus metric name to a sanitized autoscaler name).
+  - Create a HorizontalPodAutoscaler (HPA) resource.
+  - Reference the exposed custom metric in the HPA using the autoscaling.gke.io|<AutoscalingMetric-name>|<gauge-name> naming convention.
+
+  Expected Manifest Generated:
+  apiVersion: autoscaling.gke.io/v1beta1
+  kind: AutoscalingMetric
+  metadata:
+    name: web-metric
+    namespace: default
+  spec:
+    metrics:
+    - gauge:
+        name: renamed_metric
+        prometheusMetricName: original_metric_name
+  ---
+  apiVersion: autoscaling/v2
+  kind: HorizontalPodAutoscaler
+  metadata:
+    name: web-hpa
+    namespace: default
+  spec:
+    scaleTargetRef:
+      apiVersion: apps/v1
+      kind: Deployment
+      name: web-app
+    minReplicas: 1
+    maxReplicas: 10
+    metrics:
+    - type: Pods
+      pods:
+        metric:
+          name: autoscaling.gke.io|web-metric|renamed_metric
+        target:
+          type: AverageValue
+          averageValue: 100

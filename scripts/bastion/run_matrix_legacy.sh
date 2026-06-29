@@ -16,7 +16,7 @@
 # docs/bastion.md "Parallel agent support".
 #
 # CUJs supported: one task x many models, and all tasks x one model. E.g.:
-#   MATRIX_TASKS="complextasks/secret-rotation/task.yaml" \
+#   MATRIX_TASKS="tasks/gcp/secret-rotation/task.yaml" \
 #   MATRIX_MODELS="gemini-3.1-pro gemini-3.5-flash" \
 #   GCP_PROJECT_ID=<proj> run_matrix_legacy.sh
 #
@@ -37,7 +37,7 @@ while IFS= read -r task; do
   [ -n "${task}" ] || continue
   tname="$(basename "$(dirname "${task}")")"
   for model in ${MATRIX_MODELS}; do
-    kvs="AGENT_MODEL=${model};AGENT_PROVIDER=${AGENT_PROVIDER};${LEGACY_KVS}"
+    kvs="AGENT_MODEL=${model};AGENT_PROVIDER=${AGENT_PROVIDER};${LEGACY_KVS}$(task_extra_env "${task}")"
     rid="$(sanitize "${tname}")__$(sanitize "${model}")__legacy"
     COMBOS+=("${rid}|${task}|${kvs}|legacy")
   done

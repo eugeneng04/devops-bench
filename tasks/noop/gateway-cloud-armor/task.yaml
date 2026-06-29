@@ -1,0 +1,29 @@
+task_id: 9
+name: "gateway-cloud-armor"
+# Manifest-generation task: judged on the YAML produced by generate_manifest,
+# never applied to a cluster. deployer: noop skips provisioning so it does not
+# fall back to the default prebuilt/kind stack and is trivially parallel-safe.
+infrastructure:
+  deployer: "noop"
+prompt: "Generate the Kubernetes manifest for a GCPBackendPolicy that attaches a Cloud Armor security policy named block-ddos-policy to the external Gateway public-gw. Output the manifest only; do not apply it to a cluster."
+expected_output: |
+  critical requirements:
+
+  - Expected Tool Call: generate_manifest
+  - Create a GKE-specific GCPBackendPolicy resource.
+  - Bind the policy to the external Gateway public-gw in the targetRef.
+  - Reference the exact Cloud Armor policy block-ddos-policy under spec.default.securityPolicy.
+
+  Expected Manifest Generated:
+  apiVersion: networking.gke.io/v1
+  kind: GCPBackendPolicy
+  metadata:
+    name: public-gw-security-policy
+    namespace: default
+  spec:
+    default:
+      securityPolicy: block-ddos-policy
+    targetRef:
+      group: gateway.networking.k8s.io
+      kind: Gateway
+      name: public-gw

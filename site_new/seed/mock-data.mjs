@@ -124,7 +124,13 @@ function setupId(def) {
     const augPart = def.augmentation.length
         ? `-${def.augmentation.slice().sort().join("-")}`
         : "";
-    return `${def.model}-${def.harness}${augPart}`.replace(/[^a-z0-9-]/gi, "");
+    // Same slug algorithm as ingest/catalog.mjs and the Python producer
+    // (results/normalize.slugify): lower-case, collapse non-alphanumeric runs to
+    // a single dash, trim — so a mock and a real id for the same arm coincide.
+    return `${def.model}-${def.harness}${augPart}`
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
 }
 
 function runId(t) {
@@ -185,7 +191,10 @@ export function generateRaw() {
                         toolScore: round(Math.min(1, outcomeScore + rng() * 0.1), 4),
                         latencySec: round(20 + rng() * 60, 2),
                         inputTokens: Math.round(8000 + rng() * 30000),
-                        outputTokens: Math.round(300 + rng() * 1500)
+                        outputTokens: Math.round(300 + rng() * 1500),
+                        // Mock rows are all vetted so the seeded demo renders;
+                        // real rows carry per-task validated from the harness.
+                        validated: true
                     });
                 }
             });
@@ -251,6 +260,10 @@ function meanScores(scoreList) {
  * @returns {Setup[]}
  */
 export function derive(rows) {
+    // Leaderboard gate: only tasks vetted as correct (validated) promote. A row
+    // without an explicit validated:true is excluded so an unvetted/buggy task
+    // never counts toward a setup's score.
+    rows = rows.filter(r => r.validated === true);
     // Group rows by setupId.
     const bySetup = new Map();
     for (const r of rows) {

@@ -38,3 +38,11 @@ variable "kubeconfig_path" {
   description = "Target path to write kubeconfig (KinD-only)"
   default     = "~/.kube/config"
 }
+
+# Unused by this bare stack, but declared so tasks that pin NAMESPACE (for
+# prompt/fixture consistency) don't trip an "undeclared variable" warning when
+# the provider resolver forwards namespace= to every GCP stack.
+variable "namespace" {
+  type    = string
+  default = "default"
+}

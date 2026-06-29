@@ -736,6 +736,8 @@ class DefaultHarness(Harness):
             "documentation",
             "capabilities_granted",
             "verification_parse_errors",
+            "generation_only",
+            "validated",
         }
     )
 
@@ -781,6 +783,18 @@ class DefaultHarness(Harness):
                 ],
                 "trajectory": dumped.get("trajectory", []),
                 "status": "success",
+                # Run-level validity gate: a vetted task only promotes to the
+                # leaderboard when this run actually produced a usable result.
+                # ``AgentResult.errored()`` (429 / SDK fault / agent timeout)
+                # yields populated ``errors`` + an empty trajectory while the
+                # record still reads ``status:"success"``, so gating on the task
+                # flag alone would let an empty/errored run pass as a genuine low
+                # score. Require no agent error *and* a non-empty trajectory.
+                "validated": (
+                    task.validated
+                    and not agent_errors
+                    and bool(dumped.get("trajectory"))
+                ),
                 "errors": agent_errors,
                 # First-error scalar so a parser reading ``error`` finds the
                 # same key on the success shape (None when nothing went wrong).
@@ -833,6 +847,8 @@ class DefaultHarness(Harness):
                 "status": "failed",
                 "error": error_text,
                 "errors": [error_text],
+                # A failed run never promotes, even on a vetted task.
+                "validated": False,
                 "verification_parse_errors": list(verification_parse_errors or []),
             }
         )
@@ -879,6 +895,12 @@ class DefaultHarness(Harness):
                 "skills": list(self._granted_skill_paths),
             },
             "verification_parse_errors": [],
+            # Generation-only (``deployer: noop``) tasks have no cluster, so the
+            # OutcomeValidity judge must not penalize them for "not applying".
+            "generation_only": (task.infrastructure or {}).get("deployer") == "noop",
+            # Only tasks vetted as correct promote to the leaderboard; downstream
+            # ingest gates inclusion on this flag (default False until vetted).
+            "validated": task.validated,
         }
 
     def _drain_scenario(

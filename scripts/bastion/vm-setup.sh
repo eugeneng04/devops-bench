@@ -68,6 +68,58 @@ else
     || echo "    WARN: gemini CLI install failed; gcli agent runs will not work until it's installed."
 fi
 
+# fortio — the load generator the chaos agent shells out to for `generate_load`
+# faults (e.g. the optimize-scale load spike). The chaos system instruction tells
+# the agent to use the `fortio` binary; without it on PATH the spike is a silent
+# no-op (the run can still "pass" via the agent's HPA minReplicas, but the load is
+# never actually applied). Install to ~/bin (idempotent).
+echo "==> fortio check (chaos load generator)"
+if command -v fortio >/dev/null 2>&1; then
+  echo "    fortio present: $(fortio version 2>/dev/null | head -1)"
+else
+  echo "    installing fortio to ~/bin..."
+  FORTIO_VERSION="${FORTIO_VERSION:-1.66.4}"
+  mkdir -p "${HOME}/bin"
+  if curl -fsSL -o /tmp/fortio.tgz \
+       "https://github.com/fortio/fortio/releases/download/v${FORTIO_VERSION}/fortio-linux_amd64-${FORTIO_VERSION}.tgz" \
+     && tar -xzf /tmp/fortio.tgz -C /tmp 2>/dev/null \
+     && cp "$(find /tmp -maxdepth 4 -name fortio -type f 2>/dev/null | head -1)" "${HOME}/bin/fortio" \
+     && chmod +x "${HOME}/bin/fortio"; then
+    echo "    fortio installed: $("${HOME}/bin/fortio" version 2>/dev/null | head -1)"
+  else
+    echo "    WARN: fortio install failed; chaos generate_load faults (optimize-scale) will no-op."
+  fi
+fi
+# The chaos agent runs `fortio` via run_command in a NON-login shell, whose PATH
+# does NOT include ~/bin — so symlink fortio into /usr/local/bin (which IS on the
+# default PATH). Without this the optimize-scale load spike silently no-ops even
+# though fortio is installed. Idempotent.
+if [ -x "${HOME}/bin/fortio" ] && [ ! -e /usr/local/bin/fortio ]; then
+  echo "==> symlinking fortio into /usr/local/bin (non-login PATH)"
+  sudo ln -sf "${HOME}/bin/fortio" /usr/local/bin/fortio \
+    && echo "    linked: $(command -v fortio)" \
+    || echo "    WARN: could not symlink fortio to /usr/local/bin; chaos may not find it."
+fi
+
+# gke-mcp operational skills — the source for the AGENT's +skills capability
+# (oc/gcli). The refactored matrix points AGENT_SKILLS_PATHS at this repo's
+# skills/ dir (19 SKILL.md skills: gke-compute-class-creator, gke-workload-scaling,
+# gke-networking-edge, gke-productionize, ...). These are operational skills, NOT
+# the judge rubric markdown under ~/oc-skills. Clone to a stable path OUTSIDE the
+# synced ~/devops-bench tree so sync-to-bastion never clobbers it. Idempotent.
+echo "==> gke-mcp skills check (agent +skills source)"
+GKE_MCP_REPO="${GKE_MCP_REPO:-${HOME}/gke-mcp-repo}"
+if [ -d "${GKE_MCP_REPO}/skills" ]; then
+  echo "    present: ${GKE_MCP_REPO}/skills ($(find "${GKE_MCP_REPO}/skills" -name SKILL.md 2>/dev/null | wc -l) skills)"
+else
+  echo "    cloning gke-mcp -> ${GKE_MCP_REPO}..."
+  if git clone --depth 1 https://github.com/GoogleCloudPlatform/gke-mcp "${GKE_MCP_REPO}"; then
+    echo "    gke-mcp skills ready ($(find "${GKE_MCP_REPO}/skills" -name SKILL.md 2>/dev/null | wc -l) skills)"
+  else
+    echo "    WARN: gke-mcp clone failed; agent +skills will be empty until it is cloned."
+  fi
+fi
+
 # Disable Gemini CLI folder-trust gating at the USER level. The gcli agent runs
 # in a fresh, untrusted per-run temp cwd; untrusted folders have their MCP
 # servers (e.g. gke-mcp) suppressed, and a workspace-level setting can't lift it
@@ -124,4 +176,4 @@ echo ""
 echo "==> setup complete. To run the secret-rotation eval:"
 echo "    source ~/bench.env   # after filling in project + keys"
 echo "    cd ${REPO_DIR} && source .venv/bin/activate"
-echo "    devops-bench complextasks/secret-rotation/task.yaml"
+echo "    devops-bench tasks/gcp/secret-rotation/task.yaml"

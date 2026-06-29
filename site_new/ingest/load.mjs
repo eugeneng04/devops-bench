@@ -18,7 +18,10 @@ import path from "node:path";
 /** @typedef {import('../src/lib/schema').ResultRow} ResultRow */
 
 const STATUSES = new Set(["success", "failed"]);
-const RUN_ID_RE = /^run_\d{8}_\d{6}$/;
+// run_YYYYMMDD_HHMMSS + optional `_<suffix>`. The timestamp alone isn't unique,
+// so parallel runs append a suffix (pid / matrix id) to keep the
+// setupId__runId__taskFolder__iteration doc id distinct.
+const RUN_ID_RE = /^run_\d{8}_\d{6}(?:_[A-Za-z0-9_-]+)?$/;
 
 // The harness emits each run as `run_<ts>/rows.json` (alongside a manifest.json
 // the ingest does not read — identity is denormalized onto every row). A
@@ -41,6 +44,9 @@ export function validateRow(row) {
     if (!row || typeof row !== "object" || Array.isArray(row)) {
         return ["not an object"];
     }
+    // TODO(follow-up): enforce `validated` as a required boolean once the
+    // leaderboard gate is enabled in derive.mjs (deferred pending task-catalog
+    // cleanup). Fixtures omit it today, so it is not yet required here.
     const str = k => {
         if (typeof row[k] !== "string" || row[k] === "") errs.push(`${k}: required non-empty string`);
     };
@@ -67,7 +73,7 @@ export function validateRow(row) {
         errs.push("augmentation: must be an array of non-empty strings (use [] for baseline)");
     }
     if (typeof row.runId !== "string" || !RUN_ID_RE.test(row.runId)) {
-        errs.push("runId: must match run_YYYYMMDD_HHMMSS");
+        errs.push("runId: must match run_YYYYMMDD_HHMMSS with an optional _<suffix>");
     }
     str("t");
     str("taskFolder");

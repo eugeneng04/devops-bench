@@ -25,8 +25,15 @@ a per-run temp dir:
   ``<OPENCLAW_STATE_DIR>/skills/<name>/SKILL.md``.
 * **Rules** — ``config.capabilities.rules.text`` is prepended to the prompt
   (the ``oc`` build has no dedicated system-prompt flag).
+* **Model catalog** — models openclaw doesn't ship in its built-in catalog
+  (e.g. ``gemini-3.5-flash``) are registered in the same per-run
+  ``<run>/openclaw.json`` so a run never depends on a global
+  ``oc models``/``configure-oc.sh`` step. The entry is written for whichever
+  Google backend ``config.provider`` selects — ``google`` (google-genai) or
+  ``google-vertex`` (Vertex AI).
 * **Model auth** — ``config.api_key`` is threaded into the provider env var
-  (``GEMINI_API_KEY``/``ANTHROPIC_API_KEY``/...) that ``oc agent --local`` reads.
+  (``GEMINI_API_KEY``/``GOOGLE_CLOUD_API_KEY``/``ANTHROPIC_API_KEY``/...) that
+  ``oc agent --local`` reads.
 
 Trajectory extraction uses the official session commands documented in
 ``docs/openclaw/sessions.md``: run ``oc agent --local``, locate the single
@@ -82,6 +89,24 @@ _OPENCLAW_STATE_DIRNAME = "state"
 _OPENCLAW_SKILLS_DIRNAME = "skills"
 _OPENCLAW_CONFIG_FILE = "openclaw.json"
 
+# Bare model ids (the part after ``provider/``) absent from openclaw's built-in
+# catalog; the harness registers these per-run (see :func:`_build_model_override`).
+_CATALOG_OVERRIDES: frozenset[str] = frozenset({"gemini-3.5-flash"})
+
+# Transport each per-run provider entry must pin: such an entry *replaces* oc's
+# built-in provider rather than merging, so without ``api`` oc falls back to the
+# OpenAI transport and 401s. ``google`` needs no ``baseUrl``; for ``google-vertex``
+# ``{location}`` is expanded by oc, so it stays literal here.
+_PROVIDER_TRANSPORT: dict[str, dict[str, str]] = {
+    "google": {
+        "api": "google-generative-ai",
+    },
+    "google-vertex": {
+        "api": "google-vertex",
+        "baseUrl": "https://{location}-aiplatform.googleapis.com",
+    },
+}
+
 
 def _oc_model_id(config: AgentConfig) -> str:
     """Resolve the canonical ``provider/model`` id ``oc agent --model`` expects.
@@ -111,22 +136,80 @@ def _oc_model_id(config: AgentConfig) -> str:
     return f"{provider}/{model}"
 
 
-def _build_openclaw_config(mcp_servers: tuple[McpBinding, ...]) -> dict:
+def _build_model_override(config: AgentConfig) -> dict:
+    """Register a catalog entry for a model openclaw doesn't ship by default.
+
+    openclaw resolves ``--model provider/id`` against its built-in catalog;
+    ids absent from it (e.g. ``gemini-3.5-flash``) abort the run unless the
+    provider's catalog is patched. Rather than depend on a global
+    ``oc models``/``configure-oc.sh`` step — which races across parallel runs
+    and mutates the operator's shared config — the harness writes the catalog
+    entry into the per-run isolated ``openclaw.json`` selected via
+    ``OPENCLAW_CONFIG_PATH``.
+
+    The entry is provider-agnostic across Google's two backends: the provider is
+    read from the resolved oc model id, so the *same* model id works on
+    ``google`` (google-genai, API key) or ``google-vertex`` (Vertex AI, ADC) by
+    flipping ``config.provider`` alone. Both pin their transport (see
+    :data:`_PROVIDER_TRANSPORT`) because a per-run provider entry replaces oc's
+    built-in one rather than merging into it.
+
+    No auth is written here — it flows from the env: an API key
+    (``GEMINI_API_KEY``/``GOOGLE_API_KEY``) for google-genai, or, when no key is
+    set, the Vertex **ADC** path (the ``GOOGLE_CLOUD_API_KEY=gcp-vertex-credentials``
+    marker → metadata-server credentials). So the override stands on its own for
+    a keyless ADC run.
+
+    Returns an empty dict when no model is configured or the model is already in
+    oc's catalog (caller then writes no ``models``/``agents`` sections).
+    """
+    model_id = _oc_model_id(config)
+    if not model_id:
+        return {}
+    provider, _, bare = model_id.partition("/")
+    if bare not in _CATALOG_OVERRIDES:
+        return {}
+    provider_entry: dict = dict(_PROVIDER_TRANSPORT.get(provider, {}))
+    provider_entry["models"] = [{"id": bare, "name": bare}]
+    return {
+        "models": {"providers": {provider: provider_entry}},
+        # Allowlist ``provider/id`` for the agent's per-run ``--model`` override.
+        "agents": {"defaults": {"models": {model_id: {}}}},
+    }
+
+
+def _build_openclaw_config(config: AgentConfig, mcp_servers: tuple[McpBinding, ...]) -> dict:
     """Assemble the isolated ``openclaw.json`` payload for a run.
 
+    Merges the two per-run config concerns the harness owns: command-bearing MCP
+    bindings (``mcp.servers``) and a catalog entry for a model openclaw doesn't
+    ship by default (``models``/``agents``; see :func:`_build_model_override`).
+    Their key spaces are disjoint, so either, both, or neither may be present.
+
     Args:
+        config: Resolved :class:`AgentConfig` (drives the model-catalog entry).
         mcp_servers: Bindings to render into ``mcp.servers`` (empty-command
             bindings are skipped by :func:`build_mcp_servers`).
 
     Returns:
-        A config mapping with an ``mcp.servers`` section, or an empty dict when
-        no binding carries a launch command (caller then skips the config write
-        and leaves ``OPENCLAW_CONFIG_PATH`` unset).
+        A config mapping, or an empty dict when there is neither a launchable MCP
+        binding nor a model needing a catalog entry (caller then skips the config
+        write and leaves ``OPENCLAW_CONFIG_PATH`` unset).
+
+    Each MCP server entry inherits the run's ``KUBECONFIG`` (set by ``RunEnv``) as
+    an explicit ``env`` so the MCP server (e.g. gke-mcp) reads the run-scoped
+    cluster credentials directly instead of forcing the agent to re-fetch them.
     """
+    payload: dict = {}
     servers = build_mcp_servers(mcp_servers)
-    if not servers:
-        return {}
-    return {"mcp": {"servers": servers}}
+    if servers:
+        kubeconfig = os.environ.get("KUBECONFIG")
+        if kubeconfig:
+            for entry in servers.values():
+                entry.setdefault("env", {})["KUBECONFIG"] = kubeconfig
+        payload["mcp"] = {"servers": servers}
+    payload.update(_build_model_override(config))
+    return payload
 
 
 def _build_env(config: AgentConfig) -> dict[str, str]:
@@ -136,6 +219,15 @@ def _build_env(config: AgentConfig) -> dict[str, str]:
     benchmark's neutral ``config.api_key`` is mapped onto the provider-specific
     variable(s) openclaw expects; the model itself is never hardcoded (it flows
     from ``config.model`` via ``oc agent --model``).
+
+    When ``config.api_key`` is unset the overlay carries no key at all — this is
+    the **Vertex / ADC** path: ``google-vertex`` resolves credentials from the
+    metadata-server Application Default Credentials at request time (the matrix
+    exports the ``GOOGLE_CLOUD_API_KEY=gcp-vertex-credentials`` ADC marker that
+    tells oc's vertex transport to use ADC), so no key is threaded here. A
+    provided ``google-vertex`` key lands on ``GOOGLE_CLOUD_API_KEY`` rather than
+    ``GEMINI_API_KEY`` so it reaches the vertex transport, not the google-genai
+    one.
 
     Args:
         config: Resolved :class:`AgentConfig` for this run.
@@ -150,6 +242,8 @@ def _build_env(config: AgentConfig) -> dict[str, str]:
         if provider in ("google", "gemini"):
             overlay["GEMINI_API_KEY"] = config.api_key
             overlay["GOOGLE_API_KEY"] = config.api_key
+        elif provider == "google-vertex":
+            overlay["GOOGLE_CLOUD_API_KEY"] = config.api_key
         elif provider == "anthropic":
             overlay["ANTHROPIC_API_KEY"] = config.api_key
         elif provider == "openai":
@@ -196,9 +290,7 @@ def _prepend_rules(rules_text: str, prompt: str) -> str:
     return f"{rules_text.rstrip()}\n\n{prompt}"
 
 
-def _build_local_command(
-    config: AgentConfig, prompt: str, agent_name: str, oc_bin: str
-) -> str:
+def _build_local_command(config: AgentConfig, prompt: str, agent_name: str, oc_bin: str) -> str:
     """Build the bash command that sets the model and runs ``oc agent --local``.
 
     Every interpolated value is ``shlex.quote``d so prompts/agent names
@@ -251,9 +343,7 @@ class OpenClawAgent(AgentHarness):
             per-run isolated one written for MCP).
     """
 
-    def __init__(
-        self, config: AgentConfig | None = None, *, agent_name: str = "main"
-    ) -> None:
+    def __init__(self, config: AgentConfig | None = None, *, agent_name: str = "main") -> None:
         AgentHarness.__init__(self, config)
         self.agent_name = agent_name
         caps = self.config.capabilities
@@ -296,7 +386,7 @@ class OpenClawAgent(AgentHarness):
             env_overlay = _build_env(self.config)
             env_overlay["OPENCLAW_STATE_DIR"] = str(state_dir)
 
-            config_payload = _build_openclaw_config(caps.mcp_servers)
+            config_payload = _build_openclaw_config(self.config, caps.mcp_servers)
             if config_payload:
                 config_path = workdir / _OPENCLAW_CONFIG_FILE
                 config_path.write_text(json.dumps(config_payload, indent=2))
@@ -304,6 +394,11 @@ class OpenClawAgent(AgentHarness):
 
             command = _build_local_command(self.config, final_prompt, self.agent_name, oc_bin)
 
+            # TODO(follow-up): on TimeoutExpired this SIGKILLs only the bash
+            # child, orphaning the oc/gcloud/kubectl/MCP process tree (which keeps
+            # consuming Vertex quota). Run in its own process group
+            # (start_new_session=True) and os.killpg(...) on timeout. Tracked as a
+            # separate, more intrusive change to generalize across all CLI agents.
             try:
                 completed = subprocess.run(
                     command,
@@ -327,9 +422,7 @@ class OpenClawAgent(AgentHarness):
 
             if completed.returncode != 0:
                 stderr = (completed.stderr or "").strip()
-                errors.append(
-                    f"oc agent exited {completed.returncode}: {stderr or '<no stderr>'}"
-                )
+                errors.append(f"oc agent exited {completed.returncode}: {stderr or '<no stderr>'}")
                 metadata["returncode"] = completed.returncode
 
             trajectory, tokens, bundle_output, export_errors = self._extract_trajectory(
@@ -380,9 +473,7 @@ class OpenClawAgent(AgentHarness):
 
         if sessions.returncode != 0:
             stderr = (sessions.stderr or "").strip()
-            errors.append(
-                f"oc sessions exited {sessions.returncode}: {stderr or '<no stderr>'}"
-            )
+            errors.append(f"oc sessions exited {sessions.returncode}: {stderr or '<no stderr>'}")
             return [], {}, "", errors
 
         key = _pick_session_key(sessions.stdout or "")
@@ -418,8 +509,7 @@ class OpenClawAgent(AgentHarness):
             if export.returncode != 0:
                 stderr = (export.stderr or "").strip()
                 errors.append(
-                    f"oc export-trajectory exited {export.returncode}: "
-                    f"{stderr or '<no stderr>'}"
+                    f"oc export-trajectory exited {export.returncode}: {stderr or '<no stderr>'}"
                 )
                 return [], {}, "", errors
 
@@ -428,8 +518,6 @@ class OpenClawAgent(AgentHarness):
             if not events_text:
                 return [], {}, "", errors
 
-            trajectory, tokens, output_text, parse_errors = parse_trajectory_export(
-                events_text
-            )
+            trajectory, tokens, output_text, parse_errors = parse_trajectory_export(events_text)
             errors.extend(parse_errors)
             return trajectory, tokens, output_text, errors
