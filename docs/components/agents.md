@@ -25,7 +25,7 @@ Several harnesses ship today. Each self-registers under a canonical key.
 | `gemini` | The Google **Gemini CLI** binary | Headless subprocess; trajectory parsed from `--output-format stream-json` on stdout | MCP, skills, rules, allowed-tools |
 | `claude` | The **Claude Code CLI** binary | Headless `claude -p --output-format stream-json --verbose --dangerously-skip-permissions`; trajectory parsed from the event stream on stdout | MCP, skills, rules |
 | `openclaw` | The **Openclaw Agent CLI** | `openclaw agent --local` with per-run isolated state/config; trajectory via `openclaw sessions export-trajectory` | MCP, skills, rules |
-| `antigravity` | The **Antigravity CLI** (`agy`) binary | Headless subprocess preserving the real `HOME` for cached OAuth/ADC; trajectory parsed from the transcript JSONL log | MCP, skills, rules |
+| `antigravity` | The **Antigravity CLI** (`agy`) binary | Headless subprocess preserving the real `HOME` for cached OAuth/ADC; trajectory parsed from the transcript JSONL log, token usage decoded from the conversation DB (`gen_metadata` protobuf blobs) | MCP, skills, rules |
 | `api` | **In-process** model call | Calls `get_model(provider, model)` and runs a model-agnostic MCP tool-use loop (`max_turns`, default 50) | MCP (spawns a stdio server), skills (served as tools), rules (system instruction) |
 
 > `oc` is just a shorthand alias for the `openclaw` CLI; this doc uses `openclaw` throughout.
@@ -141,13 +141,25 @@ the row. One asymmetry is worth knowing when you compare token counts or cost
   prompt size.
 - The `gemini` harness reports `stats.input_tokens` as the *full* prompt count,
   cached or not.
+- The `antigravity` harness decodes per-turn usage records from the
+  conversation DB into a six-bucket shape (harness-local for now): `input` is
+  the *non-cached* prompt,
+  `cached` is cache-read only, `output` *excludes* `reasoning` (thinking), and
+  `total` is the full footprint (all buckets summed). Buckets are `None` — not
+  `0` — when no telemetry was recovered (`metadata.token_source` says which
+  source fed the run: `db`, `transcript`, or `unavailable`). Totals cover the
+  main trajectory only; auxiliary side-call usage (e.g. title generation) is not
+  stored in `gen_metadata` (~0.2% low observed).
 
-So a raw `input`-token or derived-cost comparison between the two harnesses
-under-reports Claude. Treat per-harness token columns as within-harness
-measures, not cross-harness ones, until the row schema carries `cached`
-explicitly. (When the terminal `result` event is missing — e.g. a truncated pipe
-on older `claude` builds — the `claude` parser falls back to summing the
-per-turn assistant usage, so token counts survive even then.)
+So a raw `input`-token or derived-cost comparison across harnesses under-reports
+the harnesses that split cached out of input (`claude`, `antigravity`) relative
+to those that fold it in (`gemini`). The `reasoning` bucket likewise reaches the
+row for no harness yet, and `antigravity`'s `output` is response-only where
+older records folded thinking in. Treat per-harness token columns as
+within-harness measures, not cross-harness ones, until the row schema carries
+`cached`/`reasoning` explicitly. (When the terminal `result` event is missing —
+e.g. a truncated pipe on older `claude` builds — the `claude` parser falls back
+to summing the per-turn assistant usage, so token counts survive even then.)
 
 ## Trajectory contents
 
