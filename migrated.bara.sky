@@ -27,7 +27,7 @@ MIGRATED = [
     # --- Wave 3: leaves + bases (parallel) ---
     # tasks contracts (schema, loader)
     # "devops_bench/tasks/**",
-    # "tests/unit/tasks/**",
+    "tests/unit/tasks/**",
     # judge skill guides (the packaged *.md the metrics judge reads)
     # "devops_bench/skills/**",
     # metrics registry base
@@ -59,7 +59,7 @@ MIGRATED = [
     # "tests/unit/agents/test_agents_import_hygiene.py",
     # "tests/unit/agents/test_agents_no_gke_strings.py",
     # k8s wrappers (kubectl, conditions)
-    # "devops_bench/k8s/**",
+    "devops_bench/k8s/**",
     # "tests/unit/k8s/**",
     # cloud providers (base, gcp, kind)
     "devops_bench/providers/**",
@@ -104,19 +104,19 @@ MIGRATED = [
     # "tests/unit/chaos/test_package_import.py",
     # PR: verification base + metrics judge
     "devops_bench/verification/base.py",
-    # "devops_bench/verification/spec.py",
-    # "devops_bench/verification/runner.py",
+    "devops_bench/verification/spec.py",
+    "devops_bench/verification/runner.py",
     "devops_bench/verification/__init__.py",
     "tests/unit/verification/test_base.py",
     # "tests/unit/verification/test_spec.py",
-    # "tests/unit/verification/test_runner.py",
+    "tests/unit/verification/test_runner.py",
     # "tests/unit/verification/test_verifier_registry.py",
     "tests/unit/verification/test_package_import.py",
     "devops_bench/metrics/geval.py",
-    # "devops_bench/metrics/pipeline.py",
+    "devops_bench/metrics/pipeline.py",
     "devops_bench/metrics/_skills.py",
     "tests/unit/metrics/test_metrics_geval.py",
-    # "tests/unit/metrics/test_metrics_pipeline.py",
+    "tests/unit/metrics/test_metrics_pipeline.py",
     # "tests/unit/metrics/test_metrics_skills.py",
     # PR: deployers base + engines + default kind stack (task-specific stacks travel with their task — wave 8)
     "devops_bench/deployers/base.py",
@@ -132,17 +132,17 @@ MIGRATED = [
     # "devops_bench/evalharness/reporter.py",
     # "tests/unit/evalharness/test_reporter.py",
     # PR: verification verifiers (pod-healthy + scaling-complete; pulled forward from wave 5)
-    # "devops_bench/verification/verifiers/pod_healthy.py",
-    # "tests/unit/verification/test_pod_healthy.py",
-    # "devops_bench/verification/verifiers/scaling_complete.py",
-    # "tests/unit/verification/test_scaling_complete.py",
+    "devops_bench/verification/verifiers/pod_healthy.py",
+    "tests/unit/verification/test_pod_healthy.py",
+    "devops_bench/verification/verifiers/scaling_complete.py",
+    "tests/unit/verification/test_scaling_complete.py",
     # PR: concrete metrics (all five; pulled forward from wave 5; each travels with its skills/
     # guide — see wave 3 skills — and this PR restores the full metrics/__init__.py surface,
     # so flip the init after it lands)
     # "devops_bench/metrics/grounding.py",
     # "tests/unit/metrics/test_metrics_grounding.py",
     # "devops_bench/metrics/tool_invocation.py",
-    # "devops_bench/metrics/checklist.py",
+    "devops_bench/metrics/checklist.py",
     # "devops_bench/metrics/outcome_validity.py",
     # "devops_bench/metrics/chaos_metrics.py",
     # "tests/unit/metrics/test_metrics_chaos.py",
@@ -168,18 +168,18 @@ MIGRATED = [
     # "tests/unit/chaos/test_time_trigger.py",
 
     # --- Wave 6: eval harness (base + scenario + default), and module docs/skills (each after its module lands) ---
-    # "devops_bench/evalharness/base.py",
+    "devops_bench/evalharness/base.py",
     # "devops_bench/evalharness/artifacts.py",
-    # "devops_bench/evalharness/scenario.py",
-    # "devops_bench/evalharness/default.py",
-    # "devops_bench/evalharness/__init__.py",
-    # "tests/unit/evalharness/test_scenario.py",
-    # "tests/unit/evalharness/test_default_harness.py",
+    "devops_bench/evalharness/scenario.py",
+    "devops_bench/evalharness/default.py",
+    "devops_bench/evalharness/__init__.py",
+    "tests/unit/evalharness/test_scenario.py",
+    "tests/unit/evalharness/test_default_harness.py",
     # "tests/unit/evalharness/test_registry_resolution.py",
     # "tests/unit/evalharness/test_spec_parsing.py",
     # "tests/unit/evalharness/test_single_env_read.py",
     # "tests/unit/evalharness/test_e2e_smoke.py",
-    # "tests/unit/evalharness/test_package_import.py",
+    "tests/unit/evalharness/test_package_import.py",
     # docs + skills whose module has fully landed (pr-plan.md §3.4)
     # "docs/components/infra.md",
     # "docs/components/model_providers.md",
@@ -199,7 +199,7 @@ MIGRATED = [
 
     # --- Wave 7: entrypoints + cross-cutting tests ---
     # "devops_bench/cli.py",
-    # "devops_bench/__main__.py",
+    "devops_bench/__main__.py",
     # "devops_bench/run.py",
     # "tests/unit/run/**",
     # "tests/unit/comparison/**",
