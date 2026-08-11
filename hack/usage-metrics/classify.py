@@ -41,12 +41,15 @@ CANONICAL_REPOS = {"gke-labs/devops-bench", "kubernetes-sigs/devops-bench"}
 # layout and is kept because fork branches still carry it.
 PATH_TAXONOMY: list[tuple[str, int, tuple[str, ...]]] = [
     ("addingTasks", 1, ("tasks/", "devops_bench/tasks/")),
-    ("addingHarness", 1, ("devops_bench/agents/", "pkg/agents/runner/")),
     ("addingVerifiers", 1, ("devops_bench/verification/", "pkg/agents/verifier/")),
     ("addingProvider", 1, ("devops_bench/providers/", "devops_bench/models/")),
     ("changingGrading", 1, ("devops_bench/metrics/", "pkg/evaluator/")),
     ("addingChaos", 1, ("devops_bench/chaos/", "pkg/agents/chaos/")),
     ("addingSkills", 1, ("skills/", "devops_bench/skills/")),
+    # Shared agent plumbing - base.py, config.py, capabilities/. Touching it is
+    # not adding a harness; adding a harness is a new directory (see
+    # HARNESS_PARENTS below), which classify_file checks first.
+    ("agentFramework", 2, ("devops_bench/agents/", "pkg/agents/runner/")),
     (
         "infrastructure",
         2,
@@ -70,6 +73,20 @@ PATH_TAXONOMY: list[tuple[str, int, tuple[str, ...]]] = [
     ("docs", 3, ("docs/", "site/")),
 ]
 
+# A harness is a directory under one of these, per §2.4 - not any file in the
+# agents package. `devops_bench/agents/cli/gemini.py` is a module in the shared
+# framework; `devops_bench/agents/cli/gemini_cli/` is a harness.
+HARNESS_PARENTS = (
+    "devops_bench/agents/cli/",
+    "devops_bench/agents/api/",
+    "pkg/agents/runner/",
+)
+
+# A tier-1 class only takes the primary slot if it accounts for at least this
+# share of the branch's changed lines. Without it a 130-file refactor that
+# grazes one task file reads as "adding tasks".
+PRIMARY_SHARE_FLOOR = 0.20
+
 CLASS_LABELS = {
     "addingTasks": "Adding tasks",
     "addingHarness": "Adding a harness",
@@ -78,6 +95,7 @@ CLASS_LABELS = {
     "changingGrading": "Changing grading",
     "addingChaos": "Adding chaos scenarios",
     "addingSkills": "Adding skills",
+    "agentFramework": "Agent framework",
     "infrastructure": "Infrastructure",
     "core": "Core changes",
     "tests": "Tests",
@@ -93,12 +111,44 @@ IMPORT_QUERIES = ('"import devops_bench"', '"from devops_bench"')
 
 
 def classify_file(path: str) -> tuple[str, int]:
+    for parent in HARNESS_PARENTS:
+        # A file inside a directory under the parent, not a file directly in it.
+        if path.startswith(parent) and "/" in path[len(parent):]:
+            return "addingHarness", 1
     for name, tier, prefixes in PATH_TAXONOMY:
         if any(path == p or path.startswith(p) for p in prefixes):
             return name, tier
     if path.endswith(".md"):
         return "docs", 3
     return "unclassified", UNCLASSIFIED_TIER
+
+
+def pick_primary(weight: dict[str, int], tiers: dict[str, int]) -> str:
+    """Choose one primary class from the per-class changed-line weights.
+
+    Two corrections to a naive "most specific path wins":
+
+    - A specific class only takes the slot if it is a real share of the change,
+      so a 130-file refactor that grazes one task file is not "adding tasks".
+    - Tests and documentation are supporting work. They win only when there is
+      no substantive class in the branch at all, otherwise every large feature
+      branch classifies as "tests" purely because test files are verbose.
+    """
+    if not weight:
+        return "unclassified"
+
+    total = sum(weight.values())
+    substantive = {n: w for n, w in weight.items() if tiers[n] <= 2}
+
+    if substantive:
+        clears_floor = [n for n, w in substantive.items() if w / total >= PRIMARY_SHARE_FLOOR]
+        if clears_floor:
+            return min(clears_floor, key=lambda n: (tiers[n], -weight[n], n))
+        # Nothing dominates - the branch is spread thin. Take the largest
+        # substantive area rather than letting tier order decide alone.
+        return max(substantive, key=lambda n: (weight[n], -tiers[n], n))
+
+    return max(weight, key=lambda n: (weight[n], n))
 
 
 def classify_branch(branch: dict[str, Any]) -> dict[str, Any]:
@@ -110,10 +160,7 @@ def classify_branch(branch: dict[str, Any]) -> dict[str, Any]:
         weight[name] = weight.get(name, 0) + max(f.get("changes", 0), 1)
         tiers[name] = tier
 
-    # Lowest tier wins; more changed lines breaks a tie inside a tier.
-    primary = (
-        min(weight, key=lambda n: (tiers[n], -weight[n], n)) if weight else "unclassified"
-    )
+    primary = pick_primary(weight, tiers)
 
     return {
         "name": branch["name"],
