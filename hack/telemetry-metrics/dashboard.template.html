@@ -300,11 +300,11 @@ edit this template and re-render.
   <div class="card">
     <div class="card-head">
       <div>
-        <h2>Tasks not in the catalog</h2>
-        <p class="sub">Task names executed that no <code>tasks/**/task.yaml</code> defines — people writing their own.</p>
+        <h2>Catalog drift</h2>
+        <p class="sub" id="drift-sub"></p>
       </div>
     </div>
-    <div id="local-table"></div>
+    <div id="drift-table"></div>
   </div>
 </div>
 
@@ -363,6 +363,7 @@ edit this template and re-render.
   const pct = (r) => (r === null || r === undefined ? null : (r * 100).toFixed(1) + "%");
   const secs = (s) => (s === null || s === undefined ? null : s >= 60 ? (s / 60).toFixed(1) + " min" : Math.round(s) + " s");
   const compact = (n) => (n >= 1e9 ? (n / 1e9).toFixed(1) + "B" : n >= 1e6 ? (n / 1e6).toFixed(1) + "M" : n >= 1e3 ? (n / 1e3).toFixed(0) + "k" : String(n));
+  const fmtDate = (d) => (d ? new Date(d + "T00:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" }) : null);
   const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   const scope = () => DATA.scopes[scopeKey];
 
@@ -586,9 +587,18 @@ edit this template and re-render.
     const rows = DATA.harnessSummary
       .filter((h) => scopeKey === "all" || h.harness === scopeKey)
       .slice()
-      .sort((a, b) => b.failureRate - a.failureRate);
+      .sort((a, b) => (b.failureRate || 0) - (a.failureRate || 0));
+    // A harness nobody ran has no failure rate. A zero-length bar would read as
+    // a measured 0%, so it stays out of the chart and shows in the table.
+    const measured = rows.filter((h) => h.failureRate !== null);
+    if (!measured.length) {
+      clear(host);
+      host.appendChild(emptyState("No executions in this selection", "Nothing was reported for this harness."));
+      fill("harness-table", harnessTable(rows));
+      return;
+    }
 
-    barChart(host, rows.map((h) => ({
+    barChart(host, measured.map((h) => ({
       label: h.harness,
       value: h.failureRate,
       display: pct(h.failureRate),
@@ -600,11 +610,23 @@ edit this template and re-render.
       label: "Failure rate by harness", rightPad: 56,
     });
 
-    fill("harness-table", buildTable(
-      ["Harness", "Executions", "Failures", "Failure rate", "p50", "p95"],
-      rows.map((h) => [h.harness, num(h.runs), num(h.failures), pct(h.failureRate), secs(h.p50LatencySec), secs(h.p95LatencySec)]),
-      [false, true, true, true, true, true]
-    ));
+    if (rows.length > measured.length) {
+      host.appendChild(el("p", { class: "sub muted" },
+        `${rows.length - measured.length} registered harness(es) had no executions and are in the table view.`));
+    }
+    fill("harness-table", harnessTable(rows));
+  }
+
+  function harnessTable(rows) {
+    return buildTable(
+      ["Harness", "First seen", "Executions", "Failure rate", "p50", "p95"],
+      rows.map((h) => [
+        h.harness + (h.isNew ? " (new)" : ""),
+        fmtDate(h.firstSeen),
+        num(h.runs), pct(h.failureRate), secs(h.p50LatencySec), secs(h.p95LatencySec),
+      ]),
+      [false, false, true, true, true, true]
+    );
   }
 
   /* ---------- most-run tasks ---------- */
@@ -612,13 +634,14 @@ edit this template and re-render.
   function renderTasks() {
     const host = document.getElementById("tasks-chart");
     const all = scope().byTask;
-    if (!all.length) {
+    const run = all.filter((t) => t.runs > 0);
+    if (!run.length) {
       clear(host);
       host.appendChild(emptyState("No executions in this selection", "Nothing was reported for this harness."));
       fill("tasks-table", el("p", { class: "sub muted" }, "No data."));
       return;
     }
-    const rows = all.slice(0, 12);
+    const rows = run.slice(0, 12);
     barChart(host, rows.map((t) => ({
       label: t.name,
       value: t.runs,
@@ -626,9 +649,9 @@ edit this template and re-render.
       tip: [[num(t.runs), "executions"], [num(t.installs), "installs"], [pct(t.failureRate), "failure rate"]],
     })), { label: "Executions per task", leftPad: 170 });
 
-    if (all.length > rows.length) {
+    if (run.length > rows.length) {
       document.getElementById("tasks-chart").appendChild(
-        el("p", { class: "sub muted" }, `Showing the 12 most-run of ${all.length} tasks.`));
+        el("p", { class: "sub muted" }, `Showing the 12 most-run of ${run.length} executed tasks. ${all.length - run.length} catalog task(s) had no executions.`));
     }
     fill("tasks-table", buildTable(
       ["Task", "Executions", "Installs", "Failure rate", "p50"],
@@ -680,23 +703,31 @@ edit this template and re-render.
     ));
   }
 
-  function renderLocal() {
-    const local = scope().byTask.filter((t) => !t.inCatalog).sort((a, b) => b.runs - a.runs);
-    const totals = scope().totals;
-    if (!local.length) {
-      fill("local-table", emptyState("Every executed task is in the catalog",
-        "A measured zero: no install ran a task name this repository does not define."));
+  /* Where the executed set and the checked-in catalog disagree. Computed over
+     every event, so the harness filter does not apply to it. */
+  function renderDrift() {
+    const LABEL = { new: "New in catalog", neverExecuted: "Never executed", outsideCatalog: "Not in catalog" };
+    document.getElementById("drift-sub").textContent =
+      `Where executions and the ${DATA.catalogSize}-task catalog disagree, across all harnesses. `
+      + `New means first executed after ${fmtDate(DATA.newSince)}.`;
+
+    if (!DATA.drift.length) {
+      fill("drift-table", emptyState("No drift",
+        "Every catalog task has been executed, none is new in this window, and no install ran a task name this repository does not define."));
       return;
     }
-    const host = document.getElementById("local-table");
+    const host = document.getElementById("drift-table");
     clear(host);
     host.appendChild(buildTable(
-      ["Task name", "Executions", "Installs"],
-      local.slice(0, 10).map((t) => [t.name, num(t.runs), num(t.installs)]),
-      [false, true, true], true
+      ["Task", "State", "First seen", "Executions", "Installs"],
+      DATA.drift.map((d) => [d.task, LABEL[d.state], fmtDate(d.firstSeen), num(d.runs), num(d.installs)]),
+      [false, false, false, true, true], true
     ));
+    const count = (state) => DATA.drift.filter((d) => d.state === state).length;
+    const t = DATA.scopes.all.totals;
     host.appendChild(el("p", { class: "sub muted" },
-      `${num(totals.localTaskRuns)} executions (${pct(totals.localTaskShare)}) across ${totals.localTaskNames} task names not in the catalog.`));
+      `${count("new")} new · ${count("neverExecuted")} never executed · `
+      + `${count("outsideCatalog")} outside the catalog (${num(t.localTaskRuns)} executions, ${pct(t.localTaskShare)}).`));
   }
 
   function renderModels() {
@@ -727,7 +758,8 @@ edit this template and re-render.
     const t = scope().totals;
     setValue(document.getElementById("hero-value"), num(t.runs));
     document.getElementById("hero-note").textContent =
-      `${num(t.turns)} agent turns over ${DATA.windowDays} days. Catalog coverage ${pct(t.catalogCoverage)} of ${DATA.catalogSize} tasks.`;
+      `${num(t.turns)} agent turns over ${DATA.windowDays} days. ` +
+      `${pct(t.catalogCoverage)} of the ${DATA.catalogSize}-task catalog was executed at least once.`;
 
     setValue(document.getElementById("tile-installs"), num(t.installs));
     document.getElementById("tile-installs-note").textContent =
@@ -769,7 +801,7 @@ edit this template and re-render.
     renderTasks();
     renderFanout();
     renderHardest();
-    renderLocal();
+    renderDrift();
     renderModels();
     renderMeta();
   }

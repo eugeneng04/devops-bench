@@ -4,9 +4,10 @@ A mockup of the reporting surface for the in-product telemetry proposal — what
 maintainer would actually look at once opt-in events are being ingested.
 
 ```bash
-python3 hack/telemetry-metrics/simulate.py                      # -> events.json
-python3 hack/telemetry-metrics/aggregate.py events.json --out report.json
-python3 hack/telemetry-metrics/render.py report.json            # -> dashboard.html
+cd hack/telemetry-metrics
+python3 simulate.py                              # -> events.json
+python3 aggregate.py events.json --out report.json
+python3 render.py report.json                    # -> dashboard.html
 ```
 
 `dashboard.html` is self-contained: no network requests, no CDN, no build step.
@@ -20,8 +21,8 @@ python3 hack/telemetry-metrics/render.py report.json            # -> dashboard.h
 
 | Thing | Source |
 |---|---|
-| Task names | `tasks/**/task.yaml` |
-| Harness keys | the `@AGENTS.register("...")` decorators under `devops_bench/` |
+| Task names | `tasks/**/task.yaml`, via `inventory.py` |
+| Harness keys | the `@AGENTS.register("...")` decorators, via `inventory.py` |
 | Event schema | the `ResultRow` contract, plus the proposal's added fields |
 | Latency and token magnitudes | the runs checked in under `results/` |
 
@@ -62,6 +63,17 @@ shape; keep `MeterProvider` for genuinely low-cardinality counters only.
   on noise.
 - **Aggregation is separate from collection** so it can be revised and re-run
   over every stream ever ingested.
+- **The catalog is read from the repository at aggregation time,** never taken
+  from the stream. A task added today has to show as present when a stream from
+  last month is re-aggregated, or old snapshots silently contradict the repo.
+- **A catalog task nobody executed gets a row of zeros, not an omission.** So
+  does a registered harness nobody ran. Absent and zero are different findings,
+  and only one of them is actionable.
+- **Catalog drift is computed over every event, never per harness.** Scoped, a
+  task looks new merely because the harness that ran it is new.
+- **"New" needs a grace period.** A rarely-run task can take days to appear at
+  all, so first-seen-after-the-window-opened on its own flags a third of the
+  catalog. `NEW_GRACE_DAYS` is the guard.
 - **No PII.** The install identifier is a locally generated UUID. Affiliation,
   hostnames, paths, and prompts are never in the event.
 

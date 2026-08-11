@@ -32,11 +32,19 @@ import argparse
 import json
 import sys
 from collections import defaultdict
+from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
 
+from inventory import discover_harnesses, discover_tasks
+
 # Below this, a per-task failure rate is noise rather than a signal.
 MIN_RUNS_FOR_RATE = 20
+
+# A rarely-run task can take a few days to show up at all, so "first seen after
+# the window opened" on its own flags half the catalog as new. Only a first
+# execution this far past the window start means the task did not exist before.
+NEW_GRACE_DAYS = 7
 
 
 def ratio(numerator: int, denominator: int) -> float | None:
@@ -75,7 +83,12 @@ def summarize(events: list[dict]) -> dict[str, Any]:
     }
 
 
-def scope(events: list[dict], catalog: set[str]) -> dict[str, Any]:
+def new_threshold(window_start: str) -> str:
+    """First-seen dates after this are genuinely new, not just slow to appear."""
+    return (date.fromisoformat(window_start) + timedelta(days=NEW_GRACE_DAYS)).isoformat()
+
+
+def scope(events: list[dict], catalog: set[str], window_start: str) -> dict[str, Any]:
     """Every figure the dashboard draws, over one slice of the event stream."""
     daily = [
         {"date": date, "runs": len(day), "installs": len({e["userUuid"] for e in day})}
@@ -85,16 +98,32 @@ def scope(events: list[dict], catalog: set[str]) -> dict[str, Any]:
     by_task = []
     for (folder, name), rows in group(events, lambda e: (e["taskFolder"], e["taskName"])).items():
         summary = summarize(rows)
+        first_seen = min(e["t"][:10] for e in rows)
         by_task.append(
             {
                 "task": f"{folder}/{name}",
                 "name": name,
                 "folder": folder,
                 "inCatalog": f"{folder}/{name}" in catalog,
+                "firstSeen": first_seen,
                 # A rate over a handful of runs swings wildly; the dashboard
                 # ranks on it, so suppress it rather than rank on noise.
                 "rateIsStable": summary["runs"] >= MIN_RUNS_FOR_RATE,
                 **summary,
+            }
+        )
+    # A catalog task nobody ran is a measured zero. Omitting it makes it look
+    # like it does not exist, when what it means is that nobody uses it.
+    executed = {t["task"] for t in by_task}
+    for task in sorted(catalog - executed):
+        folder, _, name = task.partition("/")
+        by_task.append(
+            {
+                "task": task, "name": name, "folder": folder,
+                "inCatalog": True, "firstSeen": None,
+                "rateIsStable": False, "runs": 0, "installs": 0, "failures": 0,
+                "failureRate": None, "p50LatencySec": None, "p95LatencySec": None,
+                "inputTokens": 0, "outputTokens": 0, "turns": 0,
             }
         )
     by_task.sort(key=lambda t: -t["runs"])
@@ -116,6 +145,7 @@ def scope(events: list[dict], catalog: set[str]) -> dict[str, Any]:
                 for k, rows in group(events, lambda e: e["clientVersion"]).items()}
 
     local = [t for t in by_task if not t["inCatalog"]]
+    never = [t for t in by_task if t["inCatalog"] and t["runs"] == 0]
     overall = summarize(events)
 
     return {
@@ -124,9 +154,8 @@ def scope(events: list[dict], catalog: set[str]) -> dict[str, Any]:
             "localTaskRuns": sum(t["runs"] for t in local),
             "localTaskNames": len(local),
             "localTaskShare": ratio(sum(t["runs"] for t in local), overall["runs"]),
-            "catalogCoverage": ratio(
-                len({t["task"] for t in by_task if t["inCatalog"]}), len(catalog)
-            ),
+            "neverExecuted": len(never),
+            "catalogCoverage": ratio(len(catalog) - len(never), len(catalog)),
         },
         "daily": daily,
         "byTask": by_task,
@@ -137,12 +166,49 @@ def scope(events: list[dict], catalog: set[str]) -> dict[str, Any]:
     }
 
 
-def aggregate(stream: dict) -> dict[str, Any]:
+def aggregate(stream: dict, catalog: list[str], harnesses: list[str]) -> dict[str, Any]:
     """Pre-slice by harness. The browser filters by picking a scope rather than
     re-aggregating, so the page never has to carry the raw event stream."""
     events = stream["events"]
-    catalog = set(stream["catalog"])
+    catalog_set = set(catalog)
     by_harness = group(events, lambda e: e["harness"])
+    window_start = min((e["t"][:10] for e in events), default="")
+
+    harness_summary = [
+        {
+            "harness": h,
+            "registered": h in harnesses,
+            "firstSeen": min(e["t"][:10] for e in rows),
+            "isNew": min(e["t"][:10] for e in rows) > new_threshold(window_start),
+            **summarize(rows),
+        }
+        for h, rows in by_harness.items()
+    ]
+    # A registered harness nobody ran gets a row of zeros rather than vanishing.
+    for h in sorted(set(harnesses) - set(by_harness)):
+        harness_summary.append(
+            {
+                "harness": h, "registered": True, "firstSeen": None, "isNew": False,
+                "runs": 0, "installs": 0, "failures": 0, "failureRate": None,
+                "p50LatencySec": None, "p95LatencySec": None,
+                "inputTokens": 0, "outputTokens": 0, "turns": 0,
+            }
+        )
+    harness_summary.sort(key=lambda h: -h["runs"])
+
+    all_tasks = scope(events, catalog_set, window_start)["byTask"]
+    threshold = new_threshold(window_start) if window_start else None
+    drift = []
+    for t in all_tasks:
+        if not t["inCatalog"]:
+            state = "outsideCatalog"
+        elif t["runs"] == 0:
+            state = "neverExecuted"
+        elif threshold and t["firstSeen"] > threshold:
+            state = "new"
+        else:
+            continue
+        drift.append({**{k: t[k] for k in ("task", "firstSeen", "runs", "installs")}, "state": state})
 
     return {
         "apiVersion": "devops-bench.k8s.io/v1alpha1",
@@ -150,15 +216,18 @@ def aggregate(stream: dict) -> dict[str, Any]:
         "synthetic": stream.get("synthetic", False),
         "generatedAt": stream["generatedAt"],
         "windowDays": stream["windowDays"],
-        "catalogSize": len(catalog),
+        "windowStart": window_start,
+        "newSince": new_threshold(window_start) if window_start else None,
+        "catalogSize": len(catalog_set),
         "minRunsForRate": MIN_RUNS_FOR_RATE,
-        "harnessSummary": sorted(
-            ({"harness": h, **summarize(rows)} for h, rows in by_harness.items()),
-            key=lambda h: -h["runs"],
-        ),
+        "harnessSummary": harness_summary,
+        # Drift describes the catalog, so it is computed once over every event
+        # rather than per harness. Scoping it would make a task look new merely
+        # because the harness filtering it is itself new.
+        "drift": drift,
         "scopes": {
-            "all": scope(events, catalog),
-            **{h: scope(rows, catalog) for h, rows in by_harness.items()},
+            "all": scope(events, catalog_set, window_start),
+            **{h: scope(rows, catalog_set, window_start) for h, rows in by_harness.items()},
         },
     }
 
@@ -166,10 +235,20 @@ def aggregate(stream: dict) -> dict[str, Any]:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("stream", type=Path, help="event stream JSON from simulate.py")
+    parser.add_argument(
+        "--repo-root",
+        type=Path,
+        default=Path(__file__).resolve().parents[2],
+        help="repository to read the task catalog and harness registry from",
+    )
     parser.add_argument("--out", type=Path, default=Path("-"))
     args = parser.parse_args()
 
-    report = aggregate(json.loads(args.stream.read_text()))
+    report = aggregate(
+        json.loads(args.stream.read_text()),
+        discover_tasks(args.repo_root),
+        discover_harnesses(args.repo_root),
+    )
     text = json.dumps(report, indent=2) + "\n"
     if str(args.out) == "-":
         sys.stdout.write(text)

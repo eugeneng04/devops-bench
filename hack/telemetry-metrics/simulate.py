@@ -31,7 +31,6 @@ import argparse
 import json
 import math
 import random
-import re
 import sys
 import uuid
 import zlib
@@ -39,7 +38,7 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
-REGISTER_RE = re.compile(r'AGENTS\.register\(\s*"([^"]+)"')
+from inventory import discover_harnesses, discover_tasks
 
 # Observed in the checked-in runs under results/. Used as the centre of the
 # per-task latency and token distributions so the magnitudes are not invented.
@@ -65,6 +64,20 @@ MODELS_BY_HARNESS = {
     "api": ["gemini-3.1-pro-preview", "claude-sonnet-4-5"],
 }
 
+# Fraction of the window before a task or harness exists. Tasks and harnesses
+# get added mid-window in reality, and a dashboard that cannot show a new one
+# taking off is missing the signal maintainers most want.
+TASK_INTRODUCED = {
+    "gcp/lustre-csi-deployment": 0.62,
+    "noop/computeclass-active-migration": 0.78,
+    "gcp/multi-region-failover": 0.40,
+}
+HARNESS_INTRODUCED = {"antigravity": 0.55}
+
+# In the catalog, executed by nobody. A measured zero the dashboard must name
+# rather than silently omit.
+NEVER_RUN_TASKS = {"noop/hpa-renamed-metric", "kind/cp-recovery"}
+
 # Task names an install ran that are not in the upstream catalog: the signal
 # that someone authored a task locally.
 LOCAL_TASK_NAMES = [
@@ -74,22 +87,6 @@ LOCAL_TASK_NAMES = [
     "vpa-recommendation",
     "internal-slo-burn",
 ]
-
-
-def discover_tasks(root: Path) -> list[tuple[str, str]]:
-    return sorted(
-        (p.parent.parent.name, p.parent.name) for p in (root / "tasks").rglob("task.yaml")
-    )
-
-
-def discover_harnesses(root: Path) -> list[str]:
-    keys = set()
-    for path in (root / "devops_bench").rglob("*.py"):
-        keys.update(REGISTER_RE.findall(path.read_text(encoding="utf-8", errors="ignore")))
-    # The checked-in manifests record a "claude" harness that lives on a branch
-    # not yet merged here; it is a real key in use.
-    keys.add("claude")
-    return sorted(keys)
 
 
 def build_population(rng: random.Random, harnesses: list[str], installs: int) -> list[dict]:
@@ -148,12 +145,18 @@ def generate(root: Path, days: int, installs: int, seed: int) -> dict[str, Any]:
     events: list[dict[str, Any]] = []
 
     for person in population:
-        for day in range(person["firstDay"], days):
+        harness_from = int(days * HARNESS_INTRODUCED.get(person["harness"], 0.0))
+        for day in range(max(person["firstDay"], harness_from), days):
+            available = [
+                (t, w)
+                for t, w in zip(tasks, weights, strict=True)
+                if day >= int(days * TASK_INTRODUCED.get(t, 0.0)) and t not in NEVER_RUN_TASKS
+            ]
             # Weekday-heavy, and adoption ramps over the window.
             weekday = (end - timedelta(days=days - day)).weekday()
             rate = person["intensity"] * (0.3 if weekday >= 5 else 1.0) * (0.4 + day / days)
             for _ in range(min(poisson(rng, rate), 40)):
-                events.append(make_event(rng, person, tasks, weights, end, days, day))
+                events.append(make_event(rng, person, available, end, days, day))
 
     events.sort(key=lambda e: e["t"])
     return {
@@ -163,14 +166,18 @@ def generate(root: Path, days: int, installs: int, seed: int) -> dict[str, Any]:
         "generatedAt": end.isoformat().replace("+00:00", "Z"),
         "seed": seed,
         "windowDays": days,
-        "catalog": [f"{f}/{n}" for f, n in tasks],
-        "harnesses": harnesses,
+        # Kept for provenance only. aggregate.py reads the catalog from the
+        # repository at aggregation time, not from here.
+        "catalogAtCollection": tasks,
+        "harnessesAtCollection": harnesses,
         "events": events,
     }
 
 
-def make_event(rng, person, tasks, weights, end, days, day) -> dict[str, Any]:
-    folder, name = rng.choices(tasks, weights=weights)[0]
+def make_event(rng, person, available, end, days, day) -> dict[str, Any]:
+    folder, name = rng.choices(
+        [t for t, _ in available], weights=[w for _, w in available]
+    )[0].split("/", 1)
     if person["authorsLocalTasks"] and rng.random() < 0.35:
         folder, name = "local", rng.choice(LOCAL_TASK_NAMES)
 
