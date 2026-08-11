@@ -31,7 +31,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from collections import defaultdict
+from collections import Counter, defaultdict
 from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
@@ -86,6 +86,18 @@ def summarize(events: list[dict]) -> dict[str, Any]:
 def new_threshold(window_start: str) -> str:
     """First-seen dates after this are genuinely new, not just slow to appear."""
     return (date.fromisoformat(window_start) + timedelta(days=NEW_GRACE_DAYS)).isoformat()
+
+
+def daily_runs(events: list[dict], start: str, end: str) -> list[dict]:
+    """Zero-filled executions per day. A day with no runs is a measured zero, so
+    it has to be a point on the line rather than a missing one."""
+    counts = Counter(e["t"][:10] for e in events)
+    first, last = date.fromisoformat(start), date.fromisoformat(end)
+    out = []
+    for i in range((last - first).days + 1):
+        day = (first + timedelta(days=i)).isoformat()
+        out.append({"date": day, "runs": counts[day]})
+    return out
 
 
 def scope(events: list[dict], catalog: set[str], window_start: str) -> dict[str, Any]:
@@ -173,6 +185,7 @@ def aggregate(stream: dict, catalog: list[str], harnesses: list[str]) -> dict[st
     catalog_set = set(catalog)
     by_harness = group(events, lambda e: e["harness"])
     window_start = min((e["t"][:10] for e in events), default="")
+    window_end = max((e["t"][:10] for e in events), default="")
 
     harness_summary = [
         {
@@ -210,6 +223,31 @@ def aggregate(stream: dict, catalog: list[str], harnesses: list[str]) -> dict[st
             continue
         drift.append({**{k: t[k] for k in ("task", "firstSeen", "runs", "installs")}, "state": state})
 
+    # Every task and harness that appeared after the window opened, with the
+    # executions it has accumulated since. The dashboard narrows this to a
+    # reader-chosen lookback; the grace period is the floor it cannot go below.
+    adoption = []
+    for t in all_tasks:
+        if t["inCatalog"] and t["firstSeen"] and threshold and t["firstSeen"] > threshold:
+            rows = [e for e in events if f"{e['taskFolder']}/{e['taskName']}" == t["task"]]
+            adoption.append(
+                {
+                    "kind": "task", "id": t["task"], "firstSeen": t["firstSeen"],
+                    "runs": t["runs"], "installs": t["installs"],
+                    "daily": daily_runs(rows, t["firstSeen"], window_end),
+                }
+            )
+    for h in harness_summary:
+        if h["isNew"]:
+            adoption.append(
+                {
+                    "kind": "harness", "id": h["harness"], "firstSeen": h["firstSeen"],
+                    "runs": h["runs"], "installs": h["installs"],
+                    "daily": daily_runs(by_harness[h["harness"]], h["firstSeen"], window_end),
+                }
+            )
+    adoption.sort(key=lambda a: -a["runs"])
+
     return {
         "apiVersion": "devops-bench.k8s.io/v1alpha1",
         "kind": "TelemetryReport",
@@ -217,6 +255,7 @@ def aggregate(stream: dict, catalog: list[str], harnesses: list[str]) -> dict[st
         "generatedAt": stream["generatedAt"],
         "windowDays": stream["windowDays"],
         "windowStart": window_start,
+        "windowEnd": window_end,
         "newSince": new_threshold(window_start) if window_start else None,
         "catalogSize": len(catalog_set),
         "minRunsForRate": MIN_RUNS_FOR_RATE,
@@ -225,6 +264,7 @@ def aggregate(stream: dict, catalog: list[str], harnesses: list[str]) -> dict[st
         # rather than per harness. Scoping it would make a task look new merely
         # because the harness filtering it is itself new.
         "drift": drift,
+        "adoption": adoption,
         "scopes": {
             "all": scope(events, catalog_set, window_start),
             **{h: scope(rows, catalog_set, window_start) for h, rows in by_harness.items()},

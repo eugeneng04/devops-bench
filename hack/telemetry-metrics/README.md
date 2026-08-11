@@ -74,6 +74,12 @@ shape; keep `MeterProvider` for genuinely low-cardinality counters only.
 - **"New" needs a grace period.** A rarely-run task can take days to appear at
   all, so first-seen-after-the-window-opened on its own flags a third of the
   catalog. `NEW_GRACE_DAYS` is the guard.
+- **One definition of new, one control.** The *New within* filter sets how far
+  back new reaches, and both the drift table and the adoption chart read it. Two
+  cards each with their own idea of new would contradict each other on the same
+  page. The grace period is the floor the control cannot go below.
+- **A series color follows the entity, not its rank.** Narrowing the lookback
+  drops lines from the adoption chart without repainting the ones that remain.
 - **No PII.** The install identifier is a locally generated UUID. Affiliation,
   hostnames, paths, and prompts are never in the event.
 
