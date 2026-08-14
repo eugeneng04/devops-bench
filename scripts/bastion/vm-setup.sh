@@ -140,17 +140,20 @@ else
   fi
 fi
 
-# Disable Gemini CLI folder-trust gating at the USER level. The gcli agent runs
-# in a fresh, untrusted per-run temp cwd; untrusted folders have their MCP
-# servers (e.g. gke-mcp) suppressed, and a workspace-level setting can't lift it
-# (untrusted folders ignore their own settings.json) — nor does the --skip-trust
-# flag. Setting it here lets gke-mcp connect for every run. Merge-preserving +
-# idempotent.
-echo "==> gemini folder-trust (~/.gemini/settings.json: security.folderTrust.enabled=false)"
+# Trust the temp root the harness creates its per-run workspaces under. The gcli
+# agent runs in a fresh temp cwd; an untrusted folder has its MCP servers (e.g.
+# gke-mcp) suppressed, and neither a workspace settings.json, nor --skip-trust,
+# nor a user-level security.folderTrust.enabled=false lifts that (verified
+# against gemini 0.56 — the settings key this block used to write no longer has
+# any effect). Only a trustedFolders.json entry does, and TRUST_FOLDER on a
+# parent covers the workspaces created beneath it. This is narrower than the
+# global trust-off it replaces. Merge-preserving + idempotent.
+BENCH_TMP_ROOT="${TMPDIR:-/tmp}"
+echo "==> gemini folder-trust (~/.gemini/trustedFolders.json: ${BENCH_TMP_ROOT})"
 mkdir -p "${HOME}/.gemini"
-python3 - "${HOME}/.gemini/settings.json" <<'PY'
-import json, sys
-path = sys.argv[1]
+python3 - "${HOME}/.gemini/trustedFolders.json" "${BENCH_TMP_ROOT}" <<'PY'
+import json, os, sys
+path, root = sys.argv[1], os.path.normpath(sys.argv[2])
 try:
     with open(path) as f:
         cfg = json.load(f)
@@ -158,10 +161,10 @@ try:
         cfg = {}
 except (FileNotFoundError, ValueError):
     cfg = {}
-cfg.setdefault("security", {}).setdefault("folderTrust", {})["enabled"] = False
+cfg[root] = "TRUST_FOLDER"
 with open(path, "w") as f:
     json.dump(cfg, f, indent=2)
-print(f"    wrote {path}")
+print(f"    wrote {path} ({root})")
 PY
 
 if [ ! -f "${ENV_FILE}" ]; then
