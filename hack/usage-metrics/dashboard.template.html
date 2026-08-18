@@ -181,6 +181,15 @@ edit this template and re-render.
   #tooltip .tt-val { font-weight: 600; font-variant-numeric: tabular-nums; }
   #tooltip .tt-name { color: var(--text-secondary); }
 
+  /* The branches behind one hotspot bar. Separated by a rule rather than a
+     second card, because it is the same measurement at a finer grain. */
+  #ext-detail:not(:empty) { margin-top: 18px; border-top: 1px solid var(--border); padding-top: 14px; }
+  #ext-detail .detail-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 10px; }
+  #ext-detail h3 { font-size: 13px; font-weight: 600; margin: 0; }
+  #ext-detail .note { color: var(--text-muted); font-size: 12px; margin: 10px 0 0; line-height: 1.55; }
+  #ext-detail td.path a { text-decoration: none; border-bottom: 1px solid var(--border); }
+  #ext-detail td.path a:hover { border-bottom-color: var(--text-secondary); }
+
   footer { margin-top: 32px; color: var(--text-muted); font-size: 12px; line-height: 1.7; }
   footer code { font-size: 11px; }
   a { color: inherit; }
@@ -263,13 +272,14 @@ edit this template and re-render.
     <div class="card-head">
       <div>
         <h2>Extension hotspots</h2>
-        <p class="sub">Divergent fork branches by primary class. One branch counts once.</p>
+        <p class="sub">Divergent fork branches by primary class. One branch counts once — select a bar to list them.</p>
       </div>
       <div class="spacer"></div>
       <button type="button" data-toggle="ext" aria-pressed="false">Table</button>
     </div>
     <div id="ext-chart"></div>
     <div id="ext-table" hidden></div>
+    <div id="ext-detail"></div>
   </div>
 
   <div class="card">
@@ -329,13 +339,15 @@ edit this template and re-render.
   const SVGNS = "http://www.w3.org/2000/svg";
   const tooltip = document.getElementById("tooltip");
   let repoFilter = "all";
+  let extClass = null;   // the hotspot bar whose branches are listed, if any
 
   /* ---------- small helpers ---------- */
 
   const el = (tag, attrs, text) => {
     const n = document.createElement(tag);
     for (const k in attrs || {}) n.setAttribute(k, attrs[k]);
-    if (text !== undefined) n.textContent = text;
+    if (text instanceof Node) n.appendChild(text);
+    else if (text !== undefined) n.textContent = text;
     return n;
   };
   const svgEl = (tag, attrs, text) => {
@@ -363,7 +375,11 @@ edit this template and re-render.
     const repos = selected().map((n) => DATA.repos[n]);
     const withTraffic = repos.filter((r) => r.traffic);
     const forks = repos.flatMap((r) => r.forks || []);
-    const branches = forks.flatMap((f) => f.branches).filter((b) => b.primary);
+    // Carry the fork down onto the branch. A branch's name is only meaningful
+    // beside the fork it is on - "main" appears on almost every one of them.
+    const branches = forks
+      .flatMap((f) => (f.branches || []).map((b) => ({ ...b, fork: f })))
+      .filter((b) => b.primary);
     const externalForks = forks.filter((f) => f.external);
     // Owners, not repositories. Contributors fork both repositories and get
     // counted twice; every outside owner is counted once, so a per-repository
@@ -455,6 +471,10 @@ edit this template and re-render.
       .filter(([, v]) => v > 0)
       .sort((a, b) => b[1] - a[1]);
 
+    // A class the repository filter just emptied must not keep a list open
+    // underneath a bar that is no longer on the chart.
+    if (extClass && !rows.some(([k]) => k === extClass)) extClass = null;
+
     if (!agg.branches.length) {
       host.appendChild(emptyState("No divergent fork branches in this selection",
         "Nothing has been pushed to a fork that is ahead of upstream."));
@@ -477,19 +497,40 @@ edit this template and re-render.
       const w = Math.max((value / max) * iw, 2);
       const label = DATA.classLabels[key] || key;
 
+      const chosen = key === extClass;
       svg.appendChild(svgEl("text", { class: "cat", x: m.l - 12, y: cy + 4, "text-anchor": "end" }, label));
       // Square at the baseline, 4px rounded at the data end.
       const r = Math.min(4, w);
       svg.appendChild(svgEl("path", {
         d: `M${m.l},${cy - barH / 2} H${m.l + w - r} a${r},${r} 0 0 1 ${r},${r} V${cy + barH / 2 - r} a${r},${r} 0 0 1 ${-r},${r} H${m.l} Z`,
         fill: color,
+        // Recede the rest rather than repaint the choice: the bar keeps its
+        // colour, so nothing about the chart changes meaning when one is open.
+        "fill-opacity": extClass && !chosen ? 0.4 : 1,
       }));
       svg.appendChild(svgEl("text", { class: "val", x: m.l + w + 8, y: cy + 4 }, num(value)));
 
-      const hit = svgEl("rect", { x: m.l - 152, y: cy - rowH / 2, width: W, height: rowH, fill: "transparent", tabindex: 0 });
+      const hit = svgEl("rect", {
+        x: m.l - 152, y: cy - rowH / 2, width: W, height: rowH, fill: "transparent",
+        tabindex: 0, role: "button", "aria-pressed": String(chosen), style: "cursor:pointer",
+        "data-class": key,
+      });
       const show = (evt) => showTooltip(evt, label, [
         { color, value: num(value), name: value === 1 ? "branch" : "branches" },
       ]);
+      const choose = (refocus) => {
+        extClass = chosen ? null : key;
+        hideTooltip();
+        renderExtensions(agg);
+        // Only the keyboard path restores focus. The rows are rebuilt, so a
+        // keyboard reader would otherwise be dropped back to the top of the
+        // document by its own selection - but focusing after a click reopens
+        // the tooltip over the chart the reader just clicked away from.
+        if (refocus) {
+          const again = host.querySelector(`[data-class="${key}"]`);
+          if (again) again.focus();
+        }
+      };
       hit.addEventListener("pointermove", show);
       hit.addEventListener("pointerleave", hideTooltip);
       hit.addEventListener("focus", (e) => {
@@ -497,6 +538,10 @@ edit this template and re-render.
         show({ clientX: b.left + 40, clientY: b.top });
       });
       hit.addEventListener("blur", hideTooltip);
+      hit.addEventListener("click", () => choose(false));
+      hit.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); choose(true); }
+      });
       svg.appendChild(hit);
     });
     svg.appendChild(svgEl("line", { class: "axis-line", x1: m.l, x2: m.l, y1: m.t, y2: H - m.b }));
@@ -509,6 +554,69 @@ edit this template and re-render.
       ]),
       [false, true, true]
     ));
+
+    renderExtDetail(agg);
+  }
+
+  /* ---------- the branches behind one bar ---------- */
+
+  // A ref may legally contain "#", which truncates a URL as a fragment, and
+  // "?" and spaces. Slashes stay literal - the tree endpoint expects them.
+  const refPath = (name) => name.split("/").map(encodeURIComponent).join("/");
+
+  function renderExtDetail(agg) {
+    const host = document.getElementById("ext-detail");
+    clear(host);
+    if (!extClass) return;
+
+    const label = DATA.classLabels[extClass] || extClass;
+    const listed = agg.branches
+      .filter((b) => b.primary === extClass)
+      .sort((a, b) => b.changedLines - a.changedLines);
+    // The bar counts primary class only. Without saying so, a reader who knows
+    // a branch touched infrastructure and cannot find it here concludes the
+    // number is wrong rather than that it means something narrower.
+    const alsoTouch = agg.branches.filter(
+      (b) => b.primary !== extClass && (b.secondary || []).includes(extClass)
+    ).length;
+    const external = listed.filter((b) => b.external).length;
+
+    const head = el("div", { class: "detail-head" });
+    head.appendChild(el("h3", {}, `${label} — ${num(listed.length)} ${listed.length === 1 ? "branch" : "branches"}`));
+    const close = el("button", { type: "button" }, "Clear");
+    close.addEventListener("click", () => {
+      extClass = null;
+      renderExtensions(agg);
+    });
+    head.appendChild(el("div", { class: "spacer" }));
+    head.appendChild(close);
+    host.appendChild(head);
+
+    host.appendChild(buildTable(
+      ["Branch", "Also touches", "Lines"],
+      listed.map((b) => {
+        const link = el("a", {
+          href: `https://github.com/${b.fork.fullName}/tree/${refPath(b.name)}`,
+          target: "_blank", rel: "noopener noreferrer",
+        }, `${b.fork.owner}:${b.name}`);
+        // A wide branch touches ten classes. Spelling all of them out in a
+        // half-width card pushes the line count off the edge, so the cell shows
+        // three and keeps the rest on hover.
+        const also = (b.secondary || []).map((k) => DATA.classLabels[k] || k);
+        const shown = also.length > 3 ? `${also.slice(0, 3).join(", ")} +${also.length - 3} more` : also.join(", ");
+        return [link, also.length ? el("span", { title: also.join(", ") }, shown) : "—", num(b.changedLines)];
+      }),
+      [false, false, true],
+      true
+    ));
+
+    const notes = [];
+    if (external) notes.push(`${num(external)} from outside the team.`);
+    if (alsoTouch) {
+      notes.push(`${num(alsoTouch)} more ${alsoTouch === 1 ? "branch touches" : "branches touch"} ` +
+        `${label} without it being their primary class, so they are counted under another bar.`);
+    }
+    if (notes.length) host.appendChild(el("p", { class: "note" }, notes.join(" ")));
   }
 
   /* ---------- usage mix ---------- */
