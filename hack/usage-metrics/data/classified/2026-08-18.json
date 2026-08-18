@@ -1,11 +1,11 @@
 {
   "formatVersion": 2,
-  "collectedAt": "2026-08-18T16:45:08Z",
+  "collectedAt": "2026-08-18T23:20:02Z",
   "windowDays": 14,
   "provenance": {
-    "collectorSha": "79b0041348ef360cc55bb1abb159d5f0338511f0",
-    "workflowRunUrl": null,
-    "writtenAt": "2026-08-18T16:45:08Z"
+    "collectorSha": "173f1cbc6e0acb6312693dea5e168b49b6b7223b",
+    "workflowRunUrl": "https://github.com/eugeneng04/devops-bench/actions/runs/32196710718",
+    "writtenAt": "2026-08-18T23:20:02Z"
   },
   "snapshotPartial": false,
   "snapshotSkipped": [],
@@ -34,7 +34,7 @@
         "openIssuesAndPulls": 33,
         "defaultBranch": "main",
         "createdAt": "2026-04-14T22:44:20Z",
-        "pushedAt": "2026-08-18T04:25:50Z"
+        "pushedAt": "2026-08-18T19:15:19Z"
       },
       "traffic": {
         "views": {
@@ -2985,7 +2985,7 @@
           ],
           "external": false,
           "active": true,
-          "divergentBranches": 30,
+          "divergentBranches": 31,
           "branches": [
             {
               "name": "add-canonical-token-buckets",
@@ -3345,6 +3345,25 @@
               "changedLines": 896,
               "unclassifiedLines": 0,
               "filesReturned": 8,
+              "unavailable": null
+            },
+            {
+              "name": "main",
+              "primary": "infrastructure",
+              "secondary": [
+                "docs"
+              ],
+              "authors": [
+                "eugeneng04"
+              ],
+              "external": false,
+              "signature": "0287ef37db374674",
+              "changedFiles": 32,
+              "additions": 196094,
+              "deletions": 0,
+              "changedLines": 196095,
+              "unclassifiedLines": 0,
+              "filesReturned": 32,
               "unavailable": null
             },
             {
@@ -3860,7 +3879,7 @@
         "addingChaos": 0,
         "addingSkills": 0,
         "agentFramework": 20,
-        "infrastructure": 28,
+        "infrastructure": 29,
         "core": 12,
         "tests": 38,
         "docs": 11,
@@ -4386,11 +4405,11 @@
                 "jessie1111101"
               ],
               "external": false,
-              "signature": "01e501aacd16afab",
+              "signature": "b3e28c61b8afbe6d",
               "changedFiles": 3,
-              "additions": 326,
+              "additions": 329,
               "deletions": 0,
-              "changedLines": 326,
+              "changedLines": 329,
               "unclassifiedLines": 0,
               "filesReturned": 3,
               "unavailable": null
@@ -5662,8 +5681,31 @@
           ],
           "external": true,
           "active": true,
-          "divergentBranches": 4,
+          "divergentBranches": 5,
           "branches": [
+            {
+              "name": "feat/chaos-dynamic-port-and-notes",
+              "primary": "infrastructure",
+              "secondary": [
+                "addingChaos",
+                "addingProvider",
+                "addingTasks",
+                "docs",
+                "tests"
+              ],
+              "authors": [
+                "isadominguez314"
+              ],
+              "external": true,
+              "signature": "2a2609c70486b5f7",
+              "changedFiles": 26,
+              "additions": 1856,
+              "deletions": 94,
+              "changedLines": 1950,
+              "unclassifiedLines": 0,
+              "filesReturned": 26,
+              "unavailable": null
+            },
             {
               "name": "feat/vcluster-factory-and-smoke-test",
               "primary": "infrastructure",
@@ -5675,11 +5717,11 @@
                 "isadominguez314"
               ],
               "external": true,
-              "signature": "7953713f3eaf12f3",
+              "signature": "025e47abda0826f9",
               "changedFiles": 23,
-              "additions": 1707,
-              "deletions": 93,
-              "changedLines": 1800,
+              "additions": 1689,
+              "deletions": 102,
+              "changedLines": 1791,
               "unclassifiedLines": 0,
               "filesReturned": 23,
               "unavailable": null
@@ -5695,11 +5737,11 @@
                 "isadominguez314"
               ],
               "external": true,
-              "signature": "f1e9b1ec7cf7e4fd",
+              "signature": "b33cfb18529ab57c",
               "changedFiles": 21,
-              "additions": 1604,
-              "deletions": 57,
-              "changedLines": 1661,
+              "additions": 1586,
+              "deletions": 66,
+              "changedLines": 1652,
               "unclassifiedLines": 0,
               "filesReturned": 21,
               "unavailable": null
@@ -5712,11 +5754,11 @@
                 "isadominguez314"
               ],
               "external": true,
-              "signature": "28c6752f02542c25",
+              "signature": "ed4fb49fe4b0cbd3",
               "changedFiles": 12,
-              "additions": 632,
-              "deletions": 30,
-              "changedLines": 662,
+              "additions": 614,
+              "deletions": 39,
+              "changedLines": 653,
               "unclassifiedLines": 0,
               "filesReturned": 12,
               "unavailable": null
@@ -5903,7 +5945,7 @@
         "addingChaos": 2,
         "addingSkills": 1,
         "agentFramework": 10,
-        "infrastructure": 18,
+        "infrastructure": 19,
         "core": 22,
         "tests": 4,
         "docs": 9,
@@ -6034,11 +6076,11 @@
     "activeOwners": 16,
     "externalOwners": 4,
     "activeExternalOwners": 2,
-    "divergentBranches": 246,
-    "externalDivergentBranches": 9,
-    "distinctChanges": 216,
-    "externalDistinctChanges": 9,
-    "changedLines": 862994,
+    "divergentBranches": 248,
+    "externalDivergentBranches": 10,
+    "distinctChanges": 218,
+    "externalDistinctChanges": 10,
+    "changedLines": 1061015,
     "unclassifiedLines": 11160,
     "trafficRepos": [
       "gke-labs/devops-bench"
@@ -6047,8 +6089,8 @@
   "derived": {
     "externalOwnerRatio": 0.2222222222222222,
     "activeExternalOwnerRatio": 0.125,
-    "externalBranchRatio": 0.036585365853658534,
-    "externalChangeRatio": 0.041666666666666664,
-    "unclassifiedLineRate": 0.012931723743154645
+    "externalBranchRatio": 0.04032258064516129,
+    "externalChangeRatio": 0.045871559633027525,
+    "unclassifiedLineRate": 0.010518230185247146
   }
 }

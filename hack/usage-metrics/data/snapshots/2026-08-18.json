@@ -2,14 +2,14 @@
   "apiVersion": "devops-bench.k8s.io/v1alpha1",
   "kind": "UsageSnapshot",
   "formatVersion": 2,
-  "collectedAt": "2026-08-18T16:45:08Z",
+  "collectedAt": "2026-08-18T23:20:02Z",
   "windowDays": 14,
   "partial": false,
   "skipped": [],
   "provenance": {
-    "collectorSha": "79b0041348ef360cc55bb1abb159d5f0338511f0",
-    "workflowRunUrl": null,
-    "writtenAt": "2026-08-18T16:45:08Z"
+    "collectorSha": "173f1cbc6e0acb6312693dea5e168b49b6b7223b",
+    "workflowRunUrl": "https://github.com/eugeneng04/devops-bench/actions/runs/32196710718",
+    "writtenAt": "2026-08-18T23:20:02Z"
   },
   "repos": {
     "gke-labs/devops-bench": {
@@ -21,7 +21,7 @@
           "openIssuesAndPulls": 33,
           "defaultBranch": "main",
           "createdAt": "2026-04-14T22:44:20Z",
-          "pushedAt": "2026-08-18T04:25:50Z"
+          "pushedAt": "2026-08-18T19:15:19Z"
         },
         "unavailable": null
       },
@@ -45952,7 +45952,7 @@
               "fullName": "eugeneng04/devops-bench",
               "owner": "eugeneng04",
               "createdAt": "2026-06-24T16:13:44Z",
-              "pushedAt": "2026-08-14T17:32:06Z",
+              "pushedAt": "2026-08-18T22:54:23Z",
               "forksOfThisFork": 0,
               "branches": [
                 {
@@ -48101,6 +48101,159 @@
                     {
                       "path": "tests/unit/agents/test_hermes_parsing.py",
                       "changes": 329
+                    }
+                  ],
+                  "unavailable": null
+                },
+                {
+                  "name": "main",
+                  "headSha": "173f1cbc6e0acb6312693dea5e168b49b6b7223b",
+                  "aheadBy": 6,
+                  "behindBy": 0,
+                  "totalCommits": 6,
+                  "commitsReturned": 6,
+                  "filesReturned": 32,
+                  "authors": [
+                    {
+                      "login": "eugeneng04",
+                      "commits": 6
+                    }
+                  ],
+                  "authorsComplete": true,
+                  "commitsUnattributed": 0,
+                  "baseSha": "89fd6df1e570652f32ed82380fc4849731890141",
+                  "mergeBaseSha": "89fd6df1e570652f32ed82380fc4849731890141",
+                  "headCommittedAt": "2026-08-18T22:54:17Z",
+                  "additions": 196094,
+                  "deletions": 0,
+                  "files": [
+                    {
+                      "path": ".github/workflows/usage-metrics.yml",
+                      "changes": 108
+                    },
+                    {
+                      "path": "docs/.nojekyll",
+                      "changes": 0
+                    },
+                    {
+                      "path": "docs/index.html",
+                      "changes": 1038
+                    },
+                    {
+                      "path": "hack/telemetry-metrics/.gitignore",
+                      "changes": 2
+                    },
+                    {
+                      "path": "hack/telemetry-metrics/README.md",
+                      "changes": 90
+                    },
+                    {
+                      "path": "hack/telemetry-metrics/aggregate.py",
+                      "changes": 302
+                    },
+                    {
+                      "path": "hack/telemetry-metrics/dashboard.html",
+                      "changes": 1064
+                    },
+                    {
+                      "path": "hack/telemetry-metrics/dashboard.template.html",
+                      "changes": 1064
+                    },
+                    {
+                      "path": "hack/telemetry-metrics/inventory.py",
+                      "changes": 46
+                    },
+                    {
+                      "path": "hack/telemetry-metrics/render.py",
+                      "changes": 56
+                    },
+                    {
+                      "path": "hack/telemetry-metrics/simulate.py",
+                      "changes": 236
+                    },
+                    {
+                      "path": "hack/usage-metrics/.gitignore",
+                      "changes": 14
+                    },
+                    {
+                      "path": "hack/usage-metrics/METRICS_PLAN.md",
+                      "changes": 488
+                    },
+                    {
+                      "path": "hack/usage-metrics/PRODUCTION_PLAN.md",
+                      "changes": 1019
+                    },
+                    {
+                      "path": "hack/usage-metrics/README.md",
+                      "changes": 282
+                    },
+                    {
+                      "path": "hack/usage-metrics/affiliation.json",
+                      "changes": 26
+                    },
+                    {
+                      "path": "hack/usage-metrics/classify.py",
+                      "changes": 513
+                    },
+                    {
+                      "path": "hack/usage-metrics/collect.py",
+                      "changes": 761
+                    },
+                    {
+                      "path": "hack/usage-metrics/dashboard.template.html",
+                      "changes": 1038
+                    },
+                    {
+                      "path": "hack/usage-metrics/data/classified/2026-08-12.json",
+                      "changes": 5418
+                    },
+                    {
+                      "path": "hack/usage-metrics/data/classified/2026-08-18.json",
+                      "changes": 6054
+                    },
+                    {
+                      "path": "hack/usage-metrics/data/series/latest.json",
+                      "changes": 298
+                    },
+                    {
+                      "path": "hack/usage-metrics/data/snapshots/2026-08-11.json",
+                      "changes": 26239
+                    },
+                    {
+                      "path": "hack/usage-metrics/data/snapshots/2026-08-12.json",
+                      "changes": 72561
+                    },
+                    {
+                      "path": "hack/usage-metrics/data/snapshots/2026-08-18.json",
+                      "changes": 75488
+                    },
+                    {
+                      "path": "hack/usage-metrics/ghclient.py",
+                      "changes": 243
+                    },
+                    {
+                      "path": "hack/usage-metrics/render.py",
+                      "changes": 72
+                    },
+                    {
+                      "path": "hack/usage-metrics/series.py",
+                      "changes": 290
+                    },
+                    {
+                      "path": "hack/usage-metrics/store.py",
+                      "changes": 167
+                    },
+                    {
+                      "path": "hack/usage-metrics/test_classify.py",
+                      "changes": 408
+                    },
+                    {
+                      "path": "hack/usage-metrics/test_collect.py",
+                      "changes": 474
+                    },
+                    {
+                      "path": "hack/usage-metrics/test_series.py",
+                      "changes": 235
                     }
                   ],
                   "unavailable": null
@@ -61125,13 +61278,13 @@
                 "type": "User",
                 "isBot": false
               },
-              "additions": 326,
+              "additions": 329,
               "deletions": 0,
               "changedFiles": 3,
               "files": [
                 {
                   "path": ".agents/references/harness-capabilities.md",
-                  "additions": 40,
+                  "additions": 43,
                   "deletions": 0
                 },
                 {
@@ -61172,9 +61325,27 @@
                     "type": "User",
                     "isBot": false
                   }
+                },
+                {
+                  "state": "COMMENTED",
+                  "submittedAt": "2026-08-18T20:32:46Z",
+                  "author": {
+                    "login": "jessie1111101",
+                    "type": "User",
+                    "isBot": false
+                  }
+                },
+                {
+                  "state": "COMMENTED",
+                  "submittedAt": "2026-08-18T20:32:48Z",
+                  "author": {
+                    "login": "jessie1111101",
+                    "type": "User",
+                    "isBot": false
+                  }
                 }
               ],
-              "reviewCount": 3,
+              "reviewCount": 5,
               "comments": [
                 {
                   "createdAt": "2026-07-29T18:28:36Z",
@@ -62122,9 +62293,36 @@
                     "type": "User",
                     "isBot": false
                   }
+                },
+                {
+                  "state": "COMMENTED",
+                  "submittedAt": "2026-08-18T20:32:49Z",
+                  "author": {
+                    "login": "jessie1111101",
+                    "type": "User",
+                    "isBot": false
+                  }
+                },
+                {
+                  "state": "COMMENTED",
+                  "submittedAt": "2026-08-18T20:32:50Z",
+                  "author": {
+                    "login": "jessie1111101",
+                    "type": "User",
+                    "isBot": false
+                  }
+                },
+                {
+                  "state": "COMMENTED",
+                  "submittedAt": "2026-08-18T20:32:52Z",
+                  "author": {
+                    "login": "jessie1111101",
+                    "type": "User",
+                    "isBot": false
+                  }
                 }
               ],
-              "reviewCount": 4,
+              "reviewCount": 7,
               "comments": [
                 {
                   "createdAt": "2026-07-31T21:43:37Z",
@@ -62338,9 +62536,36 @@
                     "type": "User",
                     "isBot": false
                   }
+                },
+                {
+                  "state": "COMMENTED",
+                  "submittedAt": "2026-08-18T20:33:04Z",
+                  "author": {
+                    "login": "jessie1111101",
+                    "type": "User",
+                    "isBot": false
+                  }
+                },
+                {
+                  "state": "COMMENTED",
+                  "submittedAt": "2026-08-18T20:33:05Z",
+                  "author": {
+                    "login": "jessie1111101",
+                    "type": "User",
+                    "isBot": false
+                  }
+                },
+                {
+                  "state": "COMMENTED",
+                  "submittedAt": "2026-08-18T20:33:07Z",
+                  "author": {
+                    "login": "jessie1111101",
+                    "type": "User",
+                    "isBot": false
+                  }
                 }
               ],
-              "reviewCount": 7,
+              "reviewCount": 10,
               "comments": [
                 {
                   "createdAt": "2026-07-31T21:57:38Z",
@@ -62398,8 +62623,8 @@
                 "type": "User",
                 "isBot": false
               },
-              "additions": 632,
-              "deletions": 30,
+              "additions": 614,
+              "deletions": 39,
               "changedFiles": 12,
               "files": [
                 {
@@ -62418,9 +62643,34 @@
                   "deletions": 3
                 },
                 {
+                  "path": "tf/modules/cluster/vcluster/.terraform.lock.hcl",
+                  "additions": 37,
+                  "deletions": 0
+                },
+                {
+                  "path": "tf/modules/cluster/vcluster/main.tf",
+                  "additions": 160,
+                  "deletions": 0
+                },
+                {
+                  "path": "tf/modules/cluster/vcluster/outputs.tf",
+                  "additions": 34,
+                  "deletions": 0
+                },
+                {
+                  "path": "tf/modules/cluster/vcluster/values.yaml.tftpl",
+                  "additions": 83,
+                  "deletions": 0
+                },
+                {
+                  "path": "tf/modules/cluster/vcluster/variables.tf",
+                  "additions": 108,
+                  "deletions": 0
+                },
+                {
                   "path": "tf/prebuilt/opa-remediation/main.tf",
-                  "additions": 10,
-                  "deletions": 2
+                  "additions": 19,
+                  "deletions": 11
                 },
                 {
                   "path": "tf/prebuilt/opa-remediation/outputs.tf",
@@ -62435,31 +62685,6 @@
                 {
                   "path": "tf/prebuilt/opa-remediation/variables.tf",
                   "additions": 12,
-                  "deletions": 0
-                },
-                {
-                  "path": "tf/prebuilt/vcluster/.terraform.lock.hcl",
-                  "additions": 37,
-                  "deletions": 0
-                },
-                {
-                  "path": "tf/prebuilt/vcluster/main.tf",
-                  "additions": 175,
-                  "deletions": 0
-                },
-                {
-                  "path": "tf/prebuilt/vcluster/outputs.tf",
-                  "additions": 34,
-                  "deletions": 0
-                },
-                {
-                  "path": "tf/prebuilt/vcluster/values.yaml.tftpl",
-                  "additions": 95,
-                  "deletions": 0
-                },
-                {
-                  "path": "tf/prebuilt/vcluster/variables.tf",
-                  "additions": 108,
                   "deletions": 0
                 }
               ],
@@ -62535,9 +62760,45 @@
                     "type": "Bot",
                     "isBot": true
                   }
+                },
+                {
+                  "state": "COMMENTED",
+                  "submittedAt": "2026-08-18T19:23:21Z",
+                  "author": {
+                    "login": "itssimrank",
+                    "type": "User",
+                    "isBot": false
+                  }
+                },
+                {
+                  "state": "COMMENTED",
+                  "submittedAt": "2026-08-18T19:27:30Z",
+                  "author": {
+                    "login": "itssimrank",
+                    "type": "User",
+                    "isBot": false
+                  }
+                },
+                {
+                  "state": "COMMENTED",
+                  "submittedAt": "2026-08-18T19:30:18Z",
+                  "author": {
+                    "login": "itssimrank",
+                    "type": "User",
+                    "isBot": false
+                  }
+                },
+                {
+                  "state": "COMMENTED",
+                  "submittedAt": "2026-08-18T19:32:15Z",
+                  "author": {
+                    "login": "itssimrank",
+                    "type": "User",
+                    "isBot": false
+                  }
                 }
               ],
-              "reviewCount": 8,
+              "reviewCount": 12,
               "comments": [
                 {
                   "createdAt": "2026-07-31T22:04:41Z",
@@ -63238,8 +63499,8 @@
                 "type": "User",
                 "isBot": false
               },
-              "additions": 1604,
-              "deletions": 57,
+              "additions": 1586,
+              "deletions": 66,
               "changedFiles": 21,
               "files": [
                 {
@@ -63303,9 +63564,34 @@
                   "deletions": 3
                 },
                 {
+                  "path": "tf/modules/cluster/vcluster/.terraform.lock.hcl",
+                  "additions": 37,
+                  "deletions": 0
+                },
+                {
+                  "path": "tf/modules/cluster/vcluster/main.tf",
+                  "additions": 160,
+                  "deletions": 0
+                },
+                {
+                  "path": "tf/modules/cluster/vcluster/outputs.tf",
+                  "additions": 34,
+                  "deletions": 0
+                },
+                {
+                  "path": "tf/modules/cluster/vcluster/values.yaml.tftpl",
+                  "additions": 83,
+                  "deletions": 0
+                },
+                {
+                  "path": "tf/modules/cluster/vcluster/variables.tf",
+                  "additions": 108,
+                  "deletions": 0
+                },
+                {
                   "path": "tf/prebuilt/opa-remediation/main.tf",
-                  "additions": 10,
-                  "deletions": 2
+                  "additions": 19,
+                  "deletions": 11
                 },
                 {
                   "path": "tf/prebuilt/opa-remediation/outputs.tf",
@@ -63320,31 +63606,6 @@
                 {
                   "path": "tf/prebuilt/opa-remediation/variables.tf",
                   "additions": 12,
-                  "deletions": 0
-                },
-                {
-                  "path": "tf/prebuilt/vcluster/.terraform.lock.hcl",
-                  "additions": 37,
-                  "deletions": 0
-                },
-                {
-                  "path": "tf/prebuilt/vcluster/main.tf",
-                  "additions": 175,
-                  "deletions": 0
-                },
-                {
-                  "path": "tf/prebuilt/vcluster/outputs.tf",
-                  "additions": 34,
-                  "deletions": 0
-                },
-                {
-                  "path": "tf/prebuilt/vcluster/values.yaml.tftpl",
-                  "additions": 95,
-                  "deletions": 0
-                },
-                {
-                  "path": "tf/prebuilt/vcluster/variables.tf",
-                  "additions": 108,
                   "deletions": 0
                 }
               ],
@@ -63402,9 +63663,18 @@
                     "type": "Bot",
                     "isBot": true
                   }
+                },
+                {
+                  "state": "CHANGES_REQUESTED",
+                  "submittedAt": "2026-08-18T20:11:29Z",
+                  "author": {
+                    "login": "coderabbitai",
+                    "type": "Bot",
+                    "isBot": true
+                  }
                 }
               ],
-              "reviewCount": 6,
+              "reviewCount": 7,
               "comments": [
                 {
                   "createdAt": "2026-08-06T20:09:55Z",
@@ -63454,8 +63724,8 @@
                 "type": "User",
                 "isBot": false
               },
-              "additions": 1707,
-              "deletions": 93,
+              "additions": 1689,
+              "deletions": 102,
               "changedFiles": 23,
               "files": [
                 {
@@ -63529,9 +63799,34 @@
                   "deletions": 3
                 },
                 {
+                  "path": "tf/modules/cluster/vcluster/.terraform.lock.hcl",
+                  "additions": 37,
+                  "deletions": 0
+                },
+                {
+                  "path": "tf/modules/cluster/vcluster/main.tf",
+                  "additions": 160,
+                  "deletions": 0
+                },
+                {
+                  "path": "tf/modules/cluster/vcluster/outputs.tf",
+                  "additions": 34,
+                  "deletions": 0
+                },
+                {
+                  "path": "tf/modules/cluster/vcluster/values.yaml.tftpl",
+                  "additions": 83,
+                  "deletions": 0
+                },
+                {
+                  "path": "tf/modules/cluster/vcluster/variables.tf",
+                  "additions": 108,
+                  "deletions": 0
+                },
+                {
                   "path": "tf/prebuilt/opa-remediation/main.tf",
-                  "additions": 10,
-                  "deletions": 2
+                  "additions": 19,
+                  "deletions": 11
                 },
                 {
                   "path": "tf/prebuilt/opa-remediation/outputs.tf",
@@ -63546,31 +63841,6 @@
                 {
                   "path": "tf/prebuilt/opa-remediation/variables.tf",
                   "additions": 12,
-                  "deletions": 0
-                },
-                {
-                  "path": "tf/prebuilt/vcluster/.terraform.lock.hcl",
-                  "additions": 37,
-                  "deletions": 0
-                },
-                {
-                  "path": "tf/prebuilt/vcluster/main.tf",
-                  "additions": 175,
-                  "deletions": 0
-                },
-                {
-                  "path": "tf/prebuilt/vcluster/outputs.tf",
-                  "additions": 34,
-                  "deletions": 0
-                },
-                {
-                  "path": "tf/prebuilt/vcluster/values.yaml.tftpl",
-                  "additions": 95,
-                  "deletions": 0
-                },
-                {
-                  "path": "tf/prebuilt/vcluster/variables.tf",
-                  "additions": 108,
                   "deletions": 0
                 }
               ],
@@ -65183,17 +65453,9 @@
                     "type": "Bot",
                     "isBot": true
                   }
-                },
-                {
-                  "createdAt": "2026-08-18T16:46:26Z",
-                  "author": {
-                    "login": "eugeneng04",
-                    "type": "User",
-                    "isBot": false
-                  }
                 }
               ],
-              "commentCount": 4
+              "commentCount": 3
             }
           ]
         },
@@ -66611,34 +66873,34 @@
               "fullName": "jessie1111101/devops-bench-upstream",
               "owner": "jessie1111101",
               "createdAt": "2026-07-07T18:07:22Z",
-              "pushedAt": "2026-08-17T21:22:27Z",
+              "pushedAt": "2026-08-18T20:32:32Z",
               "forksOfThisFork": 0,
               "branches": [
                 {
                   "name": "add-agents-docs",
-                  "headSha": "f9b3d6e53f4e9e0fea994db30356de3ae25fe1a1",
-                  "aheadBy": 1,
+                  "headSha": "27beb6ab076f88cd9b325a40bdc71947460e6dc7",
+                  "aheadBy": 2,
                   "behindBy": 10,
-                  "totalCommits": 1,
-                  "commitsReturned": 1,
+                  "totalCommits": 2,
+                  "commitsReturned": 2,
                   "filesReturned": 3,
                   "authors": [
                     {
                       "login": "jessie1111101",
-                      "commits": 1
+                      "commits": 2
                     }
                   ],
                   "authorsComplete": true,
                   "commitsUnattributed": 0,
                   "baseSha": "547c7ea17e81d199bba8186065c3bc0b6c4a23ac",
                   "mergeBaseSha": "bef4468894593e76506685fafc7790cae3975d9d",
-                  "headCommittedAt": "2026-07-29T18:28:09Z",
-                  "additions": 326,
+                  "headCommittedAt": "2026-08-18T20:32:31Z",
+                  "additions": 329,
                   "deletions": 0,
                   "files": [
                     {
                       "path": ".agents/references/harness-capabilities.md",
-                      "changes": 40
+                      "changes": 43
                     },
                     {
                       "path": "docs/components/agents.md",
@@ -66706,23 +66968,23 @@
                 },
                 {
                   "name": "add-cleanup-skill",
-                  "headSha": "8dba8acfcdbc2cd099c3afe7e3ca6a5533336a4c",
-                  "aheadBy": 2,
+                  "headSha": "badc9b38dec243bd5acd816af1bd248348e58283",
+                  "aheadBy": 3,
                   "behindBy": 1,
-                  "totalCommits": 2,
-                  "commitsReturned": 2,
+                  "totalCommits": 3,
+                  "commitsReturned": 3,
                   "filesReturned": 2,
                   "authors": [
                     {
                       "login": "jessie1111101",
-                      "commits": 2
+                      "commits": 3
                     }
                   ],
                   "authorsComplete": true,
                   "commitsUnattributed": 0,
                   "baseSha": "547c7ea17e81d199bba8186065c3bc0b6c4a23ac",
                   "mergeBaseSha": "4670d76dcc497e8f515d51c2bb6bad6ced7100b6",
-                  "headCommittedAt": "2026-08-01T00:10:01Z",
+                  "headCommittedAt": "2026-08-18T20:32:13Z",
                   "additions": 200,
                   "deletions": 0,
                   "files": [
@@ -67116,23 +67378,23 @@
                 },
                 {
                   "name": "add-review-skills",
-                  "headSha": "b0b40ebc1c99b4e50a3416518a7f1b34eec8ed20",
-                  "aheadBy": 3,
+                  "headSha": "9d47e8a4258913b82e20f37f87abb31503c97776",
+                  "aheadBy": 4,
                   "behindBy": 1,
-                  "totalCommits": 3,
-                  "commitsReturned": 3,
+                  "totalCommits": 4,
+                  "commitsReturned": 4,
                   "filesReturned": 4,
                   "authors": [
                     {
                       "login": "jessie1111101",
-                      "commits": 3
+                      "commits": 4
                     }
                   ],
                   "authorsComplete": true,
                   "commitsUnattributed": 0,
                   "baseSha": "547c7ea17e81d199bba8186065c3bc0b6c4a23ac",
                   "mergeBaseSha": "4670d76dcc497e8f515d51c2bb6bad6ced7100b6",
-                  "headCommittedAt": "2026-08-13T17:15:35Z",
+                  "headCommittedAt": "2026-08-18T20:31:31Z",
                   "additions": 526,
                   "deletions": 0,
                   "files": [
@@ -72312,30 +72574,159 @@
               "fullName": "isadominguez314/devops-bench",
               "owner": "isadominguez314",
               "createdAt": "2026-07-31T22:04:31Z",
-              "pushedAt": "2026-08-12T21:45:36Z",
+              "pushedAt": "2026-08-18T20:04:51Z",
               "forksOfThisFork": 0,
               "branches": [
                 {
-                  "name": "feat/vcluster-factory-and-smoke-test",
-                  "headSha": "49bef7c79de1ffe871ababd6f53e1d0b2657e1ba",
-                  "aheadBy": 4,
+                  "name": "feat/chaos-dynamic-port-and-notes",
+                  "headSha": "0b78699b0c072538bc764c527a1ef7638d99a470",
+                  "aheadBy": 6,
                   "behindBy": 1,
-                  "totalCommits": 4,
-                  "commitsReturned": 4,
-                  "filesReturned": 23,
+                  "totalCommits": 6,
+                  "commitsReturned": 6,
+                  "filesReturned": 26,
                   "authors": [
                     {
                       "login": "isadominguez314",
-                      "commits": 4
+                      "commits": 6
                     }
                   ],
                   "authorsComplete": true,
                   "commitsUnattributed": 0,
                   "baseSha": "547c7ea17e81d199bba8186065c3bc0b6c4a23ac",
                   "mergeBaseSha": "4670d76dcc497e8f515d51c2bb6bad6ced7100b6",
-                  "headCommittedAt": "2026-08-12T20:44:36Z",
-                  "additions": 1707,
-                  "deletions": 93,
+                  "headCommittedAt": "2026-08-18T17:52:23Z",
+                  "additions": 1856,
+                  "deletions": 94,
+                  "files": [
+                    {
+                      "path": "devops_bench/chaos/faults/generate_load.py",
+                      "changes": 8
+                    },
+                    {
+                      "path": "devops_bench/deployers/factory.py",
+                      "changes": 35
+                    },
+                    {
+                      "path": "devops_bench/deployers/tofu.py",
+                      "changes": 83
+                    },
+                    {
+                      "path": "devops_bench/providers/__init__.py",
+                      "changes": 1
+                    },
+                    {
+                      "path": "devops_bench/providers/base.py",
+                      "changes": 22
+                    },
+                    {
+                      "path": "devops_bench/providers/gcp.py",
+                      "changes": 16
+                    },
+                    {
+                      "path": "devops_bench/providers/kind.py",
+                      "changes": 16
+                    },
+                    {
+                      "path": "devops_bench/providers/vcluster.py",
+                      "changes": 417
+                    },
+                    {
+                      "path": "docs/fault-notes.md",
+                      "changes": 142
+                    },
+                    {
+                      "path": "tasks/common/opa-remediation/task.yaml",
+                      "changes": 15
+                    },
+                    {
+                      "path": "tests/unit/deployers/test_deployers_factory.py",
+                      "changes": 104
+                    },
+                    {
+                      "path": "tests/unit/deployers/test_deployers_tofu.py",
+                      "changes": 59
+                    },
+                    {
+                      "path": "tests/unit/providers/test_providers.py",
+                      "changes": 3
+                    },
+                    {
+                      "path": "tests/unit/providers/test_vcluster_provider.py",
+                      "changes": 382
+                    },
+                    {
+                      "path": "tf/modules/cluster/main.tf",
+                      "changes": 22
+                    },
+                    {
+                      "path": "tf/modules/cluster/outputs.tf",
+                      "changes": 14
+                    },
+                    {
+                      "path": "tf/modules/cluster/variables.tf",
+                      "changes": 24
+                    },
+                    {
+                      "path": "tf/prebuilt/opa-remediation/main.tf",
+                      "changes": 12
+                    },
+                    {
+                      "path": "tf/prebuilt/opa-remediation/outputs.tf",
+                      "changes": 6
+                    },
+                    {
+                      "path": "tf/prebuilt/opa-remediation/scripts/setup.sh",
+                      "changes": 123
+                    },
+                    {
+                      "path": "tf/prebuilt/opa-remediation/variables.tf",
+                      "changes": 24
+                    },
+                    {
+                      "path": "tf/prebuilt/vcluster/.terraform.lock.hcl",
+                      "changes": 37
+                    },
+                    {
+                      "path": "tf/prebuilt/vcluster/main.tf",
+                      "changes": 160
+                    },
+                    {
+                      "path": "tf/prebuilt/vcluster/outputs.tf",
+                      "changes": 34
+                    },
+                    {
+                      "path": "tf/prebuilt/vcluster/values.yaml.tftpl",
+                      "changes": 83
+                    },
+                    {
+                      "path": "tf/prebuilt/vcluster/variables.tf",
+                      "changes": 108
+                    }
+                  ],
+                  "unavailable": null
+                },
+                {
+                  "name": "feat/vcluster-factory-and-smoke-test",
+                  "headSha": "59053d9844203984828482b6e250ab9170564199",
+                  "aheadBy": 6,
+                  "behindBy": 1,
+                  "totalCommits": 6,
+                  "commitsReturned": 6,
+                  "filesReturned": 23,
+                  "authors": [
+                    {
+                      "login": "isadominguez314",
+                      "commits": 6
+                    }
+                  ],
+                  "authorsComplete": true,
+                  "commitsUnattributed": 0,
+                  "baseSha": "547c7ea17e81d199bba8186065c3bc0b6c4a23ac",
+                  "mergeBaseSha": "4670d76dcc497e8f515d51c2bb6bad6ced7100b6",
+                  "headCommittedAt": "2026-08-18T20:04:43Z",
+                  "additions": 1689,
+                  "deletions": 102,
                   "files": [
                     {
                       "path": "devops_bench/deployers/factory.py",
@@ -72394,8 +72785,28 @@
                       "changes": 24
                     },
                     {
+                      "path": "tf/modules/cluster/vcluster/.terraform.lock.hcl",
+                      "changes": 37
+                    },
+                    {
+                      "path": "tf/modules/cluster/vcluster/main.tf",
+                      "changes": 160
+                    },
+                    {
+                      "path": "tf/modules/cluster/vcluster/outputs.tf",
+                      "changes": 34
+                    },
+                    {
+                      "path": "tf/modules/cluster/vcluster/values.yaml.tftpl",
+                      "changes": 83
+                    },
+                    {
+                      "path": "tf/modules/cluster/vcluster/variables.tf",
+                      "changes": 108
+                    },
+                    {
                       "path": "tf/prebuilt/opa-remediation/main.tf",
-                      "changes": 12
+                      "changes": 30
                     },
                     {
                       "path": "tf/prebuilt/opa-remediation/outputs.tf",
@@ -72408,51 +72819,31 @@
                     {
                       "path": "tf/prebuilt/opa-remediation/variables.tf",
                       "changes": 12
-                    },
-                    {
-                      "path": "tf/prebuilt/vcluster/.terraform.lock.hcl",
-                      "changes": 37
-                    },
-                    {
-                      "path": "tf/prebuilt/vcluster/main.tf",
-                      "changes": 175
-                    },
-                    {
-                      "path": "tf/prebuilt/vcluster/outputs.tf",
-                      "changes": 34
-                    },
-                    {
-                      "path": "tf/prebuilt/vcluster/values.yaml.tftpl",
-                      "changes": 95
-                    },
-                    {
-                      "path": "tf/prebuilt/vcluster/variables.tf",
-                      "changes": 108
                     }
                   ],
                   "unavailable": null
                 },
                 {
                   "name": "feat/vcluster-provider-integration",
-                  "headSha": "423baac2bd432344aa40b2a37df2108747e5a994",
-                  "aheadBy": 3,
+                  "headSha": "b93e21a10f4c389416c0b7cc2ad078726a27e800",
+                  "aheadBy": 5,
                   "behindBy": 1,
-                  "totalCommits": 3,
-                  "commitsReturned": 3,
+                  "totalCommits": 5,
+                  "commitsReturned": 5,
                   "filesReturned": 21,
                   "authors": [
                     {
                       "login": "isadominguez314",
-                      "commits": 3
+                      "commits": 5
                     }
                   ],
                   "authorsComplete": true,
                   "commitsUnattributed": 0,
                   "baseSha": "547c7ea17e81d199bba8186065c3bc0b6c4a23ac",
                   "mergeBaseSha": "4670d76dcc497e8f515d51c2bb6bad6ced7100b6",
-                  "headCommittedAt": "2026-08-12T20:44:36Z",
-                  "additions": 1604,
-                  "deletions": 57,
+                  "headCommittedAt": "2026-08-18T20:04:35Z",
+                  "additions": 1586,
+                  "deletions": 66,
                   "files": [
                     {
                       "path": "devops_bench/deployers/tofu.py",
@@ -72503,8 +72894,28 @@
                       "changes": 24
                     },
                     {
+                      "path": "tf/modules/cluster/vcluster/.terraform.lock.hcl",
+                      "changes": 37
+                    },
+                    {
+                      "path": "tf/modules/cluster/vcluster/main.tf",
+                      "changes": 160
+                    },
+                    {
+                      "path": "tf/modules/cluster/vcluster/outputs.tf",
+                      "changes": 34
+                    },
+                    {
+                      "path": "tf/modules/cluster/vcluster/values.yaml.tftpl",
+                      "changes": 83
+                    },
+                    {
+                      "path": "tf/modules/cluster/vcluster/variables.tf",
+                      "changes": 108
+                    },
+                    {
                       "path": "tf/prebuilt/opa-remediation/main.tf",
-                      "changes": 12
+                      "changes": 30
                     },
                     {
                       "path": "tf/prebuilt/opa-remediation/outputs.tf",
@@ -72517,51 +72928,31 @@
                     {
                       "path": "tf/prebuilt/opa-remediation/variables.tf",
                       "changes": 12
-                    },
-                    {
-                      "path": "tf/prebuilt/vcluster/.terraform.lock.hcl",
-                      "changes": 37
-                    },
-                    {
-                      "path": "tf/prebuilt/vcluster/main.tf",
-                      "changes": 175
-                    },
-                    {
-                      "path": "tf/prebuilt/vcluster/outputs.tf",
-                      "changes": 34
-                    },
-                    {
-                      "path": "tf/prebuilt/vcluster/values.yaml.tftpl",
-                      "changes": 95
-                    },
-                    {
-                      "path": "tf/prebuilt/vcluster/variables.tf",
-                      "changes": 108
                     }
                   ],
                   "unavailable": null
                 },
                 {
                   "name": "feat/vcluster-tf-stack",
-                  "headSha": "4ec42aeefc5a4a14729703dff99319d742ff6db4",
-                  "aheadBy": 2,
+                  "headSha": "427593912ca64f758bcdf2cef0eff0fdf80e494f",
+                  "aheadBy": 4,
                   "behindBy": 1,
-                  "totalCommits": 2,
-                  "commitsReturned": 2,
+                  "totalCommits": 4,
+                  "commitsReturned": 4,
                   "filesReturned": 12,
                   "authors": [
                     {
                       "login": "isadominguez314",
-                      "commits": 2
+                      "commits": 4
                     }
                   ],
                   "authorsComplete": true,
                   "commitsUnattributed": 0,
                   "baseSha": "547c7ea17e81d199bba8186065c3bc0b6c4a23ac",
                   "mergeBaseSha": "4670d76dcc497e8f515d51c2bb6bad6ced7100b6",
-                  "headCommittedAt": "2026-08-12T20:44:17Z",
-                  "additions": 632,
-                  "deletions": 30,
+                  "headCommittedAt": "2026-08-18T20:02:08Z",
+                  "additions": 614,
+                  "deletions": 39,
                   "files": [
                     {
                       "path": "tf/modules/cluster/main.tf",
@@ -72576,8 +72967,28 @@
                       "changes": 24
                     },
                     {
+                      "path": "tf/modules/cluster/vcluster/.terraform.lock.hcl",
+                      "changes": 37
+                    },
+                    {
+                      "path": "tf/modules/cluster/vcluster/main.tf",
+                      "changes": 160
+                    },
+                    {
+                      "path": "tf/modules/cluster/vcluster/outputs.tf",
+                      "changes": 34
+                    },
+                    {
+                      "path": "tf/modules/cluster/vcluster/values.yaml.tftpl",
+                      "changes": 83
+                    },
+                    {
+                      "path": "tf/modules/cluster/vcluster/variables.tf",
+                      "changes": 108
+                    },
+                    {
                       "path": "tf/prebuilt/opa-remediation/main.tf",
-                      "changes": 12
+                      "changes": 30
                     },
                     {
                       "path": "tf/prebuilt/opa-remediation/outputs.tf",
@@ -72590,26 +73001,6 @@
                     {
                       "path": "tf/prebuilt/opa-remediation/variables.tf",
                       "changes": 12
-                    },
-                    {
-                      "path": "tf/prebuilt/vcluster/.terraform.lock.hcl",
-                      "changes": 37
-                    },
-                    {
-                      "path": "tf/prebuilt/vcluster/main.tf",
-                      "changes": 175
-                    },
-                    {
-                      "path": "tf/prebuilt/vcluster/outputs.tf",
-                      "changes": 34
-                    },
-                    {
-                      "path": "tf/prebuilt/vcluster/values.yaml.tftpl",
-                      "changes": 95
-                    },
-                    {
-                      "path": "tf/prebuilt/vcluster/variables.tf",
-                      "changes": 108
                     }
                   ],
                   "unavailable": null
@@ -74294,19 +74685,19 @@
   },
   "budget": {
     "core": {
-      "remaining": 4647,
+      "remaining": 4638,
       "limit": 5000,
-      "reset": 1787075010
+      "reset": 1787096626
     },
     "graphql": {
-      "remaining": 4936,
+      "remaining": 4970,
       "limit": 5000,
-      "reset": 1787073133
+      "reset": 1787098222
     },
     "code_search": {
       "remaining": 5,
       "limit": 10,
-      "reset": 1787071820
+      "reset": 1787095471
     }
   },
   "apiCalls": 377,
@@ -74738,14 +75129,6 @@
               "path": "devops_bench/agents/api/__init__.py"
             },
             {
-              "repo": "kubernetes-sigs/devops-bench",
-              "path": "devops_bench/agents/__init__.py"
-            },
-            {
-              "repo": "kubernetes-sigs/devops-bench",
-              "path": "devops_bench/agents/api/__init__.py"
-            },
-            {
               "repo": "gke-labs/devops-bench",
               "path": "devops_bench/cli.py"
             },
@@ -74790,16 +75173,8 @@
               "path": "tests/unit/metrics/test_package_import.py"
             },
             {
-              "repo": "kubernetes-sigs/devops-bench",
-              "path": "tests/unit/core/test_public_api.py"
-            },
-            {
               "repo": "gke-labs/devops-bench",
               "path": "tests/unit/evalharness/test_package_import.py"
-            },
-            {
-              "repo": "kubernetes-sigs/devops-bench",
-              "path": "tests/unit/run/test_package_import.py"
             },
             {
               "repo": "gke-labs/devops-bench",
@@ -74814,10 +75189,6 @@
               "path": "tests/unit/verification/test_package_import.py"
             },
             {
-              "repo": "kubernetes-sigs/devops-bench",
-              "path": "tests/unit/evalharness/test_package_import.py"
-            },
-            {
               "repo": "gke-labs/devops-bench",
               "path": "tests/unit/agents/api/test_agents_api_import_hygiene.py"
             },
@@ -74826,16 +75197,8 @@
               "path": "tests/unit/agents/test_agents_import_hygiene.py"
             },
             {
-              "repo": "kubernetes-sigs/devops-bench",
-              "path": "tests/unit/verification/test_package_import.py"
-            },
-            {
               "repo": "gke-labs/devops-bench",
               "path": "tests/unit/agents/test_agents_capabilities_import_hygiene.py"
-            },
-            {
-              "repo": "kubernetes-sigs/devops-bench",
-              "path": "tests/unit/agents/api/test_agents_api_import_hygiene.py"
             },
             {
               "repo": "kubernetes-sigs/devops-bench",
@@ -74859,15 +75222,7 @@
             },
             {
               "repo": "kubernetes-sigs/devops-bench",
-              "path": "tests/unit/models/test_loop.py"
-            },
-            {
-              "repo": "kubernetes-sigs/devops-bench",
               "path": "tests/unit/chaos/test_extension_axis.py"
-            },
-            {
-              "repo": "kubernetes-sigs/devops-bench",
-              "path": "tests/unit/agents/api/test_agents_api_mcp.py"
             },
             {
               "repo": "gke-labs/devops-bench",
@@ -74880,6 +75235,42 @@
             {
               "repo": "gke-labs/devops-bench",
               "path": "tests/unit/agents/api/test_agents_api_agent.py"
+            },
+            {
+              "repo": "kubernetes-sigs/devops-bench",
+              "path": "devops_bench/agents/__init__.py"
+            },
+            {
+              "repo": "kubernetes-sigs/devops-bench",
+              "path": "devops_bench/agents/api/__init__.py"
+            },
+            {
+              "repo": "kubernetes-sigs/devops-bench",
+              "path": "tests/unit/core/test_public_api.py"
+            },
+            {
+              "repo": "kubernetes-sigs/devops-bench",
+              "path": "tests/unit/run/test_package_import.py"
+            },
+            {
+              "repo": "kubernetes-sigs/devops-bench",
+              "path": "tests/unit/evalharness/test_package_import.py"
+            },
+            {
+              "repo": "kubernetes-sigs/devops-bench",
+              "path": "tests/unit/verification/test_package_import.py"
+            },
+            {
+              "repo": "kubernetes-sigs/devops-bench",
+              "path": "tests/unit/agents/api/test_agents_api_import_hygiene.py"
+            },
+            {
+              "repo": "kubernetes-sigs/devops-bench",
+              "path": "tests/unit/models/test_loop.py"
+            },
+            {
+              "repo": "kubernetes-sigs/devops-bench",
+              "path": "tests/unit/agents/api/test_agents_api_mcp.py"
             },
             {
               "repo": "kubernetes-sigs/devops-bench",
@@ -75481,8 +75872,15 @@
       "ryanzhang-oss",
       "toshiowang"
     ],
-    "source": "contributors API, plus every login seen outside it, frozen at first sighting",
-    "carriedFrom": null,
+    "overrides": {
+      "inside": [
+        "gke-labs",
+        "kubernetes-sigs"
+      ],
+      "outside": []
+    },
+    "source": "contributors API and commit authorship, overridden by affiliation.json, frozen at first sighting",
+    "carriedFrom": "2026-08-18",
     "frozenAt": "2026-08-18"
   }
 }

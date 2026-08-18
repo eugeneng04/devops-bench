@@ -2,11 +2,11 @@
   "apiVersion": "usage-metrics/v1",
   "kind": "UsageSeries",
   "formatVersion": 1,
-  "generatedAt": "2026-08-18T22:53:37Z",
+  "generatedAt": "2026-08-18T23:24:01Z",
   "provenance": {
-    "collectorSha": "79b0041348ef360cc55bb1abb159d5f0338511f0",
-    "workflowRunUrl": null,
-    "writtenAt": "2026-08-18T22:53:37Z"
+    "collectorSha": "173f1cbc6e0acb6312693dea5e168b49b6b7223b",
+    "workflowRunUrl": "https://github.com/eugeneng04/devops-bench/actions/runs/32196710718",
+    "writtenAt": "2026-08-18T23:24:01Z"
   },
   "unreadable": [
     {
@@ -80,7 +80,7 @@
     },
     {
       "date": "2026-08-18",
-      "collectedAt": "2026-08-18T16:45:08Z",
+      "collectedAt": "2026-08-18T23:20:02Z",
       "windowDays": 14,
       "totals": {
         "forks": 27,
@@ -90,11 +90,11 @@
         "activeOwners": 16,
         "externalOwners": 4,
         "activeExternalOwners": 2,
-        "divergentBranches": 246,
-        "externalDivergentBranches": 9,
-        "distinctChanges": 216,
-        "externalDistinctChanges": 9,
-        "changedLines": 862994,
+        "divergentBranches": 248,
+        "externalDivergentBranches": 10,
+        "distinctChanges": 218,
+        "externalDistinctChanges": 10,
+        "changedLines": 1061015,
         "unclassifiedLines": 11160,
         "trafficRepos": [
           "gke-labs/devops-bench"
@@ -103,9 +103,9 @@
       "derived": {
         "externalOwnerRatio": 0.2222222222222222,
         "activeExternalOwnerRatio": 0.125,
-        "externalBranchRatio": 0.036585365853658534,
-        "externalChangeRatio": 0.041666666666666664,
-        "unclassifiedLineRate": 0.012931723743154645
+        "externalBranchRatio": 0.04032258064516129,
+        "externalChangeRatio": 0.045871559633027525,
+        "unclassifiedLineRate": 0.010518230185247146
       },
       "affiliation": {
         "inside": 19,
@@ -136,9 +136,9 @@
         "forksUnavailable": []
       },
       "provenance": {
-        "collectorSha": "79b0041348ef360cc55bb1abb159d5f0338511f0",
-        "workflowRunUrl": null,
-        "writtenAt": "2026-08-18T16:45:08Z"
+        "collectorSha": "173f1cbc6e0acb6312693dea5e168b49b6b7223b",
+        "workflowRunUrl": "https://github.com/eugeneng04/devops-bench/actions/runs/32196710718",
+        "writtenAt": "2026-08-18T23:20:02Z"
       }
     }
   ],
