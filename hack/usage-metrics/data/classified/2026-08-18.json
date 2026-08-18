@@ -1,11 +1,11 @@
 {
   "formatVersion": 2,
-  "collectedAt": "2026-08-18T23:20:02Z",
+  "collectedAt": "2026-08-18T23:28:35Z",
   "windowDays": 14,
   "provenance": {
-    "collectorSha": "173f1cbc6e0acb6312693dea5e168b49b6b7223b",
-    "workflowRunUrl": "https://github.com/eugeneng04/devops-bench/actions/runs/32196710718",
-    "writtenAt": "2026-08-18T23:20:02Z"
+    "collectorSha": "b73e51fa0ee01a1cb56df0d980019c89ab0d1683",
+    "workflowRunUrl": "https://github.com/eugeneng04/devops-bench/actions/runs/32197315797",
+    "writtenAt": "2026-08-18T23:28:35Z"
   },
   "snapshotPartial": false,
   "snapshotSkipped": [],
@@ -3357,11 +3357,11 @@
                 "eugeneng04"
               ],
               "external": false,
-              "signature": "0287ef37db374674",
+              "signature": "bb7479fcbab5e462",
               "changedFiles": 32,
-              "additions": 196094,
+              "additions": 196534,
               "deletions": 0,
-              "changedLines": 196095,
+              "changedLines": 196535,
               "unclassifiedLines": 0,
               "filesReturned": 32,
               "unavailable": null
@@ -6080,7 +6080,7 @@
     "externalDivergentBranches": 10,
     "distinctChanges": 218,
     "externalDistinctChanges": 10,
-    "changedLines": 1061015,
+    "changedLines": 1061455,
     "unclassifiedLines": 11160,
     "trafficRepos": [
       "gke-labs/devops-bench"
@@ -6091,6 +6091,6 @@
     "activeExternalOwnerRatio": 0.125,
     "externalBranchRatio": 0.04032258064516129,
     "externalChangeRatio": 0.045871559633027525,
-    "unclassifiedLineRate": 0.010518230185247146
+    "unclassifiedLineRate": 0.01051387011225158
   }
 }

@@ -2,14 +2,14 @@
   "apiVersion": "devops-bench.k8s.io/v1alpha1",
   "kind": "UsageSnapshot",
   "formatVersion": 2,
-  "collectedAt": "2026-08-18T23:20:02Z",
+  "collectedAt": "2026-08-18T23:28:35Z",
   "windowDays": 14,
   "partial": false,
   "skipped": [],
   "provenance": {
-    "collectorSha": "173f1cbc6e0acb6312693dea5e168b49b6b7223b",
-    "workflowRunUrl": "https://github.com/eugeneng04/devops-bench/actions/runs/32196710718",
-    "writtenAt": "2026-08-18T23:20:02Z"
+    "collectorSha": "b73e51fa0ee01a1cb56df0d980019c89ab0d1683",
+    "workflowRunUrl": "https://github.com/eugeneng04/devops-bench/actions/runs/32197315797",
+    "writtenAt": "2026-08-18T23:28:35Z"
   },
   "repos": {
     "gke-labs/devops-bench": {
@@ -45952,7 +45952,7 @@
               "fullName": "eugeneng04/devops-bench",
               "owner": "eugeneng04",
               "createdAt": "2026-06-24T16:13:44Z",
-              "pushedAt": "2026-08-18T22:54:23Z",
+              "pushedAt": "2026-08-18T23:24:03Z",
               "forksOfThisFork": 0,
               "branches": [
                 {
@@ -48107,11 +48107,11 @@
                 },
                 {
                   "name": "main",
-                  "headSha": "173f1cbc6e0acb6312693dea5e168b49b6b7223b",
-                  "aheadBy": 6,
+                  "headSha": "b73e51fa0ee01a1cb56df0d980019c89ab0d1683",
+                  "aheadBy": 7,
                   "behindBy": 0,
-                  "totalCommits": 6,
-                  "commitsReturned": 6,
+                  "totalCommits": 7,
+                  "commitsReturned": 7,
                   "filesReturned": 32,
                   "authors": [
                     {
@@ -48120,11 +48120,11 @@
                     }
                   ],
                   "authorsComplete": true,
-                  "commitsUnattributed": 0,
+                  "commitsUnattributed": 1,
                   "baseSha": "89fd6df1e570652f32ed82380fc4849731890141",
                   "mergeBaseSha": "89fd6df1e570652f32ed82380fc4849731890141",
-                  "headCommittedAt": "2026-08-18T22:54:17Z",
-                  "additions": 196094,
+                  "headCommittedAt": "2026-08-18T23:24:01Z",
+                  "additions": 196534,
                   "deletions": 0,
                   "files": [
                     {
@@ -48209,7 +48209,7 @@
                     },
                     {
                       "path": "hack/usage-metrics/data/classified/2026-08-18.json",
-                      "changes": 6054
+                      "changes": 6096
                     },
                     {
                       "path": "hack/usage-metrics/data/series/latest.json",
@@ -48225,7 +48225,7 @@
                     },
                     {
                       "path": "hack/usage-metrics/data/snapshots/2026-08-18.json",
-                      "changes": 75488
+                      "changes": 75886
                     },
                     {
                       "path": "hack/usage-metrics/ghclient.py",
@@ -74685,19 +74685,19 @@
   },
   "budget": {
     "core": {
-      "remaining": 4638,
+      "remaining": 4289,
       "limit": 5000,
       "reset": 1787096626
     },
     "graphql": {
-      "remaining": 4970,
+      "remaining": 4939,
       "limit": 5000,
       "reset": 1787098222
     },
     "code_search": {
       "remaining": 5,
       "limit": 10,
-      "reset": 1787095471
+      "reset": 1787095988
     }
   },
   "apiCalls": 377,
@@ -75129,6 +75129,14 @@
               "path": "devops_bench/agents/api/__init__.py"
             },
             {
+              "repo": "kubernetes-sigs/devops-bench",
+              "path": "devops_bench/agents/__init__.py"
+            },
+            {
+              "repo": "kubernetes-sigs/devops-bench",
+              "path": "devops_bench/agents/api/__init__.py"
+            },
+            {
               "repo": "gke-labs/devops-bench",
               "path": "devops_bench/cli.py"
             },
@@ -75173,8 +75181,16 @@
               "path": "tests/unit/metrics/test_package_import.py"
             },
             {
+              "repo": "kubernetes-sigs/devops-bench",
+              "path": "tests/unit/core/test_public_api.py"
+            },
+            {
               "repo": "gke-labs/devops-bench",
               "path": "tests/unit/evalharness/test_package_import.py"
+            },
+            {
+              "repo": "kubernetes-sigs/devops-bench",
+              "path": "tests/unit/run/test_package_import.py"
             },
             {
               "repo": "gke-labs/devops-bench",
@@ -75189,6 +75205,10 @@
               "path": "tests/unit/verification/test_package_import.py"
             },
             {
+              "repo": "kubernetes-sigs/devops-bench",
+              "path": "tests/unit/evalharness/test_package_import.py"
+            },
+            {
               "repo": "gke-labs/devops-bench",
               "path": "tests/unit/agents/api/test_agents_api_import_hygiene.py"
             },
@@ -75197,8 +75217,16 @@
               "path": "tests/unit/agents/test_agents_import_hygiene.py"
             },
             {
+              "repo": "kubernetes-sigs/devops-bench",
+              "path": "tests/unit/verification/test_package_import.py"
+            },
+            {
               "repo": "gke-labs/devops-bench",
               "path": "tests/unit/agents/test_agents_capabilities_import_hygiene.py"
+            },
+            {
+              "repo": "kubernetes-sigs/devops-bench",
+              "path": "tests/unit/agents/api/test_agents_api_import_hygiene.py"
             },
             {
               "repo": "kubernetes-sigs/devops-bench",
@@ -75222,7 +75250,15 @@
             },
             {
               "repo": "kubernetes-sigs/devops-bench",
+              "path": "tests/unit/models/test_loop.py"
+            },
+            {
+              "repo": "kubernetes-sigs/devops-bench",
               "path": "tests/unit/chaos/test_extension_axis.py"
+            },
+            {
+              "repo": "kubernetes-sigs/devops-bench",
+              "path": "tests/unit/agents/api/test_agents_api_mcp.py"
             },
             {
               "repo": "gke-labs/devops-bench",
@@ -75235,42 +75271,6 @@
             {
               "repo": "gke-labs/devops-bench",
               "path": "tests/unit/agents/api/test_agents_api_agent.py"
-            },
-            {
-              "repo": "kubernetes-sigs/devops-bench",
-              "path": "devops_bench/agents/__init__.py"
-            },
-            {
-              "repo": "kubernetes-sigs/devops-bench",
-              "path": "devops_bench/agents/api/__init__.py"
-            },
-            {
-              "repo": "kubernetes-sigs/devops-bench",
-              "path": "tests/unit/core/test_public_api.py"
-            },
-            {
-              "repo": "kubernetes-sigs/devops-bench",
-              "path": "tests/unit/run/test_package_import.py"
-            },
-            {
-              "repo": "kubernetes-sigs/devops-bench",
-              "path": "tests/unit/evalharness/test_package_import.py"
-            },
-            {
-              "repo": "kubernetes-sigs/devops-bench",
-              "path": "tests/unit/verification/test_package_import.py"
-            },
-            {
-              "repo": "kubernetes-sigs/devops-bench",
-              "path": "tests/unit/agents/api/test_agents_api_import_hygiene.py"
-            },
-            {
-              "repo": "kubernetes-sigs/devops-bench",
-              "path": "tests/unit/models/test_loop.py"
-            },
-            {
-              "repo": "kubernetes-sigs/devops-bench",
-              "path": "tests/unit/agents/api/test_agents_api_mcp.py"
             },
             {
               "repo": "kubernetes-sigs/devops-bench",
