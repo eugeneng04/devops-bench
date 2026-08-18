@@ -1,0 +1,5418 @@
+{
+  "formatVersion": 2,
+  "collectedAt": "2026-08-12T23:09:11Z",
+  "windowDays": 14,
+  "provenance": {
+    "collectorSha": "79b0041348ef360cc55bb1abb159d5f0338511f0",
+    "workflowRunUrl": null,
+    "writtenAt": "2026-08-12T23:09:11Z"
+  },
+  "snapshotPartial": false,
+  "snapshotSkipped": [],
+  "classLabels": {
+    "addingTasks": "Adding tasks",
+    "addingHarness": "Adding a harness",
+    "addingVerifiers": "Adding verifiers",
+    "addingProvider": "Adding a model provider",
+    "changingGrading": "Changing grading",
+    "addingChaos": "Adding chaos scenarios",
+    "addingSkills": "Adding skills",
+    "agentFramework": "Agent framework",
+    "infrastructure": "Infrastructure",
+    "core": "Core changes",
+    "tests": "Tests",
+    "docs": "Documentation",
+    "mixed": "Mixed",
+    "unclassified": "Unclassified"
+  },
+  "repos": {
+    "gke-labs/devops-bench": {
+      "repo": {
+        "stars": 18,
+        "forks": 15,
+        "watchers": 1,
+        "openIssuesAndPulls": 32,
+        "defaultBranch": "main",
+        "createdAt": "2026-04-14T22:44:20Z",
+        "pushedAt": "2026-08-12T04:52:56Z"
+      },
+      "traffic": {
+        "views": {
+          "total": 515,
+          "unique": 35,
+          "daily": [
+            {
+              "date": "2026-07-29",
+              "total": 35,
+              "unique": 10
+            },
+            {
+              "date": "2026-07-30",
+              "total": 17,
+              "unique": 8
+            },
+            {
+              "date": "2026-07-31",
+              "total": 16,
+              "unique": 6
+            },
+            {
+              "date": "2026-08-01",
+              "total": 1,
+              "unique": 1
+            },
+            {
+              "date": "2026-08-02",
+              "total": 2,
+              "unique": 2
+            },
+            {
+              "date": "2026-08-03",
+              "total": 44,
+              "unique": 7
+            },
+            {
+              "date": "2026-08-04",
+              "total": 42,
+              "unique": 8
+            },
+            {
+              "date": "2026-08-05",
+              "total": 36,
+              "unique": 7
+            },
+            {
+              "date": "2026-08-06",
+              "total": 98,
+              "unique": 9
+            },
+            {
+              "date": "2026-08-07",
+              "total": 24,
+              "unique": 7
+            },
+            {
+              "date": "2026-08-08",
+              "total": 1,
+              "unique": 1
+            },
+            {
+              "date": "2026-08-09",
+              "total": 1,
+              "unique": 1
+            },
+            {
+              "date": "2026-08-10",
+              "total": 115,
+              "unique": 9
+            },
+            {
+              "date": "2026-08-11",
+              "total": 83,
+              "unique": 4
+            }
+          ]
+        },
+        "clones": {
+          "total": 8120,
+          "unique": 207,
+          "daily": [
+            {
+              "date": "2026-07-29",
+              "total": 14,
+              "unique": 7
+            },
+            {
+              "date": "2026-07-30",
+              "total": 30,
+              "unique": 13
+            },
+            {
+              "date": "2026-07-31",
+              "total": 97,
+              "unique": 15
+            },
+            {
+              "date": "2026-08-01",
+              "total": 259,
+              "unique": 13
+            },
+            {
+              "date": "2026-08-02",
+              "total": 783,
+              "unique": 11
+            },
+            {
+              "date": "2026-08-03",
+              "total": 754,
+              "unique": 8
+            },
+            {
+              "date": "2026-08-04",
+              "total": 790,
+              "unique": 11
+            },
+            {
+              "date": "2026-08-05",
+              "total": 771,
+              "unique": 15
+            },
+            {
+              "date": "2026-08-06",
+              "total": 794,
+              "unique": 18
+            },
+            {
+              "date": "2026-08-07",
+              "total": 810,
+              "unique": 14
+            },
+            {
+              "date": "2026-08-08",
+              "total": 818,
+              "unique": 28
+            },
+            {
+              "date": "2026-08-09",
+              "total": 803,
+              "unique": 49
+            },
+            {
+              "date": "2026-08-10",
+              "total": 792,
+              "unique": 23
+            },
+            {
+              "date": "2026-08-11",
+              "total": 605,
+              "unique": 25
+            }
+          ]
+        },
+        "referrers": [
+          {
+            "source": "Google",
+            "total": 68,
+            "unique": 11
+          },
+          {
+            "source": "github.com",
+            "total": 29,
+            "unique": 12
+          },
+          {
+            "source": "b2607f8b0480010000115c7aeac12dc8d150b000000000000000001.proxy.googlers.com",
+            "total": 6,
+            "unique": 2
+          }
+        ],
+        "popularPaths": [
+          {
+            "path": "/gke-labs/devops-bench",
+            "title": "Overview",
+            "total": 102,
+            "unique": 26
+          },
+          {
+            "path": "/gke-labs/devops-bench/pulls",
+            "title": "/pulls",
+            "total": 41,
+            "unique": 7
+          },
+          {
+            "path": "/gke-labs/devops-bench/tree/main/tasks",
+            "title": "/tree/main/tasks",
+            "total": 27,
+            "unique": 11
+          },
+          {
+            "path": "/gke-labs/devops-bench/tree/main/tasks/gcp",
+            "title": "/tree/main/tasks/gcp",
+            "total": 21,
+            "unique": 11
+          },
+          {
+            "path": "/gke-labs/devops-bench/tree/main/tasks/common",
+            "title": "/tree/main/tasks/common",
+            "total": 14,
+            "unique": 5
+          },
+          {
+            "path": "/gke-labs/devops-bench/pull/240",
+            "title": "/pull/240",
+            "total": 10,
+            "unique": 2
+          },
+          {
+            "path": "/gke-labs/devops-bench/pull/237",
+            "title": "/pull/237",
+            "total": 9,
+            "unique": 4
+          },
+          {
+            "path": "/gke-labs/devops-bench/blob/main/tasks/gcp/gpu-stress-test-diagnosis/task.yaml",
+            "title": "/blob/main/tasks/gcp/gpu-stress-test-diagnosis/task.yaml",
+            "total": 7,
+            "unique": 4
+          },
+          {
+            "path": "/gke-labs/devops-bench/pull/229/changes",
+            "title": "/pull/229/changes",
+            "total": 7,
+            "unique": 3
+          },
+          {
+            "path": "/gke-labs/devops-bench/pull/238",
+            "title": "/pull/238",
+            "total": 7,
+            "unique": 3
+          }
+        ]
+      },
+      "trafficUnavailable": null,
+      "contributorCount": 15,
+      "forks": [
+        {
+          "fullName": "noahlwest/devops-bench",
+          "owner": "noahlwest",
+          "authors": [],
+          "external": false,
+          "active": true,
+          "divergentBranches": 1,
+          "branches": [
+            {
+              "name": "main",
+              "primary": "docs",
+              "secondary": [
+                "addingSkills",
+                "addingTasks",
+                "infrastructure"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "81217830780406ad",
+              "changedFiles": 13,
+              "additions": 1309,
+              "deletions": 9,
+              "changedLines": 1318,
+              "unclassifiedLines": 0,
+              "filesReturned": 13,
+              "unavailable": null
+            }
+          ],
+          "unavailable": null
+        },
+        {
+          "fullName": "richackard/devops-bench",
+          "owner": "richackard",
+          "authors": [],
+          "external": false,
+          "active": true,
+          "divergentBranches": 3,
+          "branches": [
+            {
+              "name": "add-models-base",
+              "primary": null,
+              "secondary": [],
+              "authors": [],
+              "external": null,
+              "unavailable": "repos/gke-labs/devops-bench/compare/main...richackard:add-models-base: No common ancestor between main and richackard:add-models-base. (HTTP 404)"
+            },
+            {
+              "name": "dev",
+              "primary": "infrastructure",
+              "secondary": [
+                "addingTasks",
+                "changingGrading",
+                "docs",
+                "tests",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "489cc6a22ca6f4b7",
+              "changedFiles": 28,
+              "additions": 1110,
+              "deletions": 332,
+              "changedLines": 1442,
+              "unclassifiedLines": 151,
+              "filesReturned": 28,
+              "unavailable": null
+            },
+            {
+              "name": "docs/rebatch-wave4-cli-agents",
+              "primary": "unclassified",
+              "secondary": [
+                "docs"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "55450d9eb4516dc6",
+              "changedFiles": 2,
+              "additions": 6,
+              "deletions": 6,
+              "changedLines": 12,
+              "unclassifiedLines": 8,
+              "filesReturned": 2,
+              "unavailable": null
+            },
+            {
+              "name": "ingestion",
+              "primary": "unclassified",
+              "secondary": [
+                "docs"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "807766f57144378a",
+              "changedFiles": 16,
+              "additions": 3353,
+              "deletions": 2,
+              "changedLines": 3355,
+              "unclassifiedLines": 2995,
+              "filesReturned": 16,
+              "unavailable": null
+            }
+          ],
+          "unavailable": null
+        },
+        {
+          "fullName": "jayantid/devops-bench",
+          "owner": "jayantid",
+          "authors": [],
+          "external": false,
+          "active": true,
+          "divergentBranches": 4,
+          "branches": [
+            {
+              "name": "feature/add-m1-cuj-tasks",
+              "primary": "addingTasks",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "6258632b89c370b2",
+              "changedFiles": 2,
+              "additions": 43,
+              "deletions": 0,
+              "changedLines": 43,
+              "unclassifiedLines": 0,
+              "filesReturned": 2,
+              "unavailable": null
+            },
+            {
+              "name": "feature/add-m1-tasks",
+              "primary": "infrastructure",
+              "secondary": [
+                "addingTasks"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "61d135e390805b1a",
+              "changedFiles": 7,
+              "additions": 492,
+              "deletions": 0,
+              "changedLines": 492,
+              "unclassifiedLines": 0,
+              "filesReturned": 7,
+              "unavailable": null
+            },
+            {
+              "name": "feature/add-new-tasks",
+              "primary": "addingTasks",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "80101bf31b9c2beb",
+              "changedFiles": 6,
+              "additions": 157,
+              "deletions": 0,
+              "changedLines": 157,
+              "unclassifiedLines": 0,
+              "filesReturned": 6,
+              "unavailable": null
+            },
+            {
+              "name": "feature/use-existing-cluster",
+              "primary": "infrastructure",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "ad9954c9f23ac458",
+              "changedFiles": 1,
+              "additions": 43,
+              "deletions": 14,
+              "changedLines": 57,
+              "unclassifiedLines": 0,
+              "filesReturned": 1,
+              "unavailable": null
+            }
+          ],
+          "unavailable": null
+        },
+        {
+          "fullName": "yuwenma/devops-bench",
+          "owner": "yuwenma",
+          "authors": [],
+          "external": false,
+          "active": true,
+          "divergentBranches": 2,
+          "branches": [
+            {
+              "name": "docs/sig-k8s-readme",
+              "primary": "docs",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "a2c4a7834a00d13a",
+              "changedFiles": 1,
+              "additions": 4,
+              "deletions": 4,
+              "changedLines": 8,
+              "unclassifiedLines": 0,
+              "filesReturned": 1,
+              "unavailable": null
+            },
+            {
+              "name": "main",
+              "primary": null,
+              "secondary": [],
+              "authors": [],
+              "external": null,
+              "unavailable": "repos/gke-labs/devops-bench/compare/main...yuwenma:main: No common ancestor between main and yuwenma:main. (HTTP 404)"
+            },
+            {
+              "name": "refactor/provider-variables",
+              "primary": "infrastructure",
+              "secondary": [
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "33910760423db5cb",
+              "changedFiles": 4,
+              "additions": 78,
+              "deletions": 7,
+              "changedLines": 85,
+              "unclassifiedLines": 0,
+              "filesReturned": 4,
+              "unavailable": null
+            }
+          ],
+          "unavailable": null
+        },
+        {
+          "fullName": "jessie1111101/devops-bench",
+          "owner": "jessie1111101",
+          "authors": [],
+          "external": false,
+          "active": true,
+          "divergentBranches": 4,
+          "branches": [
+            {
+              "name": "feat/safety-checks-on-simplified-prompts",
+              "primary": "addingTasks",
+              "secondary": [
+                "infrastructure"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "dffba7c9989d667a",
+              "changedFiles": 8,
+              "additions": 389,
+              "deletions": 50,
+              "changedLines": 439,
+              "unclassifiedLines": 0,
+              "filesReturned": 8,
+              "unavailable": null
+            },
+            {
+              "name": "fix/mrf-grading-fidelity",
+              "primary": "addingTasks",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "d450a447d7806c7d",
+              "changedFiles": 1,
+              "additions": 52,
+              "deletions": 12,
+              "changedLines": 64,
+              "unclassifiedLines": 0,
+              "filesReturned": 1,
+              "unavailable": null
+            },
+            {
+              "name": "task/cve-remediation-deterministic",
+              "primary": "addingTasks",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "e50cfc8d48ce4e81",
+              "changedFiles": 2,
+              "additions": 357,
+              "deletions": 13,
+              "changedLines": 370,
+              "unclassifiedLines": 0,
+              "filesReturned": 2,
+              "unavailable": null
+            },
+            {
+              "name": "templatebug",
+              "primary": "changingGrading",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "546a66d0c8e30393",
+              "changedFiles": 1,
+              "additions": 7,
+              "deletions": 8,
+              "changedLines": 15,
+              "unclassifiedLines": 0,
+              "filesReturned": 1,
+              "unavailable": null
+            }
+          ],
+          "unavailable": null
+        },
+        {
+          "fullName": "pradeepvrd/devops-bench",
+          "owner": "pradeepvrd",
+          "authors": [],
+          "external": false,
+          "active": true,
+          "divergentBranches": 59,
+          "branches": [
+            {
+              "name": "agents",
+              "primary": "agentFramework",
+              "secondary": [
+                "changingGrading",
+                "infrastructure"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "4194543eb9a1ce8c",
+              "changedFiles": 4,
+              "additions": 170,
+              "deletions": 0,
+              "changedLines": 170,
+              "unclassifiedLines": 0,
+              "filesReturned": 4,
+              "unavailable": null
+            },
+            {
+              "name": "bench-quality",
+              "primary": "infrastructure",
+              "secondary": [
+                "addingChaos",
+                "addingProvider",
+                "addingSkills",
+                "addingTasks",
+                "agentFramework",
+                "changingGrading",
+                "core",
+                "docs",
+                "tests",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "e935207eb0b3b1dd",
+              "changedFiles": 87,
+              "additions": 2744,
+              "deletions": 257,
+              "changedLines": 3001,
+              "unclassifiedLines": 133,
+              "filesReturned": 87,
+              "unavailable": null
+            },
+            {
+              "name": "chore/dockerfile-uv-build",
+              "primary": "unclassified",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "c2c56a6222e522b4",
+              "changedFiles": 2,
+              "additions": 41,
+              "deletions": 15,
+              "changedLines": 56,
+              "unclassifiedLines": 56,
+              "filesReturned": 2,
+              "unavailable": null
+            },
+            {
+              "name": "cleanup",
+              "primary": "changingGrading",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "5b03842633ab5392",
+              "changedFiles": 1,
+              "additions": 2,
+              "deletions": 2,
+              "changedLines": 4,
+              "unclassifiedLines": 0,
+              "filesReturned": 1,
+              "unavailable": null
+            },
+            {
+              "name": "complextask",
+              "primary": "unclassified",
+              "secondary": [
+                "changingGrading",
+                "docs"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "ca60cf0c50818f6b",
+              "changedFiles": 7,
+              "additions": 289,
+              "deletions": 1,
+              "changedLines": 290,
+              "unclassifiedLines": 253,
+              "filesReturned": 7,
+              "unavailable": null
+            },
+            {
+              "name": "diagnosis",
+              "primary": "changingGrading",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "ff8d8f79e8cbbac2",
+              "changedFiles": 1,
+              "additions": 6,
+              "deletions": 1,
+              "changedLines": 7,
+              "unclassifiedLines": 0,
+              "filesReturned": 1,
+              "unavailable": null
+            },
+            {
+              "name": "docs/migration-plan",
+              "primary": "docs",
+              "secondary": [
+                "infrastructure"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "2cd08e3018e33104",
+              "changedFiles": 16,
+              "additions": 1811,
+              "deletions": 0,
+              "changedLines": 1811,
+              "unclassifiedLines": 0,
+              "filesReturned": 16,
+              "unavailable": null
+            },
+            {
+              "name": "docsmetrics",
+              "primary": "changingGrading",
+              "secondary": [
+                "addingTasks"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "229319e305a65e30",
+              "changedFiles": 3,
+              "additions": 213,
+              "deletions": 6,
+              "changedLines": 219,
+              "unclassifiedLines": 0,
+              "filesReturned": 3,
+              "unavailable": null
+            },
+            {
+              "name": "feat/agent-provider-contract",
+              "primary": "core",
+              "secondary": [
+                "addingProvider",
+                "agentFramework",
+                "docs",
+                "infrastructure",
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "e16797f09eafd793",
+              "changedFiles": 18,
+              "additions": 675,
+              "deletions": 131,
+              "changedLines": 806,
+              "unclassifiedLines": 0,
+              "filesReturned": 18,
+              "unavailable": null
+            },
+            {
+              "name": "feat/devops-bench-agents",
+              "primary": "tests",
+              "secondary": [
+                "addingProvider",
+                "addingTasks",
+                "agentFramework",
+                "core",
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "c25ecce8004b4818",
+              "changedFiles": 43,
+              "additions": 6176,
+              "deletions": 7,
+              "changedLines": 6183,
+              "unclassifiedLines": 59,
+              "filesReturned": 43,
+              "unavailable": null
+            },
+            {
+              "name": "feat/devops-bench-agents-api",
+              "primary": "tests",
+              "secondary": [
+                "addingProvider",
+                "addingTasks",
+                "agentFramework",
+                "core",
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "a887fb14166115ff",
+              "changedFiles": 48,
+              "additions": 7318,
+              "deletions": 7,
+              "changedLines": 7325,
+              "unclassifiedLines": 59,
+              "filesReturned": 48,
+              "unavailable": null
+            },
+            {
+              "name": "feat/devops-bench-chaos",
+              "primary": "tests",
+              "secondary": [
+                "addingChaos",
+                "addingProvider",
+                "addingTasks",
+                "core",
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "69a3b5dcd6fb66c3",
+              "changedFiles": 41,
+              "additions": 5677,
+              "deletions": 7,
+              "changedLines": 5684,
+              "unclassifiedLines": 59,
+              "filesReturned": 41,
+              "unavailable": null
+            },
+            {
+              "name": "feat/devops-bench-core",
+              "primary": "core",
+              "secondary": [
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "be124527a8246ebf",
+              "changedFiles": 16,
+              "additions": 1643,
+              "deletions": 0,
+              "changedLines": 1643,
+              "unclassifiedLines": 0,
+              "filesReturned": 16,
+              "unavailable": null
+            },
+            {
+              "name": "feat/devops-bench-deployers",
+              "primary": "infrastructure",
+              "secondary": [
+                "addingProvider",
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "4b201e287d305649",
+              "changedFiles": 13,
+              "additions": 1326,
+              "deletions": 0,
+              "changedLines": 1326,
+              "unclassifiedLines": 0,
+              "filesReturned": 13,
+              "unavailable": null
+            },
+            {
+              "name": "feat/devops-bench-harness",
+              "primary": "tests",
+              "secondary": [
+                "addingChaos",
+                "addingProvider",
+                "addingSkills",
+                "addingTasks",
+                "addingVerifiers",
+                "agentFramework",
+                "changingGrading",
+                "core",
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "0214ef711eebb637",
+              "changedFiles": 89,
+              "additions": 12547,
+              "deletions": 7,
+              "changedLines": 12556,
+              "unclassifiedLines": 62,
+              "filesReturned": 89,
+              "unavailable": null
+            },
+            {
+              "name": "feat/devops-bench-k8s",
+              "primary": "core",
+              "secondary": [
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "7b37e1c9148b21ce",
+              "changedFiles": 5,
+              "additions": 634,
+              "deletions": 0,
+              "changedLines": 634,
+              "unclassifiedLines": 0,
+              "filesReturned": 5,
+              "unavailable": null
+            },
+            {
+              "name": "feat/devops-bench-metrics",
+              "primary": "tests",
+              "secondary": [
+                "addingProvider",
+                "addingSkills",
+                "addingTasks",
+                "changingGrading",
+                "core",
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "8c69112a28ad5798",
+              "changedFiles": 50,
+              "additions": 6405,
+              "deletions": 7,
+              "changedLines": 6414,
+              "unclassifiedLines": 62,
+              "filesReturned": 50,
+              "unavailable": null
+            },
+            {
+              "name": "feat/devops-bench-models",
+              "primary": "addingProvider",
+              "secondary": [
+                "tests",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "6c7522147a0294ae",
+              "changedFiles": 11,
+              "additions": 1773,
+              "deletions": 7,
+              "changedLines": 1780,
+              "unclassifiedLines": 44,
+              "filesReturned": 11,
+              "unavailable": null
+            },
+            {
+              "name": "feat/devops-bench-stage1",
+              "primary": "core",
+              "secondary": [
+                "addingProvider",
+                "addingTasks",
+                "infrastructure",
+                "tests",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "ad128203f4cf4856",
+              "changedFiles": 45,
+              "additions": 5265,
+              "deletions": 0,
+              "changedLines": 5265,
+              "unclassifiedLines": 15,
+              "filesReturned": 45,
+              "unavailable": null
+            },
+            {
+              "name": "feat/devops-bench-tasks",
+              "primary": "addingTasks",
+              "secondary": [
+                "tests",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "4563b0a49217c29b",
+              "changedFiles": 7,
+              "additions": 950,
+              "deletions": 0,
+              "changedLines": 950,
+              "unclassifiedLines": 15,
+              "filesReturned": 7,
+              "unavailable": null
+            },
+            {
+              "name": "feat/devops-bench-verification",
+              "primary": "tests",
+              "secondary": [
+                "addingProvider",
+                "addingTasks",
+                "addingVerifiers",
+                "core",
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "6750e26988d1d746",
+              "changedFiles": 44,
+              "additions": 5751,
+              "deletions": 7,
+              "changedLines": 5758,
+              "unclassifiedLines": 59,
+              "filesReturned": 44,
+              "unavailable": null
+            },
+            {
+              "name": "feat/eval-bastion",
+              "primary": "tests",
+              "secondary": [
+                "addingChaos",
+                "addingProvider",
+                "addingSkills",
+                "addingTasks",
+                "addingVerifiers",
+                "agentFramework",
+                "changingGrading",
+                "core",
+                "docs",
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "898073dc96f1be9b",
+              "changedFiles": 167,
+              "additions": 19498,
+              "deletions": 36,
+              "changedLines": 19568,
+              "unclassifiedLines": 233,
+              "filesReturned": 167,
+              "unavailable": null
+            },
+            {
+              "name": "feat/openclaw-gemini-flash-35",
+              "primary": "infrastructure",
+              "secondary": [
+                "addingChaos",
+                "addingProvider",
+                "addingSkills",
+                "addingTasks",
+                "agentFramework",
+                "changingGrading",
+                "core",
+                "docs",
+                "tests",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "ecc88b5c6cc4cc3d",
+              "changedFiles": 105,
+              "additions": 2782,
+              "deletions": 402,
+              "changedLines": 3185,
+              "unclassifiedLines": 66,
+              "filesReturned": 105,
+              "unavailable": null
+            },
+            {
+              "name": "feat/stage1-deployers-tofu-noop",
+              "primary": "core",
+              "secondary": [
+                "addingProvider",
+                "addingTasks",
+                "infrastructure",
+                "tests",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "3c8003e17b4bd504",
+              "changedFiles": 46,
+              "additions": 5137,
+              "deletions": 0,
+              "changedLines": 5137,
+              "unclassifiedLines": 15,
+              "filesReturned": 46,
+              "unavailable": null
+            },
+            {
+              "name": "feat/stage1-k8s-drop-predicates",
+              "primary": "core",
+              "secondary": [
+                "addingProvider",
+                "addingTasks",
+                "infrastructure",
+                "tests",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "79701e3def8c9584",
+              "changedFiles": 45,
+              "additions": 5195,
+              "deletions": 0,
+              "changedLines": 5195,
+              "unclassifiedLines": 15,
+              "filesReturned": 45,
+              "unavailable": null
+            },
+            {
+              "name": "feat/stage1-models-max-tokens",
+              "primary": "core",
+              "secondary": [
+                "addingProvider",
+                "addingTasks",
+                "infrastructure",
+                "tests",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "041578a149c2341b",
+              "changedFiles": 45,
+              "additions": 5360,
+              "deletions": 0,
+              "changedLines": 5360,
+              "unclassifiedLines": 15,
+              "filesReturned": 45,
+              "unavailable": null
+            },
+            {
+              "name": "feat/stage1-tasks-cleanup",
+              "primary": "core",
+              "secondary": [
+                "addingProvider",
+                "addingTasks",
+                "infrastructure",
+                "tests",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "7683641ef42718d7",
+              "changedFiles": 44,
+              "additions": 5250,
+              "deletions": 0,
+              "changedLines": 5250,
+              "unclassifiedLines": 15,
+              "filesReturned": 44,
+              "unavailable": null
+            },
+            {
+              "name": "integration/devops-bench-stage1",
+              "primary": "addingProvider",
+              "secondary": [
+                "addingTasks",
+                "core",
+                "infrastructure",
+                "tests",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "86f84a67fa1bdb81",
+              "changedFiles": 34,
+              "additions": 4729,
+              "deletions": 7,
+              "changedLines": 4736,
+              "unclassifiedLines": 59,
+              "filesReturned": 34,
+              "unavailable": null
+            },
+            {
+              "name": "integration/devops-bench-stage2-3",
+              "primary": "tests",
+              "secondary": [
+                "addingChaos",
+                "addingProvider",
+                "addingSkills",
+                "addingTasks",
+                "addingVerifiers",
+                "agentFramework",
+                "changingGrading",
+                "core",
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "0214ef711eebb637",
+              "changedFiles": 89,
+              "additions": 12547,
+              "deletions": 7,
+              "changedLines": 12556,
+              "unclassifiedLines": 62,
+              "filesReturned": 89,
+              "unavailable": null
+            },
+            {
+              "name": "integration/devops-bench-stage2-merged",
+              "primary": "tests",
+              "secondary": [
+                "addingChaos",
+                "addingProvider",
+                "addingSkills",
+                "addingTasks",
+                "addingVerifiers",
+                "agentFramework",
+                "changingGrading",
+                "core",
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "6a5c210cf2f0e065",
+              "changedFiles": 81,
+              "additions": 10964,
+              "deletions": 7,
+              "changedLines": 10973,
+              "unclassifiedLines": 62,
+              "filesReturned": 81,
+              "unavailable": null
+            },
+            {
+              "name": "migration/config-sync",
+              "primary": "docs",
+              "secondary": [
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "5e0dc2acee57f4b9",
+              "changedFiles": 16,
+              "additions": 693,
+              "deletions": 335,
+              "changedLines": 1031,
+              "unclassifiedLines": 242,
+              "filesReturned": 16,
+              "unavailable": null
+            },
+            {
+              "name": "oc",
+              "primary": "agentFramework",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "1abee0a4e0237567",
+              "changedFiles": 1,
+              "additions": 1,
+              "deletions": 1,
+              "changedLines": 2,
+              "unclassifiedLines": 0,
+              "filesReturned": 1,
+              "unavailable": null
+            },
+            {
+              "name": "operator-agent",
+              "primary": "core",
+              "secondary": [
+                "addingVerifiers",
+                "agentFramework",
+                "changingGrading",
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "b0174f700fbb5656",
+              "changedFiles": 6,
+              "additions": 123,
+              "deletions": 28,
+              "changedLines": 151,
+              "unclassifiedLines": 0,
+              "filesReturned": 6,
+              "unavailable": null
+            },
+            {
+              "name": "refactor/agents-api",
+              "primary": "tests",
+              "secondary": [
+                "addingProvider",
+                "addingTasks",
+                "addingVerifiers",
+                "agentFramework",
+                "core",
+                "docs",
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "859fa57ae5a82bad",
+              "changedFiles": 84,
+              "additions": 14395,
+              "deletions": 7,
+              "changedLines": 14405,
+              "unclassifiedLines": 59,
+              "filesReturned": 84,
+              "unavailable": null
+            },
+            {
+              "name": "refactor/agents-base",
+              "primary": "docs",
+              "secondary": [
+                "addingProvider",
+                "addingTasks",
+                "agentFramework",
+                "core",
+                "infrastructure",
+                "tests",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "defa41e2b4f8d9bd",
+              "changedFiles": 57,
+              "additions": 10112,
+              "deletions": 7,
+              "changedLines": 10120,
+              "unclassifiedLines": 59,
+              "filesReturned": 57,
+              "unavailable": null
+            },
+            {
+              "name": "refactor/agents-capabilities",
+              "primary": "tests",
+              "secondary": [
+                "addingChaos",
+                "addingProvider",
+                "addingSkills",
+                "addingTasks",
+                "addingVerifiers",
+                "agentFramework",
+                "changingGrading",
+                "core",
+                "docs",
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "29af604bc98a8cdd",
+              "changedFiles": 133,
+              "additions": 19422,
+              "deletions": 3,
+              "changedLines": 19435,
+              "unclassifiedLines": 18,
+              "filesReturned": 133,
+              "unavailable": null
+            },
+            {
+              "name": "refactor/chaos",
+              "primary": "tests",
+              "secondary": [
+                "addingChaos",
+                "addingProvider",
+                "addingTasks",
+                "addingVerifiers",
+                "agentFramework",
+                "core",
+                "docs",
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "73be4c0b4f3ecc96",
+              "changedFiles": 93,
+              "additions": 14215,
+              "deletions": 7,
+              "changedLines": 14225,
+              "unclassifiedLines": 59,
+              "filesReturned": 93,
+              "unavailable": null
+            },
+            {
+              "name": "refactor/chaos-phase4",
+              "primary": "tests",
+              "secondary": [
+                "addingChaos",
+                "addingProvider",
+                "addingSkills",
+                "addingTasks",
+                "addingVerifiers",
+                "agentFramework",
+                "changingGrading",
+                "core",
+                "docs",
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "6063f83b6f9dc2ba",
+              "changedFiles": 150,
+              "additions": 19680,
+              "deletions": 32,
+              "changedLines": 19743,
+              "unclassifiedLines": 78,
+              "filesReturned": 150,
+              "unavailable": null
+            },
+            {
+              "name": "refactor/chaos-test-isolation",
+              "primary": "tests",
+              "secondary": [
+                "addingChaos",
+                "addingProvider",
+                "addingSkills",
+                "addingTasks",
+                "addingVerifiers",
+                "agentFramework",
+                "changingGrading",
+                "core",
+                "docs",
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "1df625fab25cb7c2",
+              "changedFiles": 150,
+              "additions": 19797,
+              "deletions": 32,
+              "changedLines": 19860,
+              "unclassifiedLines": 78,
+              "filesReturned": 150,
+              "unavailable": null
+            },
+            {
+              "name": "refactor/comparison",
+              "primary": "tests",
+              "secondary": [
+                "addingChaos",
+                "addingProvider",
+                "addingSkills",
+                "addingTasks",
+                "addingVerifiers",
+                "agentFramework",
+                "changingGrading",
+                "core",
+                "docs",
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "46aab1b33cd14886",
+              "changedFiles": 176,
+              "additions": 19622,
+              "deletions": 39,
+              "changedLines": 19700,
+              "unclassifiedLines": 233,
+              "filesReturned": 176,
+              "unavailable": null
+            },
+            {
+              "name": "refactor/entrypoint",
+              "primary": "tests",
+              "secondary": [
+                "addingChaos",
+                "addingProvider",
+                "addingSkills",
+                "addingTasks",
+                "addingVerifiers",
+                "agentFramework",
+                "changingGrading",
+                "core",
+                "docs",
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "ec3e828ffa1f6a05",
+              "changedFiles": 155,
+              "additions": 19702,
+              "deletions": 36,
+              "changedLines": 19759,
+              "unclassifiedLines": 233,
+              "filesReturned": 155,
+              "unavailable": null
+            },
+            {
+              "name": "refactor/gemini-capabilities",
+              "primary": "tests",
+              "secondary": [
+                "addingChaos",
+                "addingProvider",
+                "addingSkills",
+                "addingTasks",
+                "addingVerifiers",
+                "agentFramework",
+                "changingGrading",
+                "core",
+                "docs",
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "71c1ee3a7a35ba3a",
+              "changedFiles": 158,
+              "additions": 19596,
+              "deletions": 36,
+              "changedLines": 19658,
+              "unclassifiedLines": 233,
+              "filesReturned": 158,
+              "unavailable": null
+            },
+            {
+              "name": "refactor/harness",
+              "primary": "tests",
+              "secondary": [
+                "addingChaos",
+                "addingProvider",
+                "addingSkills",
+                "addingTasks",
+                "addingVerifiers",
+                "agentFramework",
+                "changingGrading",
+                "core",
+                "docs",
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "0dd36b15877a1a10",
+              "changedFiles": 149,
+              "additions": 19773,
+              "deletions": 32,
+              "changedLines": 19832,
+              "unclassifiedLines": 78,
+              "filesReturned": 149,
+              "unavailable": null
+            },
+            {
+              "name": "refactor/harness-env-snapshot",
+              "primary": "tests",
+              "secondary": [
+                "addingChaos",
+                "addingProvider",
+                "addingSkills",
+                "addingTasks",
+                "addingVerifiers",
+                "agentFramework",
+                "changingGrading",
+                "core",
+                "docs",
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "3b10d83bbb395725",
+              "changedFiles": 149,
+              "additions": 19746,
+              "deletions": 32,
+              "changedLines": 19806,
+              "unclassifiedLines": 78,
+              "filesReturned": 149,
+              "unavailable": null
+            },
+            {
+              "name": "refactor/integration",
+              "primary": "tests",
+              "secondary": [
+                "addingChaos",
+                "addingProvider",
+                "addingSkills",
+                "addingTasks",
+                "addingVerifiers",
+                "agentFramework",
+                "changingGrading",
+                "core",
+                "docs",
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "54726282e680bb5a",
+              "changedFiles": 151,
+              "additions": 19737,
+              "deletions": 32,
+              "changedLines": 19801,
+              "unclassifiedLines": 78,
+              "filesReturned": 151,
+              "unavailable": null
+            },
+            {
+              "name": "refactor/metrics",
+              "primary": "tests",
+              "secondary": [
+                "addingProvider",
+                "addingSkills",
+                "addingTasks",
+                "addingVerifiers",
+                "agentFramework",
+                "changingGrading",
+                "core",
+                "docs",
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "650cd63e9ff4bda9",
+              "changedFiles": 98,
+              "additions": 15298,
+              "deletions": 7,
+              "changedLines": 15308,
+              "unclassifiedLines": 59,
+              "filesReturned": 98,
+              "unavailable": null
+            },
+            {
+              "name": "refactor/models-loop",
+              "primary": "docs",
+              "secondary": [
+                "addingProvider",
+                "addingTasks",
+                "core",
+                "infrastructure",
+                "tests",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "c952f4ac8f64e81f",
+              "changedFiles": 45,
+              "additions": 8660,
+              "deletions": 7,
+              "changedLines": 8667,
+              "unclassifiedLines": 59,
+              "filesReturned": 45,
+              "unavailable": null
+            },
+            {
+              "name": "refactor/openclaw-orphan",
+              "primary": "tests",
+              "secondary": [
+                "addingChaos",
+                "addingProvider",
+                "addingSkills",
+                "addingTasks",
+                "addingVerifiers",
+                "agentFramework",
+                "changingGrading",
+                "core",
+                "docs",
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "e8f7450dde059a12",
+              "changedFiles": 149,
+              "additions": 19784,
+              "deletions": 32,
+              "changedLines": 19843,
+              "unclassifiedLines": 78,
+              "filesReturned": 149,
+              "unavailable": null
+            },
+            {
+              "name": "refactor/verification",
+              "primary": "tests",
+              "secondary": [
+                "addingProvider",
+                "addingTasks",
+                "addingVerifiers",
+                "core",
+                "docs",
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "4ad411443f1b5c2e",
+              "changedFiles": 59,
+              "additions": 9931,
+              "deletions": 7,
+              "changedLines": 9939,
+              "unclassifiedLines": 59,
+              "filesReturned": 59,
+              "unavailable": null
+            },
+            {
+              "name": "submit/1-models-loop",
+              "primary": "addingProvider",
+              "secondary": [
+                "addingTasks",
+                "core",
+                "infrastructure",
+                "tests",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "6c863917ac0b100d",
+              "changedFiles": 36,
+              "additions": 5260,
+              "deletions": 7,
+              "changedLines": 5267,
+              "unclassifiedLines": 59,
+              "filesReturned": 36,
+              "unavailable": null
+            },
+            {
+              "name": "submit/2-verification",
+              "primary": "tests",
+              "secondary": [
+                "addingProvider",
+                "addingTasks",
+                "addingVerifiers",
+                "core",
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "476135da800b4177",
+              "changedFiles": 52,
+              "additions": 7271,
+              "deletions": 7,
+              "changedLines": 7279,
+              "unclassifiedLines": 59,
+              "filesReturned": 52,
+              "unavailable": null
+            },
+            {
+              "name": "submit/3-agents-capabilities",
+              "primary": "tests",
+              "secondary": [
+                "addingProvider",
+                "addingTasks",
+                "addingVerifiers",
+                "agentFramework",
+                "core",
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "0cd939fb54bf7607",
+              "changedFiles": 60,
+              "additions": 7731,
+              "deletions": 7,
+              "changedLines": 7740,
+              "unclassifiedLines": 59,
+              "filesReturned": 60,
+              "unavailable": null
+            },
+            {
+              "name": "submit/4-agents-base-cli",
+              "primary": "tests",
+              "secondary": [
+                "addingProvider",
+                "addingTasks",
+                "addingVerifiers",
+                "agentFramework",
+                "core",
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "4d678a057ff2172d",
+              "changedFiles": 74,
+              "additions": 10449,
+              "deletions": 7,
+              "changedLines": 10458,
+              "unclassifiedLines": 59,
+              "filesReturned": 74,
+              "unavailable": null
+            },
+            {
+              "name": "submit/5-agents-api",
+              "primary": "tests",
+              "secondary": [
+                "addingProvider",
+                "addingTasks",
+                "addingVerifiers",
+                "agentFramework",
+                "core",
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "4cd47d755f426517",
+              "changedFiles": 85,
+              "additions": 12622,
+              "deletions": 7,
+              "changedLines": 12632,
+              "unclassifiedLines": 59,
+              "filesReturned": 85,
+              "unavailable": null
+            },
+            {
+              "name": "submit/6-chaos",
+              "primary": "tests",
+              "secondary": [
+                "addingChaos",
+                "addingProvider",
+                "addingTasks",
+                "addingVerifiers",
+                "agentFramework",
+                "core",
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "ce6bc231791c2421",
+              "changedFiles": 103,
+              "additions": 14892,
+              "deletions": 7,
+              "changedLines": 14903,
+              "unclassifiedLines": 59,
+              "filesReturned": 103,
+              "unavailable": null
+            },
+            {
+              "name": "submit/7-metrics",
+              "primary": "tests",
+              "secondary": [
+                "addingChaos",
+                "addingProvider",
+                "addingSkills",
+                "addingTasks",
+                "addingVerifiers",
+                "agentFramework",
+                "changingGrading",
+                "core",
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "86667f1a935b11ee",
+              "changedFiles": 125,
+              "additions": 17387,
+              "deletions": 7,
+              "changedLines": 17399,
+              "unclassifiedLines": 59,
+              "filesReturned": 125,
+              "unavailable": null
+            },
+            {
+              "name": "submit/8-harness",
+              "primary": "tests",
+              "secondary": [
+                "addingChaos",
+                "addingProvider",
+                "addingSkills",
+                "addingTasks",
+                "addingVerifiers",
+                "agentFramework",
+                "changingGrading",
+                "core",
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "281e9d00af1a86f9",
+              "changedFiles": 141,
+              "additions": 19692,
+              "deletions": 32,
+              "changedLines": 19736,
+              "unclassifiedLines": 78,
+              "filesReturned": 141,
+              "unavailable": null
+            },
+            {
+              "name": "task-reorg",
+              "primary": "infrastructure",
+              "secondary": [
+                "addingChaos",
+                "addingProvider",
+                "addingSkills",
+                "addingTasks",
+                "agentFramework",
+                "changingGrading",
+                "core",
+                "docs",
+                "tests",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "31b21dac91b22b92",
+              "changedFiles": 103,
+              "additions": 2470,
+              "deletions": 348,
+              "changedLines": 2819,
+              "unclassifiedLines": 66,
+              "filesReturned": 103,
+              "unavailable": null
+            },
+            {
+              "name": "worktree-openclaw-gemini-flash-35-rebase",
+              "primary": "docs",
+              "secondary": [
+                "addingTasks",
+                "agentFramework",
+                "core",
+                "infrastructure",
+                "tests",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "a4c8279c8a92a138",
+              "changedFiles": 100,
+              "additions": 4370,
+              "deletions": 2778,
+              "changedLines": 7163,
+              "unclassifiedLines": 299,
+              "filesReturned": 100,
+              "unavailable": null
+            }
+          ],
+          "unavailable": null
+        },
+        {
+          "fullName": "kweinmeister/devops-bench",
+          "owner": "kweinmeister",
+          "authors": [],
+          "external": false,
+          "active": true,
+          "divergentBranches": 1,
+          "branches": [
+            {
+              "name": "main",
+              "primary": "infrastructure",
+              "secondary": [
+                "addingTasks"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "0ee27196a27ce094",
+              "changedFiles": 6,
+              "additions": 499,
+              "deletions": 0,
+              "changedLines": 499,
+              "unclassifiedLines": 0,
+              "filesReturned": 6,
+              "unavailable": null
+            }
+          ],
+          "unavailable": null
+        },
+        {
+          "fullName": "adrianchung/devops-bench-1",
+          "owner": "adrianchung",
+          "authors": [],
+          "external": false,
+          "active": true,
+          "divergentBranches": 22,
+          "branches": [
+            {
+              "name": "add-local-e2e-harness",
+              "primary": "infrastructure",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "5e7b1bdee1ff2b37",
+              "changedFiles": 3,
+              "additions": 233,
+              "deletions": 0,
+              "changedLines": 233,
+              "unclassifiedLines": 0,
+              "filesReturned": 3,
+              "unavailable": null
+            },
+            {
+              "name": "add-noop-deployer",
+              "primary": "infrastructure",
+              "secondary": [
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "0c50e1dfe11079cc",
+              "changedFiles": 2,
+              "additions": 72,
+              "deletions": 1,
+              "changedLines": 73,
+              "unclassifiedLines": 0,
+              "filesReturned": 2,
+              "unavailable": null
+            },
+            {
+              "name": "add-ollama-provider",
+              "primary": "agentFramework",
+              "secondary": [
+                "changingGrading",
+                "infrastructure",
+                "tests",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "7a774716b53768c8",
+              "changedFiles": 5,
+              "additions": 417,
+              "deletions": 1,
+              "changedLines": 418,
+              "unclassifiedLines": 1,
+              "filesReturned": 5,
+              "unavailable": null
+            },
+            {
+              "name": "add-task-generation-framework",
+              "primary": "docs",
+              "secondary": [
+                "addingTasks",
+                "agentFramework"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "4945c60d2874c8ef",
+              "changedFiles": 7,
+              "additions": 662,
+              "deletions": 2,
+              "changedLines": 664,
+              "unclassifiedLines": 0,
+              "filesReturned": 7,
+              "unavailable": null
+            },
+            {
+              "name": "addcomplextask",
+              "primary": "infrastructure",
+              "secondary": [
+                "docs",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "a0b1f9ecfc56c690",
+              "changedFiles": 17,
+              "additions": 842,
+              "deletions": 0,
+              "changedLines": 842,
+              "unclassifiedLines": 27,
+              "filesReturned": 17,
+              "unavailable": null
+            },
+            {
+              "name": "agents",
+              "primary": "agentFramework",
+              "secondary": [
+                "changingGrading",
+                "infrastructure"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "4194543eb9a1ce8c",
+              "changedFiles": 4,
+              "additions": 170,
+              "deletions": 0,
+              "changedLines": 170,
+              "unclassifiedLines": 0,
+              "filesReturned": 4,
+              "unavailable": null
+            },
+            {
+              "name": "agents-md-gke-labs",
+              "primary": "docs",
+              "secondary": [
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "e04ea65d3c3af97d",
+              "changedFiles": 2,
+              "additions": 116,
+              "deletions": 0,
+              "changedLines": 116,
+              "unclassifiedLines": 4,
+              "filesReturned": 2,
+              "unavailable": null
+            },
+            {
+              "name": "agents-md-issue-11",
+              "primary": null,
+              "secondary": [],
+              "authors": [],
+              "external": null,
+              "unavailable": "repos/gke-labs/devops-bench/compare/main...adrianchung:agents-md-issue-11: No common ancestor between main and adrianchung:agents-md-issue-11. (HTTP 404)"
+            },
+            {
+              "name": "claude/k8s-devops-test-setup-9448ns",
+              "primary": "addingTasks",
+              "secondary": [
+                "changingGrading",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "2ed94d3e1d103387",
+              "changedFiles": 14,
+              "additions": 520,
+              "deletions": 0,
+              "changedLines": 520,
+              "unclassifiedLines": 139,
+              "filesReturned": 14,
+              "unavailable": null
+            },
+            {
+              "name": "claude/model-providers-support-ajv6s3",
+              "primary": "infrastructure",
+              "secondary": [
+                "agentFramework",
+                "changingGrading",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "ae1349af4536fec6",
+              "changedFiles": 5,
+              "additions": 213,
+              "deletions": 0,
+              "changedLines": 213,
+              "unclassifiedLines": 1,
+              "filesReturned": 5,
+              "unavailable": null
+            },
+            {
+              "name": "cleanup",
+              "primary": "changingGrading",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "5b03842633ab5392",
+              "changedFiles": 1,
+              "additions": 2,
+              "deletions": 2,
+              "changedLines": 4,
+              "unclassifiedLines": 0,
+              "filesReturned": 1,
+              "unavailable": null
+            },
+            {
+              "name": "complextask",
+              "primary": "infrastructure",
+              "secondary": [
+                "agentFramework",
+                "changingGrading",
+                "docs",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "2bc67fd50c2a501b",
+              "changedFiles": 23,
+              "additions": 623,
+              "deletions": 29,
+              "changedLines": 652,
+              "unclassifiedLines": 26,
+              "filesReturned": 23,
+              "unavailable": null
+            },
+            {
+              "name": "complextask2",
+              "primary": "infrastructure",
+              "secondary": [
+                "docs",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "f295754521f816e7",
+              "changedFiles": 31,
+              "additions": 1105,
+              "deletions": 4,
+              "changedLines": 1109,
+              "unclassifiedLines": 54,
+              "filesReturned": 31,
+              "unavailable": null
+            },
+            {
+              "name": "diagnosis",
+              "primary": "changingGrading",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "ff8d8f79e8cbbac2",
+              "changedFiles": 1,
+              "additions": 6,
+              "deletions": 1,
+              "changedLines": 7,
+              "unclassifiedLines": 0,
+              "filesReturned": 1,
+              "unavailable": null
+            },
+            {
+              "name": "docsmetrics",
+              "primary": "changingGrading",
+              "secondary": [
+                "addingTasks"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "229319e305a65e30",
+              "changedFiles": 3,
+              "additions": 213,
+              "deletions": 6,
+              "changedLines": 219,
+              "unclassifiedLines": 0,
+              "filesReturned": 3,
+              "unavailable": null
+            },
+            {
+              "name": "fix/mcp-server-env-passthrough",
+              "primary": "agentFramework",
+              "secondary": [
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "c036a01de7494feb",
+              "changedFiles": 7,
+              "additions": 142,
+              "deletions": 15,
+              "changedLines": 157,
+              "unclassifiedLines": 0,
+              "filesReturned": 7,
+              "unavailable": null
+            },
+            {
+              "name": "kubernetes-task-generation",
+              "primary": "infrastructure",
+              "secondary": [
+                "addingTasks",
+                "agentFramework",
+                "changingGrading",
+                "docs",
+                "tests",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "cef52acf4c8f02ad",
+              "changedFiles": 17,
+              "additions": 1359,
+              "deletions": 3,
+              "changedLines": 1362,
+              "unclassifiedLines": 1,
+              "filesReturned": 17,
+              "unavailable": null
+            },
+            {
+              "name": "main",
+              "primary": "infrastructure",
+              "secondary": [
+                "addingTasks",
+                "agentFramework",
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "1c0afdd7609b65ff",
+              "changedFiles": 26,
+              "additions": 908,
+              "deletions": 15,
+              "changedLines": 923,
+              "unclassifiedLines": 0,
+              "filesReturned": 26,
+              "unavailable": null
+            },
+            {
+              "name": "oc",
+              "primary": "agentFramework",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "1abee0a4e0237567",
+              "changedFiles": 1,
+              "additions": 1,
+              "deletions": 1,
+              "changedLines": 2,
+              "unclassifiedLines": 0,
+              "filesReturned": 1,
+              "unavailable": null
+            },
+            {
+              "name": "ollama-e2e-testing",
+              "primary": "infrastructure",
+              "secondary": [
+                "addingTasks",
+                "agentFramework",
+                "changingGrading",
+                "docs",
+                "tests",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "cef52acf4c8f02ad",
+              "changedFiles": 17,
+              "additions": 1359,
+              "deletions": 3,
+              "changedLines": 1362,
+              "unclassifiedLines": 1,
+              "filesReturned": 17,
+              "unavailable": null
+            },
+            {
+              "name": "operator-agent",
+              "primary": "core",
+              "secondary": [
+                "addingVerifiers",
+                "agentFramework",
+                "changingGrading",
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "b0174f700fbb5656",
+              "changedFiles": 6,
+              "additions": 123,
+              "deletions": 28,
+              "changedLines": 151,
+              "unclassifiedLines": 0,
+              "filesReturned": 6,
+              "unavailable": null
+            },
+            {
+              "name": "tasks/complex-failing-kind-tasks",
+              "primary": "infrastructure",
+              "secondary": [
+                "addingTasks"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "6533fe762172dd3e",
+              "changedFiles": 19,
+              "additions": 766,
+              "deletions": 0,
+              "changedLines": 766,
+              "unclassifiedLines": 0,
+              "filesReturned": 19,
+              "unavailable": null
+            },
+            {
+              "name": "tasks-easy-medium-hard",
+              "primary": "docs",
+              "secondary": [
+                "addingTasks",
+                "agentFramework",
+                "changingGrading",
+                "infrastructure",
+                "tests",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "39daaadfb1ef94ac",
+              "changedFiles": 22,
+              "additions": 1566,
+              "deletions": 3,
+              "changedLines": 1569,
+              "unclassifiedLines": 1,
+              "filesReturned": 22,
+              "unavailable": null
+            }
+          ],
+          "unavailable": null
+        },
+        {
+          "fullName": "onix-net/devops-bench-gke-labs",
+          "owner": "onix-net",
+          "authors": [],
+          "external": true,
+          "active": true,
+          "divergentBranches": 19,
+          "branches": [
+            {
+              "name": "addcomplextask",
+              "primary": "infrastructure",
+              "secondary": [
+                "agentFramework",
+                "docs",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": true,
+              "signature": "9e7d261d564e96d7",
+              "changedFiles": 12,
+              "additions": 649,
+              "deletions": 43,
+              "changedLines": 692,
+              "unclassifiedLines": 28,
+              "filesReturned": 12,
+              "unavailable": null
+            },
+            {
+              "name": "agents",
+              "primary": "agentFramework",
+              "secondary": [
+                "changingGrading",
+                "infrastructure"
+              ],
+              "authors": [],
+              "external": true,
+              "signature": "4194543eb9a1ce8c",
+              "changedFiles": 4,
+              "additions": 170,
+              "deletions": 0,
+              "changedLines": 170,
+              "unclassifiedLines": 0,
+              "filesReturned": 4,
+              "unavailable": null
+            },
+            {
+              "name": "cleanup",
+              "primary": "changingGrading",
+              "secondary": [],
+              "authors": [],
+              "external": true,
+              "signature": "5b03842633ab5392",
+              "changedFiles": 1,
+              "additions": 2,
+              "deletions": 2,
+              "changedLines": 4,
+              "unclassifiedLines": 0,
+              "filesReturned": 1,
+              "unavailable": null
+            },
+            {
+              "name": "cli-agent-adc-auth",
+              "primary": "agentFramework",
+              "secondary": [
+                "docs",
+                "tests"
+              ],
+              "authors": [],
+              "external": true,
+              "signature": "ac34317096b60b99",
+              "changedFiles": 3,
+              "additions": 136,
+              "deletions": 6,
+              "changedLines": 142,
+              "unclassifiedLines": 0,
+              "filesReturned": 3,
+              "unavailable": null
+            },
+            {
+              "name": "complextask",
+              "primary": "infrastructure",
+              "secondary": [
+                "agentFramework",
+                "changingGrading",
+                "docs",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": true,
+              "signature": "2bc67fd50c2a501b",
+              "changedFiles": 23,
+              "additions": 623,
+              "deletions": 29,
+              "changedLines": 652,
+              "unclassifiedLines": 26,
+              "filesReturned": 23,
+              "unavailable": null
+            },
+            {
+              "name": "complextask2",
+              "primary": "infrastructure",
+              "secondary": [
+                "docs",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": true,
+              "signature": "f295754521f816e7",
+              "changedFiles": 31,
+              "additions": 1105,
+              "deletions": 4,
+              "changedLines": 1109,
+              "unclassifiedLines": 54,
+              "filesReturned": 31,
+              "unavailable": null
+            },
+            {
+              "name": "diagnosis",
+              "primary": "changingGrading",
+              "secondary": [],
+              "authors": [],
+              "external": true,
+              "signature": "ff8d8f79e8cbbac2",
+              "changedFiles": 1,
+              "additions": 6,
+              "deletions": 1,
+              "changedLines": 7,
+              "unclassifiedLines": 0,
+              "filesReturned": 1,
+              "unavailable": null
+            },
+            {
+              "name": "docsmetrics",
+              "primary": "changingGrading",
+              "secondary": [
+                "addingTasks"
+              ],
+              "authors": [],
+              "external": true,
+              "signature": "229319e305a65e30",
+              "changedFiles": 3,
+              "additions": 213,
+              "deletions": 6,
+              "changedLines": 219,
+              "unclassifiedLines": 0,
+              "filesReturned": 3,
+              "unavailable": null
+            },
+            {
+              "name": "ehole/deterministic-verification-mvp",
+              "primary": null,
+              "secondary": [],
+              "authors": [],
+              "external": null,
+              "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:ehole/deterministic-verification-mvp: No common ancestor between main and onix-net:ehole/deterministic-verification-mvp. (HTTP 404)"
+            },
+            {
+              "name": "ehole/task-verification-schemas-mvp",
+              "primary": "tests",
+              "secondary": [
+                "addingChaos",
+                "addingTasks",
+                "addingVerifiers",
+                "agentFramework",
+                "changingGrading",
+                "core",
+                "docs",
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": true,
+              "signature": "7a1d685f7e37ec6c",
+              "changedFiles": 103,
+              "additions": 7081,
+              "deletions": 1481,
+              "changedLines": 8562,
+              "unclassifiedLines": 12,
+              "filesReturned": 103,
+              "unavailable": null
+            },
+            {
+              "name": "experiment/verification-objective-constraint",
+              "primary": "addingVerifiers",
+              "secondary": [
+                "addingTasks",
+                "core",
+                "infrastructure",
+                "tests"
+              ],
+              "authors": [],
+              "external": true,
+              "signature": "b580a07920318abb",
+              "changedFiles": 23,
+              "additions": 3103,
+              "deletions": 27,
+              "changedLines": 3130,
+              "unclassifiedLines": 0,
+              "filesReturned": 23,
+              "unavailable": null
+            },
+            {
+              "name": "feat/deterministic-verifiers",
+              "primary": "addingVerifiers",
+              "secondary": [
+                "addingTasks",
+                "changingGrading"
+              ],
+              "authors": [],
+              "external": true,
+              "signature": "679737ee8355306c",
+              "changedFiles": 7,
+              "additions": 556,
+              "deletions": 32,
+              "changedLines": 588,
+              "unclassifiedLines": 0,
+              "filesReturned": 7,
+              "unavailable": null
+            },
+            {
+              "name": "feat/verification-spec-foundation",
+              "primary": "addingVerifiers",
+              "secondary": [
+                "addingTasks",
+                "core",
+                "tests"
+              ],
+              "authors": [],
+              "external": true,
+              "signature": "fc638fc293b66ecd",
+              "changedFiles": 12,
+              "additions": 598,
+              "deletions": 16,
+              "changedLines": 614,
+              "unclassifiedLines": 0,
+              "filesReturned": 12,
+              "unavailable": null
+            },
+            {
+              "name": "feat/verification-spec-schema",
+              "primary": "addingVerifiers",
+              "secondary": [
+                "addingTasks",
+                "core",
+                "tests"
+              ],
+              "authors": [],
+              "external": true,
+              "signature": "7b80810095cd66e1",
+              "changedFiles": 20,
+              "additions": 2424,
+              "deletions": 27,
+              "changedLines": 2451,
+              "unclassifiedLines": 0,
+              "filesReturned": 20,
+              "unavailable": null
+            },
+            {
+              "name": "feat/verification-vocabulary",
+              "primary": "addingVerifiers",
+              "secondary": [
+                "addingTasks",
+                "core",
+                "infrastructure",
+                "tests"
+              ],
+              "authors": [],
+              "external": true,
+              "signature": "381f0c6f49412753",
+              "changedFiles": 23,
+              "additions": 2998,
+              "deletions": 27,
+              "changedLines": 3025,
+              "unclassifiedLines": 0,
+              "filesReturned": 23,
+              "unavailable": null
+            },
+            {
+              "name": "feat/verification-vocabulary-v2",
+              "primary": "addingVerifiers",
+              "secondary": [
+                "addingTasks",
+                "core",
+                "tests"
+              ],
+              "authors": [],
+              "external": true,
+              "signature": "3f0adc680104a1bd",
+              "changedFiles": 22,
+              "additions": 2742,
+              "deletions": 28,
+              "changedLines": 2770,
+              "unclassifiedLines": 0,
+              "filesReturned": 22,
+              "unavailable": null
+            },
+            {
+              "name": "fix/lustre-csi-task-live-deploy-expected-output",
+              "primary": "addingTasks",
+              "secondary": [],
+              "authors": [],
+              "external": true,
+              "signature": "e19d735330d32a77",
+              "changedFiles": 1,
+              "additions": 8,
+              "deletions": 83,
+              "changedLines": 91,
+              "unclassifiedLines": 0,
+              "filesReturned": 1,
+              "unavailable": null
+            },
+            {
+              "name": "geojaz/brainstorm",
+              "primary": "docs",
+              "secondary": [],
+              "authors": [],
+              "external": true,
+              "signature": "e570f23279f1de35",
+              "changedFiles": 4,
+              "additions": 795,
+              "deletions": 0,
+              "changedLines": 795,
+              "unclassifiedLines": 0,
+              "filesReturned": 4,
+              "unavailable": null
+            },
+            {
+              "name": "oc",
+              "primary": "agentFramework",
+              "secondary": [],
+              "authors": [],
+              "external": true,
+              "signature": "1abee0a4e0237567",
+              "changedFiles": 1,
+              "additions": 1,
+              "deletions": 1,
+              "changedLines": 2,
+              "unclassifiedLines": 0,
+              "filesReturned": 1,
+              "unavailable": null
+            },
+            {
+              "name": "operator-agent",
+              "primary": "core",
+              "secondary": [
+                "addingVerifiers",
+                "agentFramework",
+                "changingGrading",
+                "tests"
+              ],
+              "authors": [],
+              "external": true,
+              "signature": "b0174f700fbb5656",
+              "changedFiles": 6,
+              "additions": 123,
+              "deletions": 28,
+              "changedLines": 151,
+              "unclassifiedLines": 0,
+              "filesReturned": 6,
+              "unavailable": null
+            }
+          ],
+          "unavailable": null
+        },
+        {
+          "fullName": "eugeneng04/devops-bench",
+          "owner": "eugeneng04",
+          "authors": [],
+          "external": false,
+          "active": true,
+          "divergentBranches": 29,
+          "branches": [
+            {
+              "name": "add-canonical-token-buckets",
+              "primary": null,
+              "secondary": [],
+              "authors": [],
+              "external": null,
+              "unavailable": "repos/gke-labs/devops-bench/compare/main...eugeneng04:add-canonical-token-buckets: No common ancestor between main and eugeneng04:add-canonical-token-buckets. (HTTP 404)"
+            },
+            {
+              "name": "addcomplextask",
+              "primary": "infrastructure",
+              "secondary": [
+                "agentFramework",
+                "docs",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "9e7d261d564e96d7",
+              "changedFiles": 12,
+              "additions": 649,
+              "deletions": 43,
+              "changedLines": 692,
+              "unclassifiedLines": 28,
+              "filesReturned": 12,
+              "unavailable": null
+            },
+            {
+              "name": "agents",
+              "primary": "agentFramework",
+              "secondary": [
+                "changingGrading",
+                "infrastructure"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "4194543eb9a1ce8c",
+              "changedFiles": 4,
+              "additions": 170,
+              "deletions": 0,
+              "changedLines": 170,
+              "unclassifiedLines": 0,
+              "filesReturned": 4,
+              "unavailable": null
+            },
+            {
+              "name": "cleanup",
+              "primary": "changingGrading",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "5b03842633ab5392",
+              "changedFiles": 1,
+              "additions": 2,
+              "deletions": 2,
+              "changedLines": 4,
+              "unclassifiedLines": 0,
+              "filesReturned": 1,
+              "unavailable": null
+            },
+            {
+              "name": "complextask",
+              "primary": "infrastructure",
+              "secondary": [
+                "agentFramework",
+                "changingGrading",
+                "docs",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "2bc67fd50c2a501b",
+              "changedFiles": 23,
+              "additions": 623,
+              "deletions": 29,
+              "changedLines": 652,
+              "unclassifiedLines": 26,
+              "filesReturned": 23,
+              "unavailable": null
+            },
+            {
+              "name": "complextask2",
+              "primary": "infrastructure",
+              "secondary": [
+                "docs",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "e4dcc3c3b7ae4195",
+              "changedFiles": 15,
+              "additions": 522,
+              "deletions": 4,
+              "changedLines": 526,
+              "unclassifiedLines": 27,
+              "filesReturned": 15,
+              "unavailable": null
+            },
+            {
+              "name": "complextask3",
+              "primary": "infrastructure",
+              "secondary": [
+                "docs",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "8cd9ea5f1cdd328c",
+              "changedFiles": 11,
+              "additions": 512,
+              "deletions": 0,
+              "changedLines": 512,
+              "unclassifiedLines": 23,
+              "filesReturned": 11,
+              "unavailable": null
+            },
+            {
+              "name": "complextask4",
+              "primary": "infrastructure",
+              "secondary": [
+                "docs",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "390f198f55b36c29",
+              "changedFiles": 9,
+              "additions": 947,
+              "deletions": 0,
+              "changedLines": 947,
+              "unclassifiedLines": 26,
+              "filesReturned": 9,
+              "unavailable": null
+            },
+            {
+              "name": "diagnosis",
+              "primary": "changingGrading",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "ff8d8f79e8cbbac2",
+              "changedFiles": 1,
+              "additions": 6,
+              "deletions": 1,
+              "changedLines": 7,
+              "unclassifiedLines": 0,
+              "filesReturned": 1,
+              "unavailable": null
+            },
+            {
+              "name": "docsmetrics",
+              "primary": "changingGrading",
+              "secondary": [
+                "addingTasks"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "229319e305a65e30",
+              "changedFiles": 3,
+              "additions": 213,
+              "deletions": 6,
+              "changedLines": 219,
+              "unclassifiedLines": 0,
+              "filesReturned": 3,
+              "unavailable": null
+            },
+            {
+              "name": "feat/antigravity-token-reading",
+              "primary": "agentFramework",
+              "secondary": [
+                "docs",
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "97a3297356622895",
+              "changedFiles": 5,
+              "additions": 552,
+              "deletions": 12,
+              "changedLines": 564,
+              "unclassifiedLines": 0,
+              "filesReturned": 5,
+              "unavailable": null
+            },
+            {
+              "name": "feat/claude-code-harness",
+              "primary": "addingHarness",
+              "secondary": [
+                "core",
+                "docs",
+                "infrastructure",
+                "tests",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "b3e727d7108cb083",
+              "changedFiles": 14,
+              "additions": 1717,
+              "deletions": 14,
+              "changedLines": 1731,
+              "unclassifiedLines": 4,
+              "filesReturned": 14,
+              "unavailable": null
+            },
+            {
+              "name": "feat/eval-bastion",
+              "primary": "tests",
+              "secondary": [
+                "addingChaos",
+                "addingSkills",
+                "addingVerifiers",
+                "agentFramework",
+                "changingGrading",
+                "core",
+                "docs",
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "e499913c987255b6",
+              "changedFiles": 132,
+              "additions": 17786,
+              "deletions": 33,
+              "changedLines": 17827,
+              "unclassifiedLines": 215,
+              "filesReturned": 132,
+              "unavailable": null
+            },
+            {
+              "name": "feat/parallel-eval-runs",
+              "primary": "tests",
+              "secondary": [
+                "addingChaos",
+                "addingSkills",
+                "addingVerifiers",
+                "agentFramework",
+                "changingGrading",
+                "core",
+                "docs",
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "f4f65ef6f2c7a410",
+              "changedFiles": 166,
+              "additions": 19358,
+              "deletions": 90,
+              "changedLines": 19474,
+              "unclassifiedLines": 215,
+              "filesReturned": 166,
+              "unavailable": null
+            },
+            {
+              "name": "feat/token-buckets-design",
+              "primary": "agentFramework",
+              "secondary": [
+                "core",
+                "docs",
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "c65fb4ca738aa5b7",
+              "changedFiles": 12,
+              "additions": 499,
+              "deletions": 160,
+              "changedLines": 659,
+              "unclassifiedLines": 0,
+              "filesReturned": 12,
+              "unavailable": null
+            },
+            {
+              "name": "fix-oc-agent",
+              "primary": "agentFramework",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "62af28517a3e1071",
+              "changedFiles": 1,
+              "additions": 36,
+              "deletions": 1,
+              "changedLines": 37,
+              "unclassifiedLines": 0,
+              "filesReturned": 1,
+              "unavailable": null
+            },
+            {
+              "name": "hermes-harness-refactor",
+              "primary": "addingHarness",
+              "secondary": [
+                "core",
+                "docs",
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "1e2c6069283e7c0e",
+              "changedFiles": 8,
+              "additions": 895,
+              "deletions": 1,
+              "changedLines": 896,
+              "unclassifiedLines": 0,
+              "filesReturned": 8,
+              "unavailable": null
+            },
+            {
+              "name": "oc",
+              "primary": "agentFramework",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "1abee0a4e0237567",
+              "changedFiles": 1,
+              "additions": 1,
+              "deletions": 1,
+              "changedLines": 2,
+              "unclassifiedLines": 0,
+              "filesReturned": 1,
+              "unavailable": null
+            },
+            {
+              "name": "oc-agent",
+              "primary": "agentFramework",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "5a1c81fd435cc2ff",
+              "changedFiles": 2,
+              "additions": 7,
+              "deletions": 3,
+              "changedLines": 10,
+              "unclassifiedLines": 0,
+              "filesReturned": 2,
+              "unavailable": null
+            },
+            {
+              "name": "operator-agent",
+              "primary": "core",
+              "secondary": [
+                "addingVerifiers",
+                "agentFramework",
+                "changingGrading",
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "b0174f700fbb5656",
+              "changedFiles": 6,
+              "additions": 123,
+              "deletions": 28,
+              "changedLines": 151,
+              "unclassifiedLines": 0,
+              "filesReturned": 6,
+              "unavailable": null
+            },
+            {
+              "name": "refactor/comparison",
+              "primary": "infrastructure",
+              "secondary": [
+                "docs",
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "dafbf28eb88a7906",
+              "changedFiles": 15,
+              "additions": 1846,
+              "deletions": 0,
+              "changedLines": 1846,
+              "unclassifiedLines": 0,
+              "filesReturned": 15,
+              "unavailable": null
+            },
+            {
+              "name": "refactor/entrypoint",
+              "primary": "tests",
+              "secondary": [
+                "addingChaos",
+                "addingSkills",
+                "addingVerifiers",
+                "agentFramework",
+                "changingGrading",
+                "core",
+                "docs",
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "641829c88ed858ac",
+              "changedFiles": 120,
+              "additions": 16466,
+              "deletions": 33,
+              "changedLines": 16506,
+              "unclassifiedLines": 215,
+              "filesReturned": 120,
+              "unavailable": null
+            },
+            {
+              "name": "refactor/gemini-capabilities",
+              "primary": "tests",
+              "secondary": [
+                "addingChaos",
+                "addingSkills",
+                "addingVerifiers",
+                "agentFramework",
+                "changingGrading",
+                "core",
+                "docs",
+                "infrastructure",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "ca3ff081ffd99150",
+              "changedFiles": 123,
+              "additions": 17104,
+              "deletions": 33,
+              "changedLines": 17145,
+              "unclassifiedLines": 215,
+              "filesReturned": 123,
+              "unavailable": null
+            },
+            {
+              "name": "submit/2-verification",
+              "primary": "addingVerifiers",
+              "secondary": [
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "de387d166c9e9b38",
+              "changedFiles": 16,
+              "additions": 2011,
+              "deletions": 0,
+              "changedLines": 2012,
+              "unclassifiedLines": 0,
+              "filesReturned": 16,
+              "unavailable": null
+            },
+            {
+              "name": "submit/3-agents-capabilities",
+              "primary": "addingVerifiers",
+              "secondary": [
+                "agentFramework",
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "dd64cb8e5d259a5a",
+              "changedFiles": 24,
+              "additions": 2471,
+              "deletions": 0,
+              "changedLines": 2473,
+              "unclassifiedLines": 0,
+              "filesReturned": 24,
+              "unavailable": null
+            },
+            {
+              "name": "submit/4-agents-base-cli",
+              "primary": "agentFramework",
+              "secondary": [
+                "addingVerifiers",
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "d310fe5094b81f6e",
+              "changedFiles": 38,
+              "additions": 5189,
+              "deletions": 0,
+              "changedLines": 5191,
+              "unclassifiedLines": 0,
+              "filesReturned": 38,
+              "unavailable": null
+            },
+            {
+              "name": "submit/5-agents-api",
+              "primary": "agentFramework",
+              "secondary": [
+                "addingVerifiers",
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "aba815d490a473ed",
+              "changedFiles": 49,
+              "additions": 7362,
+              "deletions": 0,
+              "changedLines": 7365,
+              "unclassifiedLines": 0,
+              "filesReturned": 49,
+              "unavailable": null
+            },
+            {
+              "name": "submit/6-chaos",
+              "primary": "agentFramework",
+              "secondary": [
+                "addingChaos",
+                "addingVerifiers",
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "e725f908662ffb88",
+              "changedFiles": 67,
+              "additions": 9632,
+              "deletions": 0,
+              "changedLines": 9636,
+              "unclassifiedLines": 0,
+              "filesReturned": 67,
+              "unavailable": null
+            },
+            {
+              "name": "submit/7-metrics",
+              "primary": "tests",
+              "secondary": [
+                "addingChaos",
+                "addingSkills",
+                "addingVerifiers",
+                "agentFramework",
+                "changingGrading"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "f1f9f4ee3570a8f8",
+              "changedFiles": 89,
+              "additions": 12127,
+              "deletions": 0,
+              "changedLines": 12132,
+              "unclassifiedLines": 0,
+              "filesReturned": 89,
+              "unavailable": null
+            },
+            {
+              "name": "submit/8-harness",
+              "primary": "tests",
+              "secondary": [
+                "addingChaos",
+                "addingSkills",
+                "addingVerifiers",
+                "agentFramework",
+                "changingGrading",
+                "core",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "237b7df6cddfed09",
+              "changedFiles": 105,
+              "additions": 15427,
+              "deletions": 29,
+              "changedLines": 15462,
+              "unclassifiedLines": 60,
+              "filesReturned": 105,
+              "unavailable": null
+            }
+          ],
+          "unavailable": null
+        },
+        {
+          "fullName": "lapis2002/devops-bench",
+          "owner": "lapis2002",
+          "authors": [],
+          "external": false,
+          "active": true,
+          "divergentBranches": 1,
+          "branches": [
+            {
+              "name": "fix/task-doc-mapping",
+              "primary": "addingTasks",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "da62616ec2e474d0",
+              "changedFiles": 3,
+              "additions": 30,
+              "deletions": 0,
+              "changedLines": 30,
+              "unclassifiedLines": 0,
+              "filesReturned": 3,
+              "unavailable": null
+            }
+          ],
+          "unavailable": null
+        },
+        {
+          "fullName": "geojaz/devops-bench",
+          "owner": "geojaz",
+          "authors": [],
+          "external": false,
+          "active": true,
+          "divergentBranches": 2,
+          "branches": [
+            {
+              "name": "ehole/agent-sandbox",
+              "primary": null,
+              "secondary": [],
+              "authors": [],
+              "external": null,
+              "unavailable": "repos/gke-labs/devops-bench/compare/main...geojaz:ehole/agent-sandbox: No common ancestor between main and geojaz:ehole/agent-sandbox. (HTTP 404)"
+            },
+            {
+              "name": "ehole/deterministic-verification-mvp",
+              "primary": null,
+              "secondary": [],
+              "authors": [],
+              "external": null,
+              "unavailable": "repos/gke-labs/devops-bench/compare/main...geojaz:ehole/deterministic-verification-mvp: No common ancestor between main and geojaz:ehole/deterministic-verification-mvp. (HTTP 404)"
+            },
+            {
+              "name": "ehole/preserve-parallel-child-results",
+              "primary": null,
+              "secondary": [],
+              "authors": [],
+              "external": null,
+              "unavailable": "repos/gke-labs/devops-bench/compare/main...geojaz:ehole/preserve-parallel-child-results: No common ancestor between main and geojaz:ehole/preserve-parallel-child-results. (HTTP 404)"
+            },
+            {
+              "name": "fix/collect-generated-files-workspace",
+              "primary": "agentFramework",
+              "secondary": [
+                "core",
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "bc209a3f82b5802a",
+              "changedFiles": 15,
+              "additions": 184,
+              "deletions": 55,
+              "changedLines": 239,
+              "unclassifiedLines": 0,
+              "filesReturned": 15,
+              "unavailable": null
+            },
+            {
+              "name": "fix/metrics-geval-expected-output",
+              "primary": "tests",
+              "secondary": [
+                "addingTasks",
+                "changingGrading"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "29279b6a5f8f5339",
+              "changedFiles": 7,
+              "additions": 132,
+              "deletions": 4,
+              "changedLines": 136,
+              "unclassifiedLines": 0,
+              "filesReturned": 7,
+              "unavailable": null
+            },
+            {
+              "name": "main",
+              "primary": null,
+              "secondary": [],
+              "authors": [],
+              "external": null,
+              "unavailable": "repos/gke-labs/devops-bench/compare/main...geojaz:main: No common ancestor between main and geojaz:main. (HTTP 404)"
+            }
+          ],
+          "unavailable": null
+        },
+        {
+          "fullName": "Fuxiao-Gao/devops-bench",
+          "owner": "fuxiao-gao",
+          "authors": [],
+          "external": false,
+          "active": true,
+          "divergentBranches": 3,
+          "branches": [
+            {
+              "name": "docs/computeclass-active-migration-metadata",
+              "primary": "addingTasks",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "a3551cf9a71416cd",
+              "changedFiles": 1,
+              "additions": 7,
+              "deletions": 0,
+              "changedLines": 7,
+              "unclassifiedLines": 0,
+              "filesReturned": 1,
+              "unavailable": null
+            },
+            {
+              "name": "docs/computeclass-spot-fallback-metadata",
+              "primary": "addingTasks",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "197c920148b08147",
+              "changedFiles": 1,
+              "additions": 19,
+              "deletions": 0,
+              "changedLines": 19,
+              "unclassifiedLines": 0,
+              "filesReturned": 1,
+              "unavailable": null
+            },
+            {
+              "name": "docs/gateway-cloud-armor-metadata",
+              "primary": "addingTasks",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "2038d69778f6bc18",
+              "changedFiles": 1,
+              "additions": 15,
+              "deletions": 0,
+              "changedLines": 15,
+              "unclassifiedLines": 0,
+              "filesReturned": 1,
+              "unavailable": null
+            }
+          ],
+          "unavailable": null
+        },
+        {
+          "fullName": "toshiowang/devops-bench",
+          "owner": "toshiowang",
+          "authors": [],
+          "external": true,
+          "active": false,
+          "divergentBranches": 0,
+          "branches": [],
+          "unavailable": null
+        },
+        {
+          "fullName": "itssimrank/devops-bench",
+          "owner": "itssimrank",
+          "authors": [],
+          "external": false,
+          "active": true,
+          "divergentBranches": 1,
+          "branches": [
+            {
+              "name": "simplify-common-task-prompts",
+              "primary": "addingTasks",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "864ecae2d0f72672",
+              "changedFiles": 5,
+              "additions": 16,
+              "deletions": 50,
+              "changedLines": 66,
+              "unclassifiedLines": 0,
+              "filesReturned": 5,
+              "unavailable": null
+            }
+          ],
+          "unavailable": null
+        }
+      ],
+      "forksUnavailable": null,
+      "forksSkippedByCap": 0,
+      "forksNotListed": 0,
+      "extensions": {
+        "addingTasks": 13,
+        "addingHarness": 2,
+        "addingVerifiers": 8,
+        "addingProvider": 3,
+        "changingGrading": 13,
+        "addingChaos": 0,
+        "addingSkills": 0,
+        "agentFramework": 19,
+        "infrastructure": 28,
+        "core": 12,
+        "tests": 38,
+        "docs": 11,
+        "mixed": 0,
+        "unclassified": 4
+      }
+    },
+    "kubernetes-sigs/devops-bench": {
+      "repo": {
+        "stars": 10,
+        "forks": 13,
+        "watchers": 1,
+        "openIssuesAndPulls": 39,
+        "defaultBranch": "main",
+        "createdAt": "2026-05-15T06:03:37Z",
+        "pushedAt": "2026-07-31T00:29:13Z"
+      },
+      "traffic": null,
+      "trafficUnavailable": "repos/kubernetes-sigs/devops-bench/traffic/views: Must have push access to repository (HTTP 403)",
+      "contributorCount": 9,
+      "forks": [
+        {
+          "fullName": "yuwenma/sig-k8s-devops-bench",
+          "owner": "yuwenma",
+          "authors": [],
+          "external": false,
+          "active": true,
+          "divergentBranches": 2,
+          "branches": [
+            {
+              "name": "feature/verifier-watch",
+              "primary": "agentFramework",
+              "secondary": [
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "f8ad3ac894e732b5",
+              "changedFiles": 13,
+              "additions": 1084,
+              "deletions": 1,
+              "changedLines": 1085,
+              "unclassifiedLines": 128,
+              "filesReturned": 13,
+              "unavailable": null
+            },
+            {
+              "name": "migrate-verifier",
+              "primary": "agentFramework",
+              "secondary": [
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "780ab8c2aeb4c31a",
+              "changedFiles": 12,
+              "additions": 821,
+              "deletions": 1,
+              "changedLines": 822,
+              "unclassifiedLines": 128,
+              "filesReturned": 12,
+              "unavailable": null
+            }
+          ],
+          "unavailable": null
+        },
+        {
+          "fullName": "janetkuo/devops-bench",
+          "owner": "janetkuo",
+          "authors": [],
+          "external": false,
+          "active": true,
+          "divergentBranches": 1,
+          "branches": [
+            {
+              "name": "configure-coderabbit",
+              "primary": "unclassified",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "399fdd9d6b871ee0",
+              "changedFiles": 1,
+              "additions": 58,
+              "deletions": 0,
+              "changedLines": 58,
+              "unclassifiedLines": 58,
+              "filesReturned": 1,
+              "unavailable": null
+            }
+          ],
+          "unavailable": null
+        },
+        {
+          "fullName": "pradeepvrd/devops-bench-1",
+          "owner": "pradeepvrd",
+          "authors": [],
+          "external": false,
+          "active": true,
+          "divergentBranches": 9,
+          "branches": [
+            {
+              "name": "add-chaos-package",
+              "primary": "addingChaos",
+              "secondary": [
+                "agentFramework",
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "47742dc16f4473e9",
+              "changedFiles": 19,
+              "additions": 2398,
+              "deletions": 298,
+              "changedLines": 2696,
+              "unclassifiedLines": 0,
+              "filesReturned": 19,
+              "unavailable": null
+            },
+            {
+              "name": "add-cli-entrypoint",
+              "primary": "core",
+              "secondary": [
+                "tests",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "257f89d884f8882c",
+              "changedFiles": 12,
+              "additions": 1082,
+              "deletions": 2,
+              "changedLines": 1084,
+              "unclassifiedLines": 40,
+              "filesReturned": 12,
+              "unavailable": null
+            },
+            {
+              "name": "add-model-provider-contract",
+              "primary": "core",
+              "secondary": [
+                "tests",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "4a2df4a6ebfc843b",
+              "changedFiles": 4,
+              "additions": 305,
+              "deletions": 1,
+              "changedLines": 306,
+              "unclassifiedLines": 7,
+              "filesReturned": 4,
+              "unavailable": null
+            },
+            {
+              "name": "add-results-package",
+              "primary": "core",
+              "secondary": [
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "891bd5e31b5c8275",
+              "changedFiles": 6,
+              "additions": 1074,
+              "deletions": 0,
+              "changedLines": 1074,
+              "unclassifiedLines": 0,
+              "filesReturned": 6,
+              "unavailable": null
+            },
+            {
+              "name": "add-vendor-neutrality-review-rule",
+              "primary": "unclassified",
+              "secondary": [
+                "docs"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "1a6b7e6f4a0f6c6c",
+              "changedFiles": 2,
+              "additions": 5,
+              "deletions": 0,
+              "changedLines": 5,
+              "unclassifiedLines": 4,
+              "filesReturned": 2,
+              "unavailable": null
+            },
+            {
+              "name": "agents-workspace-path",
+              "primary": "agentFramework",
+              "secondary": [
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "e726dcc3c8b4d12a",
+              "changedFiles": 2,
+              "additions": 20,
+              "deletions": 10,
+              "changedLines": 30,
+              "unclassifiedLines": 0,
+              "filesReturned": 2,
+              "unavailable": null
+            },
+            {
+              "name": "chore/ci-format-guardrails",
+              "primary": "unclassified",
+              "secondary": [
+                "agentFramework"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "52586440c2762db9",
+              "changedFiles": 6,
+              "additions": 28,
+              "deletions": 26,
+              "changedLines": 54,
+              "unclassifiedLines": 46,
+              "filesReturned": 6,
+              "unavailable": null
+            },
+            {
+              "name": "migrate-core-foundation",
+              "primary": "core",
+              "secondary": [
+                "tests",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "c2ab89249ee04df8",
+              "changedFiles": 20,
+              "additions": 2500,
+              "deletions": 0,
+              "changedLines": 2500,
+              "unclassifiedLines": 552,
+              "filesReturned": 20,
+              "unavailable": null
+            },
+            {
+              "name": "test/reland-runenv-env-leak-fix",
+              "primary": "tests",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "30fc007a4cd7bcbd",
+              "changedFiles": 1,
+              "additions": 8,
+              "deletions": 5,
+              "changedLines": 13,
+              "unclassifiedLines": 0,
+              "filesReturned": 1,
+              "unavailable": null
+            }
+          ],
+          "unavailable": null
+        },
+        {
+          "fullName": "ryanzhang-oss/devops-bench",
+          "owner": "ryanzhang-oss",
+          "authors": [],
+          "external": true,
+          "active": false,
+          "divergentBranches": 0,
+          "branches": [],
+          "unavailable": null
+        },
+        {
+          "fullName": "itssimrank/migration",
+          "owner": "itssimrank",
+          "authors": [],
+          "external": false,
+          "active": true,
+          "divergentBranches": 5,
+          "branches": [
+            {
+              "name": "add-agents-base-package",
+              "primary": "agentFramework",
+              "secondary": [
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "060277883db6c3da",
+              "changedFiles": 17,
+              "additions": 1410,
+              "deletions": 1,
+              "changedLines": 1411,
+              "unclassifiedLines": 0,
+              "filesReturned": 17,
+              "unavailable": null
+            },
+            {
+              "name": "add-deployers-base-package",
+              "primary": "infrastructure",
+              "secondary": [
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "2b02cfdc2fe5f08a",
+              "changedFiles": 10,
+              "additions": 1327,
+              "deletions": 0,
+              "changedLines": 1327,
+              "unclassifiedLines": 0,
+              "filesReturned": 10,
+              "unavailable": null
+            },
+            {
+              "name": "add-verification-verifiers-package",
+              "primary": "addingVerifiers",
+              "secondary": [
+                "core",
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "661f8ebc58ff577e",
+              "changedFiles": 9,
+              "additions": 679,
+              "deletions": 3,
+              "changedLines": 682,
+              "unclassifiedLines": 0,
+              "filesReturned": 9,
+              "unavailable": null
+            },
+            {
+              "name": "docs/roadmap-and-contribution-tracks",
+              "primary": "docs",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "decf403591b1fe4b",
+              "changedFiles": 2,
+              "additions": 117,
+              "deletions": 3,
+              "changedLines": 120,
+              "unclassifiedLines": 0,
+              "filesReturned": 2,
+              "unavailable": null
+            },
+            {
+              "name": "migration",
+              "primary": "agentFramework",
+              "secondary": [
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "c8320ba596e97562",
+              "changedFiles": 5,
+              "additions": 328,
+              "deletions": 2,
+              "changedLines": 330,
+              "unclassifiedLines": 5,
+              "filesReturned": 5,
+              "unavailable": null
+            }
+          ],
+          "unavailable": null
+        },
+        {
+          "fullName": "richackard/devops-bench-k8s",
+          "owner": "richackard",
+          "authors": [],
+          "external": false,
+          "active": true,
+          "divergentBranches": 2,
+          "branches": [
+            {
+              "name": "add-api-agent-and-mcp-client",
+              "primary": "agentFramework",
+              "secondary": [
+                "tests",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "ce9f852717cb9fe3",
+              "changedFiles": 13,
+              "additions": 2766,
+              "deletions": 43,
+              "changedLines": 2809,
+              "unclassifiedLines": 242,
+              "filesReturned": 13,
+              "unavailable": null
+            },
+            {
+              "name": "dev",
+              "primary": "infrastructure",
+              "secondary": [
+                "tests",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "2f4b53647d6866fc",
+              "changedFiles": 8,
+              "additions": 366,
+              "deletions": 0,
+              "changedLines": 367,
+              "unclassifiedLines": 33,
+              "filesReturned": 8,
+              "unavailable": null
+            }
+          ],
+          "unavailable": null
+        },
+        {
+          "fullName": "adrianchung/devops-bench",
+          "owner": "adrianchung",
+          "authors": [],
+          "external": false,
+          "active": true,
+          "divergentBranches": 1,
+          "branches": [
+            {
+              "name": "agents-md-issue-11",
+              "primary": "docs",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "bf8f041243a44aea",
+              "changedFiles": 1,
+              "additions": 106,
+              "deletions": 0,
+              "changedLines": 106,
+              "unclassifiedLines": 0,
+              "filesReturned": 1,
+              "unavailable": null
+            }
+          ],
+          "unavailable": null
+        },
+        {
+          "fullName": "jessie1111101/devops-bench-upstream",
+          "owner": "jessie1111101",
+          "authors": [],
+          "external": false,
+          "active": true,
+          "divergentBranches": 25,
+          "branches": [
+            {
+              "name": "add-agents-docs",
+              "primary": "docs",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "01e501aacd16afab",
+              "changedFiles": 3,
+              "additions": 326,
+              "deletions": 0,
+              "changedLines": 326,
+              "unclassifiedLines": 0,
+              "filesReturned": 3,
+              "unavailable": null
+            },
+            {
+              "name": "add-bastion-scripts",
+              "primary": "infrastructure",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "f171a5c6c319445f",
+              "changedFiles": 7,
+              "additions": 1119,
+              "deletions": 0,
+              "changedLines": 1119,
+              "unclassifiedLines": 0,
+              "filesReturned": 7,
+              "unavailable": null
+            },
+            {
+              "name": "add-cleanup-skill",
+              "primary": "docs",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "633cda0c3a817639",
+              "changedFiles": 2,
+              "additions": 200,
+              "deletions": 0,
+              "changedLines": 200,
+              "unclassifiedLines": 0,
+              "filesReturned": 2,
+              "unavailable": null
+            },
+            {
+              "name": "add-composite-outcome-score-to-rows",
+              "primary": "core",
+              "secondary": [
+                "changingGrading",
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "18f14c7169c1389e",
+              "changedFiles": 8,
+              "additions": 495,
+              "deletions": 16,
+              "changedLines": 511,
+              "unclassifiedLines": 0,
+              "filesReturned": 8,
+              "unavailable": null
+            },
+            {
+              "name": "add-composite-outcome-scoring",
+              "primary": "changingGrading",
+              "secondary": [
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "25f0ff9db07ae58c",
+              "changedFiles": 3,
+              "additions": 373,
+              "deletions": 0,
+              "changedLines": 373,
+              "unclassifiedLines": 0,
+              "filesReturned": 3,
+              "unavailable": null
+            },
+            {
+              "name": "add-evalharness-reporter",
+              "primary": "core",
+              "secondary": [
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "261e13da69535832",
+              "changedFiles": 2,
+              "additions": 249,
+              "deletions": 0,
+              "changedLines": 249,
+              "unclassifiedLines": 0,
+              "filesReturned": 2,
+              "unavailable": null
+            },
+            {
+              "name": "add-harness-base-and-scenario",
+              "primary": "core",
+              "secondary": [
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "b3460e00343a1d2d",
+              "changedFiles": 11,
+              "additions": 3212,
+              "deletions": 0,
+              "changedLines": 3212,
+              "unclassifiedLines": 0,
+              "filesReturned": 11,
+              "unavailable": null
+            },
+            {
+              "name": "add-infra-and-model-provider-docs",
+              "primary": "docs",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "111abb19e3adf250",
+              "changedFiles": 3,
+              "additions": 452,
+              "deletions": 0,
+              "changedLines": 452,
+              "unclassifiedLines": 0,
+              "filesReturned": 3,
+              "unavailable": null
+            },
+            {
+              "name": "add-judge-skill-guides",
+              "primary": "addingSkills",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "2ac139b6d0ffa146",
+              "changedFiles": 3,
+              "additions": 81,
+              "deletions": 0,
+              "changedLines": 81,
+              "unclassifiedLines": 0,
+              "filesReturned": 3,
+              "unavailable": null
+            },
+            {
+              "name": "add-metrics-base",
+              "primary": "unclassified",
+              "secondary": [
+                "changingGrading",
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "7d1b46631aa2c93c",
+              "changedFiles": 5,
+              "additions": 1429,
+              "deletions": 0,
+              "changedLines": 1429,
+              "unclassifiedLines": 1090,
+              "filesReturned": 5,
+              "unavailable": null
+            },
+            {
+              "name": "add-metrics-docs",
+              "primary": "docs",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "8a039a040c9929be",
+              "changedFiles": 1,
+              "additions": 198,
+              "deletions": 0,
+              "changedLines": 198,
+              "unclassifiedLines": 0,
+              "filesReturned": 1,
+              "unavailable": null
+            },
+            {
+              "name": "add-minimum-stack",
+              "primary": "infrastructure",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "c7d79f6e62418d16",
+              "changedFiles": 2,
+              "additions": 155,
+              "deletions": 0,
+              "changedLines": 155,
+              "unclassifiedLines": 0,
+              "filesReturned": 2,
+              "unavailable": null
+            },
+            {
+              "name": "add-review-skills",
+              "primary": "docs",
+              "secondary": [
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "4e0d0f74efc0e46a",
+              "changedFiles": 9,
+              "additions": 930,
+              "deletions": 0,
+              "changedLines": 930,
+              "unclassifiedLines": 292,
+              "filesReturned": 9,
+              "unavailable": null
+            },
+            {
+              "name": "add-safety-checklists-metric",
+              "primary": "changingGrading",
+              "secondary": [
+                "addingTasks",
+                "core",
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "d3027d0e049acdc2",
+              "changedFiles": 9,
+              "additions": 525,
+              "deletions": 3,
+              "changedLines": 528,
+              "unclassifiedLines": 0,
+              "filesReturned": 9,
+              "unavailable": null
+            },
+            {
+              "name": "add-task-authoring-docs",
+              "primary": "docs",
+              "secondary": [
+                "addingTasks"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "7408223bdb1b0a71",
+              "changedFiles": 2,
+              "additions": 165,
+              "deletions": 0,
+              "changedLines": 165,
+              "unclassifiedLines": 0,
+              "filesReturned": 2,
+              "unavailable": null
+            },
+            {
+              "name": "add-task-contracts",
+              "primary": "addingTasks",
+              "secondary": [
+                "tests",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "399772c38dc61a6a",
+              "changedFiles": 7,
+              "additions": 1036,
+              "deletions": 0,
+              "changedLines": 1036,
+              "unclassifiedLines": 12,
+              "filesReturned": 7,
+              "unavailable": null
+            },
+            {
+              "name": "experiment/hello-app-unspoonfed",
+              "primary": "tests",
+              "secondary": [
+                "addingChaos",
+                "addingTasks",
+                "addingVerifiers",
+                "core",
+                "infrastructure"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "01440b211fce41a5",
+              "changedFiles": 19,
+              "additions": 994,
+              "deletions": 473,
+              "changedLines": 1467,
+              "unclassifiedLines": 0,
+              "filesReturned": 19,
+              "unavailable": null
+            },
+            {
+              "name": "fair-verification-budget",
+              "primary": "core",
+              "secondary": [
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "1abb7cc1102d50eb",
+              "changedFiles": 2,
+              "additions": 140,
+              "deletions": 3,
+              "changedLines": 143,
+              "unclassifiedLines": 0,
+              "filesReturned": 2,
+              "unavailable": null
+            },
+            {
+              "name": "fault-owns-load-transport",
+              "primary": "addingChaos",
+              "secondary": [
+                "core",
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "8653fb3f0379ed6f",
+              "changedFiles": 5,
+              "additions": 460,
+              "deletions": 434,
+              "changedLines": 894,
+              "unclassifiedLines": 0,
+              "filesReturned": 5,
+              "unavailable": null
+            },
+            {
+              "name": "fix-hello-app-provider",
+              "primary": "addingTasks",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "b470dd63f083db80",
+              "changedFiles": 1,
+              "additions": 1,
+              "deletions": 0,
+              "changedLines": 1,
+              "unclassifiedLines": 0,
+              "filesReturned": 1,
+              "unavailable": null
+            },
+            {
+              "name": "fix-notfound-is-a-fail",
+              "primary": "core",
+              "secondary": [
+                "addingVerifiers",
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "ece778642774172e",
+              "changedFiles": 6,
+              "additions": 116,
+              "deletions": 3,
+              "changedLines": 119,
+              "unclassifiedLines": 0,
+              "filesReturned": 6,
+              "unavailable": null
+            },
+            {
+              "name": "fix-opa-policyreport-wait",
+              "primary": "infrastructure",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "1fb6794038256edd",
+              "changedFiles": 1,
+              "additions": 74,
+              "deletions": 20,
+              "changedLines": 94,
+              "unclassifiedLines": 0,
+              "filesReturned": 1,
+              "unavailable": null
+            },
+            {
+              "name": "fix-parallel-child-handoff",
+              "primary": "addingVerifiers",
+              "secondary": [
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "26aca494ee0f6ce1",
+              "changedFiles": 2,
+              "additions": 46,
+              "deletions": 2,
+              "changedLines": 48,
+              "unclassifiedLines": 0,
+              "filesReturned": 2,
+              "unavailable": null
+            },
+            {
+              "name": "integration/runnable",
+              "primary": "tests",
+              "secondary": [
+                "addingChaos",
+                "addingTasks",
+                "addingVerifiers",
+                "core",
+                "infrastructure"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "e903c0dc503eee26",
+              "changedFiles": 19,
+              "additions": 992,
+              "deletions": 462,
+              "changedLines": 1454,
+              "unclassifiedLines": 0,
+              "filesReturned": 19,
+              "unavailable": null
+            },
+            {
+              "name": "remove-unused-record-keys",
+              "primary": "core",
+              "secondary": [
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "4bd38008f5a0a778",
+              "changedFiles": 2,
+              "additions": 10,
+              "deletions": 48,
+              "changedLines": 58,
+              "unclassifiedLines": 0,
+              "filesReturned": 2,
+              "unavailable": null
+            }
+          ],
+          "unavailable": null
+        },
+        {
+          "fullName": "eugeneng04/devops-bench-sigs",
+          "owner": "eugeneng04",
+          "authors": [],
+          "external": false,
+          "active": true,
+          "divergentBranches": 11,
+          "branches": [
+            {
+              "name": "add-antigravity-cli-harness",
+              "primary": "agentFramework",
+              "secondary": [
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "3058ffccfadd9b01",
+              "changedFiles": 4,
+              "additions": 1680,
+              "deletions": 0,
+              "changedLines": 1680,
+              "unclassifiedLines": 0,
+              "filesReturned": 4,
+              "unavailable": null
+            },
+            {
+              "name": "add-canonical-token-buckets",
+              "primary": "core",
+              "secondary": [
+                "agentFramework",
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "3f17b9e88b6a2a70",
+              "changedFiles": 7,
+              "additions": 227,
+              "deletions": 38,
+              "changedLines": 265,
+              "unclassifiedLines": 0,
+              "filesReturned": 7,
+              "unavailable": null
+            },
+            {
+              "name": "add-cloud-providers",
+              "primary": "addingProvider",
+              "secondary": [
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "020d19b8a2f51f23",
+              "changedFiles": 5,
+              "additions": 523,
+              "deletions": 0,
+              "changedLines": 523,
+              "unclassifiedLines": 0,
+              "filesReturned": 5,
+              "unavailable": null
+            },
+            {
+              "name": "add-concrete-metrics",
+              "primary": "changingGrading",
+              "secondary": [
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "19c2007e204064bf",
+              "changedFiles": 11,
+              "additions": 1647,
+              "deletions": 13,
+              "changedLines": 1660,
+              "unclassifiedLines": 0,
+              "filesReturned": 11,
+              "unavailable": null
+            },
+            {
+              "name": "add-k8s-wrappers",
+              "primary": "core",
+              "secondary": [
+                "infrastructure",
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "82c984828a015bf2",
+              "changedFiles": 6,
+              "additions": 853,
+              "deletions": 0,
+              "changedLines": 853,
+              "unclassifiedLines": 0,
+              "filesReturned": 6,
+              "unavailable": null
+            },
+            {
+              "name": "add-terraform-modules",
+              "primary": "infrastructure",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "03baf7d50c1fd49d",
+              "changedFiles": 12,
+              "additions": 986,
+              "deletions": 0,
+              "changedLines": 986,
+              "unclassifiedLines": 0,
+              "filesReturned": 12,
+              "unavailable": null
+            },
+            {
+              "name": "add-verification-and-judge-base",
+              "primary": "addingVerifiers",
+              "secondary": [
+                "changingGrading",
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "a4746baef60a1113",
+              "changedFiles": 13,
+              "additions": 1764,
+              "deletions": 0,
+              "changedLines": 1764,
+              "unclassifiedLines": 0,
+              "filesReturned": 13,
+              "unavailable": null
+            },
+            {
+              "name": "feat/agents-claude-code-harness",
+              "primary": "addingHarness",
+              "secondary": [
+                "core",
+                "docs",
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "4abfc9df15509518",
+              "changedFiles": 8,
+              "additions": 2075,
+              "deletions": 12,
+              "changedLines": 2087,
+              "unclassifiedLines": 0,
+              "filesReturned": 8,
+              "unavailable": null
+            },
+            {
+              "name": "feat/agents-entry-point-group",
+              "primary": "tests",
+              "secondary": [
+                "agentFramework",
+                "core"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "df34079638bfbef3",
+              "changedFiles": 8,
+              "additions": 307,
+              "deletions": 7,
+              "changedLines": 314,
+              "unclassifiedLines": 0,
+              "filesReturned": 8,
+              "unavailable": null
+            },
+            {
+              "name": "feat/agents-hermes-harness",
+              "primary": "addingHarness",
+              "secondary": [
+                "core",
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "e7fbcbec592665d2",
+              "changedFiles": 5,
+              "additions": 1261,
+              "deletions": 0,
+              "changedLines": 1261,
+              "unclassifiedLines": 0,
+              "filesReturned": 5,
+              "unavailable": null
+            },
+            {
+              "name": "feat/bench-tf-root-override",
+              "primary": "infrastructure",
+              "secondary": [
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "fb70f2c15d2be60a",
+              "changedFiles": 3,
+              "additions": 177,
+              "deletions": 19,
+              "changedLines": 196,
+              "unclassifiedLines": 0,
+              "filesReturned": 3,
+              "unavailable": null
+            }
+          ],
+          "unavailable": null
+        },
+        {
+          "fullName": "geojaz/k8s-devops-bench",
+          "owner": "geojaz",
+          "authors": [],
+          "external": false,
+          "active": true,
+          "divergentBranches": 26,
+          "branches": [
+            {
+              "name": "ehole/agent-sandbox",
+              "primary": "agentFramework",
+              "secondary": [
+                "core",
+                "infrastructure",
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "1a22f976b7397398",
+              "changedFiles": 8,
+              "additions": 1178,
+              "deletions": 26,
+              "changedLines": 1204,
+              "unclassifiedLines": 0,
+              "filesReturned": 8,
+              "unavailable": null
+            },
+            {
+              "name": "ehole/attain-then-hold",
+              "primary": "infrastructure",
+              "secondary": [
+                "addingProvider",
+                "addingTasks",
+                "addingVerifiers",
+                "agentFramework",
+                "changingGrading",
+                "core",
+                "docs",
+                "tests",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "a571ae5501ed9fe1",
+              "changedFiles": 142,
+              "additions": 13601,
+              "deletions": 208,
+              "changedLines": 13809,
+              "unclassifiedLines": 15,
+              "filesReturned": 142,
+              "unavailable": null
+            },
+            {
+              "name": "ehole/credscan-audit",
+              "primary": "core",
+              "secondary": [
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "1d1febdc464bf923",
+              "changedFiles": 2,
+              "additions": 423,
+              "deletions": 0,
+              "changedLines": 423,
+              "unclassifiedLines": 0,
+              "filesReturned": 2,
+              "unavailable": null
+            },
+            {
+              "name": "ehole/deterministic-verification-mvp",
+              "primary": "addingVerifiers",
+              "secondary": [
+                "addingTasks",
+                "changingGrading",
+                "core",
+                "infrastructure",
+                "tests",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "bb15a90551fd542c",
+              "changedFiles": 42,
+              "additions": 5997,
+              "deletions": 230,
+              "changedLines": 6227,
+              "unclassifiedLines": 12,
+              "filesReturned": 42,
+              "unavailable": null
+            },
+            {
+              "name": "ehole/gitignore-terraform-artifacts",
+              "primary": "unclassified",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "79ae371d87f118d4",
+              "changedFiles": 1,
+              "additions": 9,
+              "deletions": 0,
+              "changedLines": 9,
+              "unclassifiedLines": 9,
+              "filesReturned": 1,
+              "unavailable": null
+            },
+            {
+              "name": "ehole/hold-consolidated",
+              "primary": "core",
+              "secondary": [
+                "addingVerifiers",
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "883f3c227e2fca42",
+              "changedFiles": 10,
+              "additions": 1411,
+              "deletions": 14,
+              "changedLines": 1425,
+              "unclassifiedLines": 0,
+              "filesReturned": 10,
+              "unavailable": null
+            },
+            {
+              "name": "ehole/integration",
+              "primary": "infrastructure",
+              "secondary": [
+                "addingProvider",
+                "addingTasks",
+                "addingVerifiers",
+                "agentFramework",
+                "changingGrading",
+                "core",
+                "docs",
+                "tests",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "5c147598ff1d0f61",
+              "changedFiles": 164,
+              "additions": 16568,
+              "deletions": 249,
+              "changedLines": 16817,
+              "unclassifiedLines": 27,
+              "filesReturned": 164,
+              "unavailable": null
+            },
+            {
+              "name": "ehole/judge-vertex-adc",
+              "primary": "addingProvider",
+              "secondary": [
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "fcb9d8c4057d4f99",
+              "changedFiles": 2,
+              "additions": 74,
+              "deletions": 4,
+              "changedLines": 78,
+              "unclassifiedLines": 0,
+              "filesReturned": 2,
+              "unavailable": null
+            },
+            {
+              "name": "ehole/kind-cni-optin",
+              "primary": "infrastructure",
+              "secondary": [],
+              "authors": [],
+              "external": false,
+              "signature": "b7faecc9ec366f12",
+              "changedFiles": 4,
+              "additions": 101,
+              "deletions": 9,
+              "changedLines": 110,
+              "unclassifiedLines": 0,
+              "filesReturned": 4,
+              "unavailable": null
+            },
+            {
+              "name": "ehole/minted-scratch-root",
+              "primary": "core",
+              "secondary": [
+                "addingTasks",
+                "docs",
+                "infrastructure",
+                "tests",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "70a85fef2657c9dc",
+              "changedFiles": 12,
+              "additions": 461,
+              "deletions": 25,
+              "changedLines": 486,
+              "unclassifiedLines": 6,
+              "filesReturned": 12,
+              "unavailable": null
+            },
+            {
+              "name": "ehole/opa-repo-remediated-objective",
+              "primary": "addingVerifiers",
+              "secondary": [
+                "addingTasks",
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "b04a942b29a1ebda",
+              "changedFiles": 4,
+              "additions": 1148,
+              "deletions": 47,
+              "changedLines": 1195,
+              "unclassifiedLines": 0,
+              "filesReturned": 4,
+              "unavailable": null
+            },
+            {
+              "name": "ehole/pin-checks-to-run-cluster",
+              "primary": "core",
+              "secondary": [
+                "addingProvider",
+                "addingVerifiers",
+                "changingGrading",
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "a98d29ba88533e60",
+              "changedFiles": 13,
+              "additions": 248,
+              "deletions": 11,
+              "changedLines": 259,
+              "unclassifiedLines": 0,
+              "filesReturned": 13,
+              "unavailable": null
+            },
+            {
+              "name": "ehole/preserve-parallel-child-results",
+              "primary": "addingVerifiers",
+              "secondary": [
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "7a83f010d3f72924",
+              "changedFiles": 2,
+              "additions": 143,
+              "deletions": 5,
+              "changedLines": 148,
+              "unclassifiedLines": 0,
+              "filesReturned": 2,
+              "unavailable": null
+            },
+            {
+              "name": "ehole/record-sandbox-state",
+              "primary": "infrastructure",
+              "secondary": [
+                "addingProvider",
+                "addingTasks",
+                "addingVerifiers",
+                "agentFramework",
+                "changingGrading",
+                "core",
+                "docs",
+                "tests",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "9a6887375d94adeb",
+              "changedFiles": 164,
+              "additions": 15920,
+              "deletions": 249,
+              "changedLines": 16169,
+              "unclassifiedLines": 27,
+              "filesReturned": 164,
+              "unavailable": null
+            },
+            {
+              "name": "ehole/resource-property-semantics",
+              "primary": "addingVerifiers",
+              "secondary": [
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "bc86b66e3b5eb072",
+              "changedFiles": 2,
+              "additions": 334,
+              "deletions": 22,
+              "changedLines": 356,
+              "unclassifiedLines": 0,
+              "filesReturned": 2,
+              "unavailable": null
+            },
+            {
+              "name": "ehole/safeguard-hold-monitor",
+              "primary": "core",
+              "secondary": [
+                "addingVerifiers",
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "883f3c227e2fca42",
+              "changedFiles": 10,
+              "additions": 1411,
+              "deletions": 14,
+              "changedLines": 1425,
+              "unclassifiedLines": 0,
+              "filesReturned": 10,
+              "unavailable": null
+            },
+            {
+              "name": "ehole/subprocess-stdin-devnull",
+              "primary": "core",
+              "secondary": [
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "83f9cf89cc456186",
+              "changedFiles": 2,
+              "additions": 44,
+              "deletions": 0,
+              "changedLines": 44,
+              "unclassifiedLines": 0,
+              "filesReturned": 2,
+              "unavailable": null
+            },
+            {
+              "name": "ehole/team-integration",
+              "primary": "infrastructure",
+              "secondary": [
+                "addingProvider",
+                "addingTasks",
+                "addingVerifiers",
+                "agentFramework",
+                "changingGrading",
+                "core",
+                "docs",
+                "tests",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "5c147598ff1d0f61",
+              "changedFiles": 164,
+              "additions": 16568,
+              "deletions": 249,
+              "changedLines": 16817,
+              "unclassifiedLines": 27,
+              "filesReturned": 164,
+              "unavailable": null
+            },
+            {
+              "name": "ehole/verification-budget-env",
+              "primary": "core",
+              "secondary": [
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "6a1fca090046423d",
+              "changedFiles": 2,
+              "additions": 90,
+              "deletions": 8,
+              "changedLines": 98,
+              "unclassifiedLines": 0,
+              "filesReturned": 2,
+              "unavailable": null
+            },
+            {
+              "name": "ehole/verification-hold-mode",
+              "primary": "addingVerifiers",
+              "secondary": [
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "8e3e1c9926119c97",
+              "changedFiles": 5,
+              "additions": 424,
+              "deletions": 10,
+              "changedLines": 434,
+              "unclassifiedLines": 0,
+              "filesReturned": 5,
+              "unavailable": null
+            },
+            {
+              "name": "ehole/verification-reason-clarity",
+              "primary": "addingVerifiers",
+              "secondary": [
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "fbdcaa7b0cd82f51",
+              "changedFiles": 4,
+              "additions": 101,
+              "deletions": 4,
+              "changedLines": 105,
+              "unclassifiedLines": 0,
+              "filesReturned": 4,
+              "unavailable": null
+            },
+            {
+              "name": "ehole/verification-result-integrity",
+              "primary": "core",
+              "secondary": [
+                "addingVerifiers",
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "f5fd5675b77cffd2",
+              "changedFiles": 13,
+              "additions": 1632,
+              "deletions": 46,
+              "changedLines": 1678,
+              "unclassifiedLines": 0,
+              "filesReturned": 13,
+              "unavailable": null
+            },
+            {
+              "name": "ehole/verifier-external-http-probe",
+              "primary": "addingVerifiers",
+              "secondary": [
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "5772c51b310e093e",
+              "changedFiles": 3,
+              "additions": 626,
+              "deletions": 0,
+              "changedLines": 626,
+              "unclassifiedLines": 0,
+              "filesReturned": 3,
+              "unavailable": null
+            },
+            {
+              "name": "ehole/verifier-git-repo-sync",
+              "primary": "addingVerifiers",
+              "secondary": [
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "f6d10773ae07fb1a",
+              "changedFiles": 3,
+              "additions": 1072,
+              "deletions": 0,
+              "changedLines": 1072,
+              "unclassifiedLines": 0,
+              "filesReturned": 3,
+              "unavailable": null
+            },
+            {
+              "name": "ehole/verifier-http-probe",
+              "primary": "addingVerifiers",
+              "secondary": [
+                "core",
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "b98f31e6a43e48da",
+              "changedFiles": 6,
+              "additions": 445,
+              "deletions": 0,
+              "changedLines": 445,
+              "unclassifiedLines": 0,
+              "filesReturned": 6,
+              "unavailable": null
+            },
+            {
+              "name": "ehole/verifier-subject-access-review",
+              "primary": "addingVerifiers",
+              "secondary": [
+                "addingProvider",
+                "changingGrading",
+                "core",
+                "tests"
+              ],
+              "authors": [],
+              "external": false,
+              "signature": "57d44c427c476018",
+              "changedFiles": 17,
+              "additions": 942,
+              "deletions": 11,
+              "changedLines": 953,
+              "unclassifiedLines": 0,
+              "filesReturned": 17,
+              "unavailable": null
+            }
+          ],
+          "unavailable": null
+        },
+        {
+          "fullName": "isadominguez314/devops-bench",
+          "owner": "isadominguez314",
+          "authors": [],
+          "external": true,
+          "active": true,
+          "divergentBranches": 4,
+          "branches": [
+            {
+              "name": "feat/vcluster-factory-and-smoke-test",
+              "primary": "infrastructure",
+              "secondary": [
+                "addingProvider",
+                "tests"
+              ],
+              "authors": [],
+              "external": true,
+              "signature": "7953713f3eaf12f3",
+              "changedFiles": 23,
+              "additions": 1707,
+              "deletions": 93,
+              "changedLines": 1800,
+              "unclassifiedLines": 0,
+              "filesReturned": 23,
+              "unavailable": null
+            },
+            {
+              "name": "feat/vcluster-provider-integration",
+              "primary": "infrastructure",
+              "secondary": [
+                "addingProvider",
+                "tests"
+              ],
+              "authors": [],
+              "external": true,
+              "signature": "f1e9b1ec7cf7e4fd",
+              "changedFiles": 21,
+              "additions": 1604,
+              "deletions": 57,
+              "changedLines": 1661,
+              "unclassifiedLines": 0,
+              "filesReturned": 21,
+              "unavailable": null
+            },
+            {
+              "name": "feat/vcluster-tf-stack",
+              "primary": "infrastructure",
+              "secondary": [],
+              "authors": [],
+              "external": true,
+              "signature": "28c6752f02542c25",
+              "changedFiles": 12,
+              "additions": 632,
+              "deletions": 30,
+              "changedLines": 662,
+              "unclassifiedLines": 0,
+              "filesReturned": 12,
+              "unavailable": null
+            },
+            {
+              "name": "fix/gemini-2.5-pro-catalog-override",
+              "primary": "agentFramework",
+              "secondary": [],
+              "authors": [],
+              "external": true,
+              "signature": "312a5d86fa29f0ba",
+              "changedFiles": 2,
+              "additions": 13,
+              "deletions": 1,
+              "changedLines": 14,
+              "unclassifiedLines": 0,
+              "filesReturned": 2,
+              "unavailable": null
+            }
+          ],
+          "unavailable": null
+        },
+        {
+          "fullName": "onix-net/devops-bench",
+          "owner": "onix-net",
+          "authors": [],
+          "external": true,
+          "active": true,
+          "divergentBranches": 5,
+          "branches": [
+            {
+              "name": "ehole/credscan-audit",
+              "primary": "core",
+              "secondary": [
+                "tests"
+              ],
+              "authors": [],
+              "external": true,
+              "signature": "1d1febdc464bf923",
+              "changedFiles": 2,
+              "additions": 423,
+              "deletions": 0,
+              "changedLines": 423,
+              "unclassifiedLines": 0,
+              "filesReturned": 2,
+              "unavailable": null
+            },
+            {
+              "name": "ehole/hold-consolidated",
+              "primary": "core",
+              "secondary": [
+                "addingVerifiers",
+                "tests"
+              ],
+              "authors": [],
+              "external": true,
+              "signature": "883f3c227e2fca42",
+              "changedFiles": 10,
+              "additions": 1411,
+              "deletions": 14,
+              "changedLines": 1425,
+              "unclassifiedLines": 0,
+              "filesReturned": 10,
+              "unavailable": null
+            },
+            {
+              "name": "ehole/kind-cni-optin",
+              "primary": "infrastructure",
+              "secondary": [],
+              "authors": [],
+              "external": true,
+              "signature": "b7faecc9ec366f12",
+              "changedFiles": 4,
+              "additions": 101,
+              "deletions": 9,
+              "changedLines": 110,
+              "unclassifiedLines": 0,
+              "filesReturned": 4,
+              "unavailable": null
+            },
+            {
+              "name": "ehole/record-sandbox-state",
+              "primary": "infrastructure",
+              "secondary": [
+                "addingProvider",
+                "addingTasks",
+                "addingVerifiers",
+                "agentFramework",
+                "changingGrading",
+                "core",
+                "docs",
+                "tests",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": true,
+              "signature": "9a6887375d94adeb",
+              "changedFiles": 164,
+              "additions": 15920,
+              "deletions": 249,
+              "changedLines": 16169,
+              "unclassifiedLines": 27,
+              "filesReturned": 164,
+              "unavailable": null
+            },
+            {
+              "name": "ehole/team-integration",
+              "primary": "infrastructure",
+              "secondary": [
+                "addingProvider",
+                "addingTasks",
+                "addingVerifiers",
+                "agentFramework",
+                "changingGrading",
+                "core",
+                "docs",
+                "tests",
+                "unclassified"
+              ],
+              "authors": [],
+              "external": true,
+              "signature": "5c147598ff1d0f61",
+              "changedFiles": 164,
+              "additions": 16568,
+              "deletions": 249,
+              "changedLines": 16817,
+              "unclassifiedLines": 27,
+              "filesReturned": 164,
+              "unavailable": null
+            }
+          ],
+          "unavailable": null
+        }
+      ],
+      "forksUnavailable": null,
+      "forksSkippedByCap": 0,
+      "forksNotListed": 1,
+      "extensions": {
+        "addingTasks": 2,
+        "addingHarness": 2,
+        "addingVerifiers": 13,
+        "addingProvider": 2,
+        "changingGrading": 3,
+        "addingChaos": 2,
+        "addingSkills": 1,
+        "agentFramework": 9,
+        "infrastructure": 18,
+        "core": 22,
+        "tests": 4,
+        "docs": 8,
+        "mixed": 0,
+        "unclassified": 5
+      }
+    }
+  },
+  "references": {
+    "depending": 2,
+    "running": 1,
+    "citing": 10
+  },
+  "referencesUnavailable": null,
+  "referenceHits": [
+    {
+      "repo": "LeslieLeung/opensource-lighthouse",
+      "path": "page/Cloud Native Computing Foundation (CNCF).md",
+      "class": "citing"
+    },
+    {
+      "repo": "LeslieLeung/opensource-lighthouse",
+      "path": "page/en/Cloud Native Computing Foundation (CNCF).md",
+      "class": "citing"
+    },
+    {
+      "repo": "gke-labs/kube-agents",
+      "path": "AGENTS.md",
+      "class": "citing"
+    },
+    {
+      "repo": "gke-labs/kube-agents",
+      "path": "bench/CUSTOM-TASKS.md",
+      "class": "citing"
+    },
+    {
+      "repo": "gke-labs/kube-agents",
+      "path": "bench/README.md",
+      "class": "citing"
+    },
+    {
+      "repo": "gke-labs/kube-agents",
+      "path": "bench/kube_agents_bench/parsing.py",
+      "class": "depending"
+    },
+    {
+      "repo": "gke-labs/kube-agents",
+      "path": "bench/pyproject.toml",
+      "class": "depending"
+    },
+    {
+      "repo": "gke-labs/kube-agents",
+      "path": "bench/tf/prebuilt/gpu-stress-test/main.tf",
+      "class": "citing"
+    },
+    {
+      "repo": "gke-labs/kube-agents",
+      "path": "docs/README.md",
+      "class": "citing"
+    },
+    {
+      "repo": "kubernetes/community",
+      "path": "sig-apps/README.md",
+      "class": "citing"
+    },
+    {
+      "repo": "kubernetes/community",
+      "path": "sigs.yaml",
+      "class": "citing"
+    },
+    {
+      "repo": "kubernetes/test-infra",
+      "path": "config/jobs/kubernetes-sigs/devops-bench/devops-bench-presubmits.yaml",
+      "class": "running"
+    },
+    {
+      "repo": "kubernetes/test-infra",
+      "path": "config/prow/config.yaml",
+      "class": "citing"
+    }
+  ],
+  "referenceQueries": [
+    {
+      "query": "\"import devops_bench\"",
+      "totalCount": 40,
+      "hits": 40,
+      "capped": false,
+      "unavailable": null
+    },
+    {
+      "query": "\"from devops_bench\"",
+      "totalCount": 249,
+      "hits": 100,
+      "capped": true,
+      "unavailable": null
+    },
+    {
+      "query": "\"gke-labs/devops-bench\"",
+      "totalCount": 9,
+      "hits": 9,
+      "capped": false,
+      "unavailable": null
+    },
+    {
+      "query": "\"kubernetes-sigs/devops-bench\"",
+      "totalCount": 21,
+      "hits": 21,
+      "capped": false,
+      "unavailable": null
+    }
+  ],
+  "referenceHitsCapped": true,
+  "affiliation": {
+    "inside": 19,
+    "outside": 4,
+    "frozenAt": "2026-08-12"
+  },
+  "totals": {
+    "forks": 27,
+    "activeForks": 25,
+    "externalForks": 5,
+    "owners": 18,
+    "activeOwners": 16,
+    "externalOwners": 4,
+    "activeExternalOwners": 2,
+    "divergentBranches": 242,
+    "externalDivergentBranches": 28,
+    "distinctChanges": 225,
+    "externalDistinctChanges": 28,
+    "changedLines": 856148,
+    "unclassifiedLines": 11452,
+    "trafficRepos": [
+      "gke-labs/devops-bench"
+    ]
+  },
+  "derived": {
+    "externalOwnerRatio": 0.2222222222222222,
+    "activeExternalOwnerRatio": 0.125,
+    "externalBranchRatio": 0.11570247933884298,
+    "externalChangeRatio": 0.12444444444444444,
+    "unclassifiedLineRate": 0.013376191966809477
+  }
+}

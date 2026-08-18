@@ -1,0 +1,14 @@
+# Records written by a hand run stay local. The anchors matter: the scheduled
+# job stores under data/, which is committed on purpose — that history is the
+# only copy of traffic older than the fourteen days GitHub retains.
+#
+# Raw snapshots carry contributor, author and fork-owner logins, so committing
+# them is a decision about this repository's visibility — PRODUCTION_PLAN.md 7.3.
+/snapshots/
+/classified/
+/series/
+*.json.tmp
+
+# The published page is docs/index.html. A second rendered copy in git
+# only ever goes stale against it.
+/dashboard.html

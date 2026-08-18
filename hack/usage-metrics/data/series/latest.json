@@ -1,0 +1,298 @@
+{
+  "apiVersion": "usage-metrics/v1",
+  "kind": "UsageSeries",
+  "formatVersion": 1,
+  "generatedAt": "2026-08-18T22:53:37Z",
+  "provenance": {
+    "collectorSha": "79b0041348ef360cc55bb1abb159d5f0338511f0",
+    "workflowRunUrl": null,
+    "writtenAt": "2026-08-18T22:53:37Z"
+  },
+  "unreadable": [
+    {
+      "date": "2026-08-11",
+      "reason": "snapshot: no formatVersion. Snapshots written before the store existed are format 1 and are not readable by this program."
+    }
+  ],
+  "runs": [
+    {
+      "date": "2026-08-12",
+      "collectedAt": "2026-08-12T23:09:11Z",
+      "windowDays": 14,
+      "totals": {
+        "forks": 27,
+        "activeForks": 25,
+        "externalForks": 5,
+        "owners": 18,
+        "activeOwners": 16,
+        "externalOwners": 4,
+        "activeExternalOwners": 2,
+        "divergentBranches": 242,
+        "externalDivergentBranches": 28,
+        "distinctChanges": 225,
+        "externalDistinctChanges": 28,
+        "changedLines": 856148,
+        "unclassifiedLines": 11452,
+        "trafficRepos": [
+          "gke-labs/devops-bench"
+        ]
+      },
+      "derived": {
+        "externalOwnerRatio": 0.2222222222222222,
+        "activeExternalOwnerRatio": 0.125,
+        "externalBranchRatio": 0.11570247933884298,
+        "externalChangeRatio": 0.12444444444444444,
+        "unclassifiedLineRate": 0.013376191966809477
+      },
+      "affiliation": {
+        "inside": 19,
+        "outside": 4,
+        "frozenAt": "2026-08-12"
+      },
+      "references": {
+        "depending": 2,
+        "running": 1,
+        "citing": 10
+      },
+      "referencesUnavailable": null,
+      "traffic": {
+        "gke-labs/devops-bench": {
+          "views": 515,
+          "uniqueVisitors": 35,
+          "clones": 8120,
+          "uniqueCloners": 207
+        },
+        "kubernetes-sigs/devops-bench": null
+      },
+      "coverage": {
+        "partial": false,
+        "skipped": [],
+        "trafficRepos": [
+          "gke-labs/devops-bench"
+        ],
+        "forksUnavailable": []
+      },
+      "provenance": {
+        "collectorSha": "79b0041348ef360cc55bb1abb159d5f0338511f0",
+        "workflowRunUrl": null,
+        "writtenAt": "2026-08-12T23:09:11Z"
+      }
+    },
+    {
+      "date": "2026-08-18",
+      "collectedAt": "2026-08-18T16:45:08Z",
+      "windowDays": 14,
+      "totals": {
+        "forks": 27,
+        "activeForks": 25,
+        "externalForks": 5,
+        "owners": 18,
+        "activeOwners": 16,
+        "externalOwners": 4,
+        "activeExternalOwners": 2,
+        "divergentBranches": 246,
+        "externalDivergentBranches": 9,
+        "distinctChanges": 216,
+        "externalDistinctChanges": 9,
+        "changedLines": 862994,
+        "unclassifiedLines": 11160,
+        "trafficRepos": [
+          "gke-labs/devops-bench"
+        ]
+      },
+      "derived": {
+        "externalOwnerRatio": 0.2222222222222222,
+        "activeExternalOwnerRatio": 0.125,
+        "externalBranchRatio": 0.036585365853658534,
+        "externalChangeRatio": 0.041666666666666664,
+        "unclassifiedLineRate": 0.012931723743154645
+      },
+      "affiliation": {
+        "inside": 19,
+        "outside": 8,
+        "frozenAt": "2026-08-18"
+      },
+      "references": {
+        "depending": 2,
+        "running": 1,
+        "citing": 11
+      },
+      "referencesUnavailable": null,
+      "traffic": {
+        "gke-labs/devops-bench": {
+          "views": 505,
+          "uniqueVisitors": 35,
+          "clones": 7738,
+          "uniqueCloners": 243
+        },
+        "kubernetes-sigs/devops-bench": null
+      },
+      "coverage": {
+        "partial": false,
+        "skipped": [],
+        "trafficRepos": [
+          "gke-labs/devops-bench"
+        ],
+        "forksUnavailable": []
+      },
+      "provenance": {
+        "collectorSha": "79b0041348ef360cc55bb1abb159d5f0338511f0",
+        "workflowRunUrl": null,
+        "writtenAt": "2026-08-18T16:45:08Z"
+      }
+    }
+  ],
+  "daily": {
+    "gke-labs/devops-bench": {
+      "covered": [
+        [
+          "2026-07-29",
+          "2026-08-17"
+        ]
+      ],
+      "gaps": [],
+      "points": [
+        {
+          "date": "2026-07-29",
+          "views": 35,
+          "uniqueVisitors": 10,
+          "clones": 14,
+          "uniqueCloners": 7
+        },
+        {
+          "date": "2026-07-30",
+          "views": 17,
+          "uniqueVisitors": 8,
+          "clones": 30,
+          "uniqueCloners": 13
+        },
+        {
+          "date": "2026-07-31",
+          "views": 16,
+          "uniqueVisitors": 6,
+          "clones": 97,
+          "uniqueCloners": 15
+        },
+        {
+          "date": "2026-08-01",
+          "views": 1,
+          "uniqueVisitors": 1,
+          "clones": 259,
+          "uniqueCloners": 13
+        },
+        {
+          "date": "2026-08-02",
+          "views": 2,
+          "uniqueVisitors": 2,
+          "clones": 783,
+          "uniqueCloners": 11
+        },
+        {
+          "date": "2026-08-03",
+          "views": 44,
+          "uniqueVisitors": 7,
+          "clones": 754,
+          "uniqueCloners": 8
+        },
+        {
+          "date": "2026-08-04",
+          "views": 42,
+          "uniqueVisitors": 8,
+          "clones": 790,
+          "uniqueCloners": 11
+        },
+        {
+          "date": "2026-08-05",
+          "views": 36,
+          "uniqueVisitors": 7,
+          "clones": 771,
+          "uniqueCloners": 15
+        },
+        {
+          "date": "2026-08-06",
+          "views": 98,
+          "uniqueVisitors": 9,
+          "clones": 794,
+          "uniqueCloners": 18
+        },
+        {
+          "date": "2026-08-07",
+          "views": 24,
+          "uniqueVisitors": 7,
+          "clones": 810,
+          "uniqueCloners": 14
+        },
+        {
+          "date": "2026-08-08",
+          "views": 1,
+          "uniqueVisitors": 1,
+          "clones": 818,
+          "uniqueCloners": 28
+        },
+        {
+          "date": "2026-08-09",
+          "views": 1,
+          "uniqueVisitors": 1,
+          "clones": 803,
+          "uniqueCloners": 49
+        },
+        {
+          "date": "2026-08-10",
+          "views": 115,
+          "uniqueVisitors": 9,
+          "clones": 792,
+          "uniqueCloners": 23
+        },
+        {
+          "date": "2026-08-11",
+          "views": 83,
+          "uniqueVisitors": 4,
+          "clones": 605,
+          "uniqueCloners": 25
+        },
+        {
+          "date": "2026-08-12",
+          "views": 23,
+          "uniqueVisitors": 9,
+          "clones": 96,
+          "uniqueCloners": 27
+        },
+        {
+          "date": "2026-08-13",
+          "views": 9,
+          "uniqueVisitors": 6,
+          "clones": 151,
+          "uniqueCloners": 17
+        },
+        {
+          "date": "2026-08-14",
+          "views": 31,
+          "uniqueVisitors": 6,
+          "clones": 723,
+          "uniqueCloners": 25
+        },
+        {
+          "date": "2026-08-15",
+          "views": 6,
+          "uniqueVisitors": 3,
+          "clones": 487,
+          "uniqueCloners": 19
+        },
+        {
+          "date": "2026-08-16",
+          "views": 3,
+          "uniqueVisitors": 3,
+          "clones": 38,
+          "uniqueCloners": 5
+        },
+        {
+          "date": "2026-08-17",
+          "views": 33,
+          "uniqueVisitors": 8,
+          "clones": 60,
+          "uniqueCloners": 14
+        }
+      ]
+    }
+  }
+}

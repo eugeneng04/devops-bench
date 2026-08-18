@@ -234,16 +234,31 @@ edit this template and re-render.
   <div class="card">
     <div class="card-head">
       <div>
-        <h2>Unique visitors and cloners per day</h2>
-        <p class="sub">Both series are unique actors, so they share one axis. Totals are in the table view.</p>
+        <h2>Traffic history</h2>
+        <p class="sub" id="history-sub">Every run's fourteen-day window, stitched. A break in the line is a stretch nobody collected, not a stretch with no visitors.</p>
       </div>
       <div class="spacer"></div>
-      <button type="button" data-toggle="traffic" aria-pressed="false">Table</button>
+      <button type="button" data-toggle="history" aria-pressed="false">Table</button>
     </div>
-    <div id="traffic-chart"></div>
-    <div id="traffic-table" hidden></div>
+    <div id="history-chart"></div>
+    <div id="history-table" hidden></div>
   </div>
 
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <h2>Adoption over time</h2>
+        <p class="sub">One point per collection, plotted where it was taken. Runs are irregular and nothing between two of them is measured.</p>
+      </div>
+      <div class="spacer"></div>
+      <button type="button" data-toggle="runs" aria-pressed="false">Table</button>
+    </div>
+    <div id="runs-chart"></div>
+    <div id="runs-table" hidden></div>
+  </div>
+</div>
+
+<div class="grid cols-2 top" style="margin-bottom:16px">
   <div class="card">
     <div class="card-head">
       <div>
@@ -256,9 +271,7 @@ edit this template and re-render.
     <div id="ext-chart"></div>
     <div id="ext-table" hidden></div>
   </div>
-</div>
 
-<div class="grid cols-2 top" style="margin-bottom:16px">
   <div class="card">
     <div class="card-head">
       <div>
@@ -268,12 +281,14 @@ edit this template and re-render.
     </div>
     <div id="usage-mix"></div>
   </div>
+</div>
 
+<div class="grid top" style="margin-bottom:16px">
   <div class="card">
     <div class="card-head">
       <div>
         <h2>Who is forking</h2>
-        <p class="sub">External means the fork owner is not a repository contributor.</p>
+        <p class="sub">External counts who authored the commits, not who holds the fork. A fork nobody has committed to falls back to its owner.</p>
       </div>
     </div>
     <div id="fork-table"></div>
@@ -348,20 +363,13 @@ edit this template and re-render.
     const repos = selected().map((n) => DATA.repos[n]);
     const withTraffic = repos.filter((r) => r.traffic);
     const forks = repos.flatMap((r) => r.forks || []);
-    const branches = forks.flatMap((f) => f.branches);
+    const branches = forks.flatMap((f) => f.branches).filter((b) => b.primary);
     const externalForks = forks.filter((f) => f.external);
-
-    const byDate = new Map();
-    for (const r of withTraffic) {
-      for (const key of ["views", "clones"]) {
-        for (const d of r.traffic[key].daily) {
-          if (!byDate.has(d.date)) byDate.set(d.date, { date: d.date, views: 0, viewsTotal: 0, clones: 0, clonesTotal: 0 });
-          const row = byDate.get(d.date);
-          row[key === "views" ? "views" : "clones"] += d.unique;
-          row[key === "views" ? "viewsTotal" : "clonesTotal"] += d.total;
-        }
-      }
-    }
+    // Owners, not repositories. Contributors fork both repositories and get
+    // counted twice; every outside owner is counted once, so a per-repository
+    // denominator is inflated with insiders and pushes the number down.
+    const owners = new Set(forks.map((f) => f.owner));
+    const externalOwners = new Set(externalForks.map((f) => f.owner));
 
     const extensions = {};
     for (const r of repos) {
@@ -372,18 +380,23 @@ edit this template and re-render.
     const uniqueVisitors = sum((r) => r.traffic.views.unique);
     const uniqueCloners = sum((r) => r.traffic.clones.unique);
     const totalClones = sum((r) => r.traffic.clones.total);
-    const unclassified = extensions.unclassified || 0;
     const ratio = (a, b) => (b === 0 ? null : a / b);
+    // Weighted by changed lines. Per branch it is a rounding error, because a
+    // branch gets a category from whatever else it touched; the lines the
+    // taxonomy could not place are what the health check is actually asking
+    // about.
+    const changedLines = branches.reduce((a, b) => a + b.changedLines, 0);
+    const unclassifiedLines = branches.reduce((a, b) => a + b.unclassifiedLines, 0);
 
     return {
       repos,
       missingTraffic: repos.filter((r) => !r.traffic),
-      daily: [...byDate.values()].sort((a, b) => a.date.localeCompare(b.date)),
-      forks, branches, externalForks, extensions,
+      forks, branches, externalForks, extensions, owners, externalOwners,
+      changedLines, unclassifiedLines,
       uniqueVisitors, uniqueCloners, totalClones,
       totalViews: sum((r) => r.traffic.views.total),
-      externalForkRatio: ratio(externalForks.length, forks.length),
-      unclassifiedRate: ratio(unclassified, branches.length),
+      externalOwnerRatio: ratio(externalOwners.size, owners.size),
+      unclassifiedRate: ratio(unclassifiedLines, changedLines),
       clonesPerCloner: ratio(totalClones, uniqueCloners),
       paths: withTraffic.flatMap((r) => r.traffic.popularPaths).sort((a, b) => b.unique - a.unique),
       referrers: withTraffic.flatMap((r) => r.traffic.referrers).sort((a, b) => b.unique - a.unique),
@@ -415,7 +428,7 @@ edit this template and re-render.
   }
   const hideTooltip = () => { tooltip.style.opacity = "0"; };
 
-  /* ---------- traffic chart: two series, one axis ---------- */
+  /* ---------- axes ---------- */
 
   /* Axis ticks land on clean numbers: try 4 and 5 divisions, keep the one with
      the least headroom above the data. */
@@ -429,113 +442,6 @@ edit this template and re-render.
       if (!best || candidate.max < best.max) best = candidate;
     }
     return best;
-  }
-
-  function renderTraffic(agg) {
-    const host = document.getElementById("traffic-chart");
-    clear(host);
-    if (!agg.daily.length) {
-      host.appendChild(emptyState("No traffic data for this selection",
-        "The traffic API requires push access to the repository being measured."));
-      return;
-    }
-
-    const legend = el("div", { class: "legend" });
-    for (const s of [{ n: "Unique visitors", c: "--series-1" }, { n: "Unique cloners", c: "--series-2" }]) {
-      const span = el("span");
-      const key = el("i", { class: "key-line" });
-      key.style.background = css(s.c);
-      span.appendChild(key);
-      span.appendChild(document.createTextNode(s.n));
-      legend.appendChild(span);
-    }
-    host.appendChild(legend);
-
-    const W = 520, H = 268, m = { t: 14, r: 44, b: 26, l: 34 };
-    const iw = W - m.l - m.r, ih = H - m.t - m.b;
-    const scale = niceScale(Math.max(...agg.daily.map((d) => Math.max(d.views, d.clones))));
-    const x = (i) => m.l + (agg.daily.length === 1 ? iw / 2 : (i * iw) / (agg.daily.length - 1));
-    const y = (v) => m.t + ih - (v / scale.max) * ih;
-
-    const svg = svgEl("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Unique visitors and unique cloners per day" });
-
-    for (let i = 0; i <= scale.ticks; i++) {
-      const v = scale.step * i;
-      svg.appendChild(svgEl("line", { class: "grid-line", x1: m.l, x2: m.l + iw, y1: y(v), y2: y(v) }));
-      svg.appendChild(svgEl("text", { class: "tick", x: m.l - 8, y: y(v) + 4, "text-anchor": "end" }, num(v)));
-    }
-    svg.appendChild(svgEl("line", { class: "axis-line", x1: m.l, x2: m.l + iw, y1: y(0), y2: y(0) }));
-
-    const fmtDay = (d) => new Date(d + "T00:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
-    for (const i of [0, Math.floor((agg.daily.length - 1) / 2), agg.daily.length - 1]) {
-      svg.appendChild(svgEl("text", {
-        class: "tick", x: x(i), y: H - 6,
-        "text-anchor": i === 0 ? "start" : i === agg.daily.length - 1 ? "end" : "middle",
-      }, fmtDay(agg.daily[i].date)));
-    }
-
-    const series = [
-      { field: "views", color: css("--series-1"), name: "Unique visitors" },
-      { field: "clones", color: css("--series-2"), name: "Unique cloners" },
-    ];
-    for (const s of series) {
-      svg.appendChild(svgEl("path", {
-        d: agg.daily.map((d, i) => `${i ? "L" : "M"}${x(i)},${y(d[s.field])}`).join(" "),
-        fill: "none", stroke: s.color, "stroke-width": 2,
-        "stroke-linejoin": "round", "stroke-linecap": "round",
-      }));
-      const last = agg.daily.length - 1;
-      // 2px surface ring keeps the end-dot legible where the two lines cross.
-      svg.appendChild(svgEl("circle", {
-        cx: x(last), cy: y(agg.daily[last][s.field]), r: 4,
-        fill: s.color, stroke: css("--surface-1"), "stroke-width": 2,
-      }));
-      svg.appendChild(svgEl("text", {
-        class: "val", x: x(last) + 9, y: y(agg.daily[last][s.field]) + 4,
-      }, num(agg.daily[last][s.field])));
-    }
-
-    const cross = svgEl("line", { class: "crosshair", y1: m.t, y2: m.t + ih, x1: 0, x2: 0, opacity: 0 });
-    svg.appendChild(cross);
-    const dots = series.map((s) => {
-      const d = svgEl("circle", { r: 4, fill: s.color, stroke: css("--surface-1"), "stroke-width": 2, opacity: 0 });
-      svg.appendChild(d);
-      return d;
-    });
-
-    const hit = svgEl("rect", { x: m.l, y: m.t, width: iw, height: ih, fill: "transparent" });
-    svg.appendChild(hit);
-    const move = (evt) => {
-      const box = svg.getBoundingClientRect();
-      const px = ((evt.clientX - box.left) / box.width) * W;
-      let i = Math.round(((px - m.l) / iw) * (agg.daily.length - 1));
-      i = Math.max(0, Math.min(agg.daily.length - 1, i));
-      const d = agg.daily[i];
-      cross.setAttribute("x1", x(i)); cross.setAttribute("x2", x(i)); cross.setAttribute("opacity", 1);
-      series.forEach((s, k) => {
-        dots[k].setAttribute("cx", x(i)); dots[k].setAttribute("cy", y(d[s.field])); dots[k].setAttribute("opacity", 1);
-      });
-      showTooltip(evt, fmtDay(d.date), [
-        { color: series[0].color, value: num(d.views), name: "unique visitors" },
-        { color: series[0].color, value: num(d.viewsTotal), name: "views" },
-        { color: series[1].color, value: num(d.clones), name: "unique cloners" },
-        { color: series[1].color, value: num(d.clonesTotal), name: "clones" },
-      ]);
-    };
-    hit.addEventListener("pointermove", move);
-    hit.addEventListener("pointerleave", () => {
-      hideTooltip(); cross.setAttribute("opacity", 0); dots.forEach((d) => d.setAttribute("opacity", 0));
-    });
-
-    host.appendChild(svg);
-
-    const table = buildTable(
-      ["Date", "Unique visitors", "Views", "Unique cloners", "Clones"],
-      agg.daily.map((d) => [fmtDay(d.date), num(d.views), num(d.viewsTotal), num(d.clones), num(d.clonesTotal)]),
-      [false, true, true, true, true]
-    );
-    const holder = document.getElementById("traffic-table");
-    clear(holder); holder.appendChild(table);
   }
 
   /* ---------- extension hotspots: one series, horizontal bars ---------- */
@@ -611,23 +517,37 @@ edit this template and re-render.
     const host = document.getElementById("usage-mix");
     clear(host);
     const order = [["running", "Running", "--series-1"], ["depending", "Depending", "--series-2"], ["citing", "Citing", "--series-3"]];
+
+    const queryTable = () => {
+      const q = buildTable(
+        ["Query", "Matches", "Examined"],
+        DATA.referenceQueries.map((r) => [
+          r.query || "—",
+          r.totalCount === null ? "—" : num(r.totalCount),
+          r.hits === null ? "—" : r.capped ? `${num(r.hits)} (capped)` : num(r.hits),
+        ]),
+        [false, true, true]
+      );
+      q.style.marginTop = "14px";
+      return q;
+    };
+
+    // A search that is not answering is not a measurement of zero references.
+    if (DATA.referencesUnavailable) {
+      host.appendChild(emptyState("References not measured", DATA.referencesUnavailable));
+      host.appendChild(queryTable());
+      return;
+    }
+
     const total = order.reduce((a, [k]) => a + DATA.references[k], 0);
 
     if (total === 0) {
       host.appendChild(emptyState(
         "No external references found",
-        "Four exact-qualified code-search queries returned only the two canonical repositories. " +
+        "Every code-search match was inside the two canonical repositories. " +
         "This is a measured zero, not a missing measurement — the queries ran and matched nothing outside the project."
       ));
-      const q = buildTable(
-        ["Query", "Hits", "External"],
-        DATA.referenceQueries.map((r) => [
-          r.query || "—", r.hits === null ? "—" : num(r.hits), "0",
-        ]),
-        [false, true, true]
-      );
-      q.style.marginTop = "14px";
-      host.appendChild(q);
+      host.appendChild(queryTable());
       return;
     }
 
@@ -662,6 +582,12 @@ edit this template and re-render.
       order.map(([k, name]) => [name, num(DATA.references[k])]),
       [false, true]
     ));
+    host.appendChild(queryTable());
+
+    if (DATA.referenceHitsCapped) {
+      host.appendChild(el("p", { class: "muted" },
+        "A query matched more files than GitHub will return, so these counts are a floor."));
+    }
   }
 
   /* ---------- tables ---------- */
@@ -698,14 +624,20 @@ edit this template and re-render.
       host.appendChild(emptyState("Fork data unavailable", "No fork listing in this snapshot."));
       return;
     }
+    // An org account holds 19 branches and outsiders wrote 3 of them. A flat
+    // "External" charged all 19 to the outside on the face of the table.
+    const externalLabel = (f) => {
+      const n = f.branches.filter((b) => b.primary && b.external).length;
+      return n && n < f.divergentBranches ? `External (${n} of ${f.divergentBranches})` : "External";
+    };
     const rows = [...agg.forks]
       .sort((a, b) => b.divergentBranches - a.divergentBranches)
       .slice(0, 12)
       .map((f) => [
         f.fullName,
-        f.external ? "External" : "Contributor",
+        f.external ? externalLabel(f) : "Contributor",
         num(f.divergentBranches),
-        [...new Set(f.branches.map((b) => DATA.classLabels[b.primary] || b.primary))].slice(0, 2).join(", ") || "—",
+        [...new Set(f.branches.filter((b) => b.primary).map((b) => DATA.classLabels[b.primary] || b.primary))].slice(0, 2).join(", ") || "—",
       ]);
     host.appendChild(buildTable(["Fork", "Affiliation", "Divergent branches", "Top classes"], rows, [false, false, true, false], true));
     if (agg.forks.length > rows.length) {
@@ -748,17 +680,17 @@ edit this template and re-render.
     document.getElementById("tile-visitors-note").textContent =
       agg.repos.some((r) => r.traffic) ? `${num(agg.totalViews)} views over ${DATA.windowDays} days.` : "Traffic API needs push access.";
 
-    setValue(document.getElementById("tile-external"), pct(agg.externalForkRatio));
+    setValue(document.getElementById("tile-external"), pct(agg.externalOwnerRatio));
     document.getElementById("tile-external-note").textContent =
-      agg.externalForkRatio === null
+      agg.externalOwnerRatio === null
         ? "No forks in this selection — undefined, not zero."
-        : `${agg.externalForks.length} of ${agg.forks.length} fork owners are not contributors.`;
+        : `${agg.externalOwners.size} of ${agg.owners.size} fork owners have outside-authored work, or have never committed.`;
 
     setValue(document.getElementById("tile-unclassified"), pct(agg.unclassifiedRate));
     document.getElementById("tile-unclassified-note").textContent =
       agg.unclassifiedRate === null
-        ? "No branches to classify — undefined, not zero."
-        : `${agg.extensions.unclassified || 0} of ${agg.branches.length} branches matched no rule.`;
+        ? "No changes to classify — undefined, not zero."
+        : `${num(agg.unclassifiedLines)} of ${num(agg.changedLines)} changed lines matched no rule.`;
   }
 
   function renderBanners(agg) {
@@ -774,11 +706,278 @@ edit this template and re-render.
     }
   }
 
+  /* ---------- history ----------
+
+     Two charts, and the difference between them is the whole reason the store
+     keeps every run. Daily traffic accumulates: consecutive fourteen-day
+     windows overlap, so they stitch into a history longer than the fourteen
+     days GitHub will answer for. Run figures do not accumulate; each is one
+     observation on the day it was taken.
+
+     Both are drawn on a date-proportional axis. Spacing runs by index would
+     draw a fortnight's silence and a day's gap the same width, which is the
+     specific way an irregular schedule turns into a trend nobody measured. */
+
+  const SERIES = DATA.series || null;
+  const DAY_MS = 86400000;
+  const dayNum = (d) => Math.round(Date.parse(d + "T00:00:00Z") / DAY_MS);
+  const fmtDate = (d) =>
+    new Date(d + "T00:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+
+  /* Split a date-ordered list wherever the dates stop being consecutive, so a
+     stretch nobody collected leaves a hole in the line instead of a straight
+     segment implying measurements that were never taken. */
+  function segments(points) {
+    const out = [];
+    let run = [];
+    for (const p of points) {
+      if (run.length && dayNum(p.date) !== dayNum(run[run.length - 1].date) + 1) {
+        out.push(run);
+        run = [];
+      }
+      run.push(p);
+    }
+    if (run.length) out.push(run);
+    return out;
+  }
+
+  /* Shared line-chart body. `lines` are already in the right order; `gapNote`
+     is rendered under the chart when the axis contains a hole. */
+  function lineChart(host, lines, opts) {
+    const W = 520, H = 268, m = { t: 14, r: 52, b: 26, l: 38 };
+    const iw = W - m.l - m.r, ih = H - m.t - m.b;
+
+    const allPoints = lines.flatMap((s) => s.points);
+    const lo = Math.min(...allPoints.map((p) => dayNum(p.date)));
+    const hi = Math.max(...allPoints.map((p) => dayNum(p.date)));
+    const span = Math.max(hi - lo, 1);
+    const scale = niceScale(Math.max(...allPoints.map((p) => p.value), 1));
+    const x = (d) => m.l + ((dayNum(d) - lo) / span) * iw;
+    const y = (v) => m.t + ih - (v / scale.max) * ih;
+
+    const legend = el("div", { class: "legend" });
+    for (const s of lines) {
+      const span_ = el("span");
+      const key = el("i", { class: "key-line" });
+      key.style.background = s.color;
+      span_.appendChild(key);
+      span_.appendChild(document.createTextNode(s.name));
+      legend.appendChild(span_);
+    }
+    host.appendChild(legend);
+
+    const svg = svgEl("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": opts.label });
+
+    for (let i = 0; i <= scale.ticks; i++) {
+      const v = scale.step * i;
+      svg.appendChild(svgEl("line", { class: "grid-line", x1: m.l, x2: m.l + iw, y1: y(v), y2: y(v) }));
+      svg.appendChild(svgEl("text", { class: "tick", x: m.l - 8, y: y(v) + 4, "text-anchor": "end" }, num(v)));
+    }
+    svg.appendChild(svgEl("line", { class: "axis-line", x1: m.l, x2: m.l + iw, y1: y(0), y2: y(0) }));
+
+    const midDate = new Date((lo + Math.round(span / 2)) * DAY_MS).toISOString().slice(0, 10);
+    const edges = [[allPoints.length ? new Date(lo * DAY_MS).toISOString().slice(0, 10) : null, "start"],
+                   [midDate, "middle"],
+                   [new Date(hi * DAY_MS).toISOString().slice(0, 10), "end"]];
+    for (const [d, anchor] of edges) {
+      if (d) svg.appendChild(svgEl("text", { class: "tick", x: x(d), y: H - 6, "text-anchor": anchor }, fmtDate(d)));
+    }
+
+    for (const s of lines) {
+      /* Only a daily series breaks at a gap. Run points are irregular by
+         nature - a missing Tuesday between two collections is not a hole in
+         the data, it is what a weekly schedule looks like - so splitting them
+         on consecutive dates leaves every point stranded and draws no line at
+         all. The dots mark where the observations actually are. */
+      for (const run of opts.breakGaps ? segments(s.points) : [s.points]) {
+        if (run.length === 1) {
+          svg.appendChild(svgEl("circle", {
+            cx: x(run[0].date), cy: y(run[0].value), r: 3,
+            fill: s.color, stroke: css("--surface-1"), "stroke-width": 2,
+          }));
+          continue;
+        }
+        svg.appendChild(svgEl("path", {
+          d: run.map((p, i) => `${i ? "L" : "M"}${x(p.date)},${y(p.value)}`).join(" "),
+          fill: "none", stroke: s.color, "stroke-width": 2,
+          "stroke-linejoin": "round", "stroke-linecap": "round",
+        }));
+      }
+      if (opts.dots) {
+        for (const p of s.points) {
+          svg.appendChild(svgEl("circle", {
+            cx: x(p.date), cy: y(p.value), r: 4,
+            fill: s.color, stroke: css("--surface-1"), "stroke-width": 2,
+          }));
+        }
+      }
+      const last = s.points[s.points.length - 1];
+      svg.appendChild(svgEl("circle", {
+        cx: x(last.date), cy: y(last.value), r: 4,
+        fill: s.color, stroke: css("--surface-1"), "stroke-width": 2,
+      }));
+      svg.appendChild(svgEl("text", { class: "val", x: x(last.date) + 9, y: y(last.value) + 4 }, num(last.value)));
+    }
+
+    /* Hover snaps to a date that exists. A pointer over a gap finds the nearest
+       measured day rather than inventing a reading for a day nobody collected. */
+    const dates = [...new Set(allPoints.map((p) => p.date))].sort();
+    const cross = svgEl("line", { class: "crosshair", y1: m.t, y2: m.t + ih, x1: 0, x2: 0, opacity: 0 });
+    svg.appendChild(cross);
+    const dots = lines.map((s) => {
+      const d = svgEl("circle", { r: 4, fill: s.color, stroke: css("--surface-1"), "stroke-width": 2, opacity: 0 });
+      svg.appendChild(d);
+      return d;
+    });
+
+    const hit = svgEl("rect", { x: m.l, y: m.t, width: iw, height: ih, fill: "transparent" });
+    svg.appendChild(hit);
+    hit.addEventListener("pointermove", (evt) => {
+      const box = svg.getBoundingClientRect();
+      const px = ((evt.clientX - box.left) / box.width) * W;
+      const target = lo + ((px - m.l) / iw) * span;
+      const date = dates.reduce((a, b) => (Math.abs(dayNum(b) - target) < Math.abs(dayNum(a) - target) ? b : a));
+      cross.setAttribute("x1", x(date)); cross.setAttribute("x2", x(date)); cross.setAttribute("opacity", 1);
+      const rows = [];
+      lines.forEach((s, k) => {
+        const p = s.points.find((q) => q.date === date);
+        if (!p) { dots[k].setAttribute("opacity", 0); return; }
+        dots[k].setAttribute("cx", x(date)); dots[k].setAttribute("cy", y(p.value)); dots[k].setAttribute("opacity", 1);
+        rows.push({ color: s.color, value: num(p.value), name: s.name.toLowerCase() });
+      });
+      showTooltip(evt, fmtDate(date), rows);
+    });
+    hit.addEventListener("pointerleave", () => {
+      hideTooltip(); cross.setAttribute("opacity", 0); dots.forEach((d) => d.setAttribute("opacity", 0));
+    });
+
+    host.appendChild(svg);
+    if (opts.note) host.appendChild(el("p", { class: "sub" }, opts.note));
+  }
+
+  function renderHistory() {
+    const host = document.getElementById("history-chart");
+    const holder = document.getElementById("history-table");
+    clear(host); clear(holder);
+
+    if (!SERIES) {
+      host.appendChild(emptyState("This page carries no history",
+        "Build one with series.py and pass it to render.py with --series."));
+      return;
+    }
+    const repos = selected().filter((n) => SERIES.daily[n]);
+    if (!repos.length) {
+      host.appendChild(emptyState("No traffic history for this selection",
+        "The traffic API needs Administration: read on the repository being measured."));
+      return;
+    }
+
+    /* Unique visitors do not add across repositories - the same person can
+       visit both - so two repositories are two lines and never one sum. */
+    const lines = repos.length === 1
+      ? [
+          { name: "Unique visitors", color: css("--series-1"),
+            points: SERIES.daily[repos[0]].points.map((p) => ({ date: p.date, value: p.uniqueVisitors })) },
+          { name: "Unique cloners", color: css("--series-2"),
+            points: SERIES.daily[repos[0]].points.map((p) => ({ date: p.date, value: p.uniqueCloners })) },
+        ]
+      : repos.map((n, i) => ({
+          name: n.split("/")[0] + " unique visitors",
+          color: css(`--series-${(i % 3) + 1}`),
+          points: SERIES.daily[n].points.map((p) => ({ date: p.date, value: p.uniqueVisitors })),
+        }));
+
+    const gaps = repos.flatMap((n) => SERIES.daily[n].gaps);
+    const covered = repos.flatMap((n) => SERIES.daily[n].covered);
+    const total = covered.reduce((a, [s, e]) => a + (dayNum(e) - dayNum(s) + 1), 0);
+    lineChart(host, lines, {
+      label: "Daily traffic across every collection",
+      breakGaps: true,
+      note: gaps.length
+        ? `${gaps.length} gap${gaps.length > 1 ? "s" : ""} where no run covered the days: ` +
+          gaps.map(([s, e]) => `${fmtDate(s)}–${fmtDate(e)}`).join(", ") + "."
+        : `${total} consecutive days, from ${repos.length} repositor${repos.length > 1 ? "ies" : "y"}` +
+          ` — ${Math.max(total - DATA.windowDays, 0)} more than GitHub retains.`,
+    });
+
+    document.getElementById("history-sub").textContent = repos.length > 1
+      ? "Every run's fourteen-day window, stitched. One line per repository: unique visitors do not add across repositories."
+      : "Every run's fourteen-day window, stitched. A break in the line is a stretch nobody collected, not a stretch with no visitors.";
+
+    const rows = [];
+    for (const n of repos) {
+      for (const p of SERIES.daily[n].points) {
+        rows.push([fmtDate(p.date), n.split("/")[0], num(p.uniqueVisitors), num(p.views), num(p.uniqueCloners), num(p.clones)]);
+      }
+    }
+    holder.appendChild(buildTable(
+      ["Date", "Repository", "Unique visitors", "Views", "Unique cloners", "Clones"],
+      rows, [false, false, true, true, true, true]
+    ));
+  }
+
+  function renderRuns() {
+    const host = document.getElementById("runs-chart");
+    const holder = document.getElementById("runs-table");
+    clear(host); clear(holder);
+
+    if (!SERIES) {
+      host.appendChild(emptyState("This page carries no history",
+        "Build one with series.py and pass it to render.py with --series."));
+      return;
+    }
+    const runs = SERIES.runs;
+    if (!runs.length) {
+      host.appendChild(emptyState("No runs in the series", "Nothing has been collected yet."));
+      return;
+    }
+
+    /* Owner counts are global across repositories - a person who forked both is
+       one adopter - so these do not respond to the repository filter, and the
+       note says so rather than leaving a reader to wonder why. */
+    const metrics = [
+      ["owners", "Fork owners", "--series-1"],
+      ["activeOwners", "Owners who committed", "--series-2"],
+      ["externalOwners", "Outside owners", "--series-3"],
+    ];
+    const lines = metrics.map(([field, name, color]) => ({
+      name, color: css(color),
+      points: runs.map((r) => ({ date: r.date, value: r.totals[field] })),
+    }));
+
+    lineChart(host, lines, {
+      label: "Fork owners, active owners and outside owners at each collection",
+      dots: true,
+      note: runs.length < 3
+        ? `${runs.length} collection${runs.length > 1 ? "s" : ""} so far. Owner counts are for both repositories together, so the repository filter does not change them.`
+        : "Owner counts are for both repositories together, so the repository filter does not change them.",
+    });
+
+    const unreadable = (SERIES.unreadable || []).length;
+    if (unreadable) {
+      host.appendChild(el("p", { class: "sub" },
+        `${unreadable} stored record${unreadable > 1 ? "s are" : " is"} in a format this page cannot read and ` +
+        `${unreadable > 1 ? "are" : "is"} absent from the chart: ` +
+        SERIES.unreadable.map((u) => u.date).join(", ") + "."));
+    }
+
+    holder.appendChild(buildTable(
+      ["Run", "Fork owners", "Committed", "Outside", "Outside share", "Traffic from"],
+      runs.map((r) => [
+        fmtDate(r.date), num(r.totals.owners), num(r.totals.activeOwners),
+        num(r.totals.externalOwners), pct(r.derived.externalOwnerRatio) || "—",
+        r.coverage.trafficRepos.map((n) => n.split("/")[0]).join(", ") || "—",
+      ]),
+      [false, true, true, true, true, false]
+    ));
+  }
+
   function render() {
     const agg = aggregate();
     renderBanners(agg);
     renderHeadline(agg);
-    renderTraffic(agg);
+    renderHistory();
+    renderRuns();
     renderExtensions(agg);
     renderUsageMix(agg);
     renderForks(agg);

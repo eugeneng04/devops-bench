@@ -1,0 +1,108 @@
+# Installs at: eugeneng04/devops-bench/.github/workflows/usage-metrics.yml (this fork only).
+# Collects usage and community-engagement metrics, commits them, and publishes
+# the dashboard to Pages. See hack/usage-metrics/PRODUCTION_PLAN.md stages 6 and 7.
+name: usage-metrics
+
+on:
+  schedule:
+    # Twice a week, not weekly. GitHub keeps traffic for fourteen days and the
+    # window ends yesterday, so a weekly run has exactly seven days of slack and
+    # two consecutive misses lose a day that cannot be recovered from anywhere.
+    # A second run costs about seven minutes and removes that failure mode.
+    - cron: "41 5 * * 1,4"     # Monday and Thursday, off-peak and off the :00 mark
+  workflow_dispatch:
+    inputs:
+      skip_forks:
+        description: "Skip fork comparison, the expensive part (about 350 of 377 requests)"
+        type: boolean
+        default: false
+
+concurrency:
+  # A manual run overlapping a scheduled one would have both writing the same
+  # dated record and both pushing.
+  group: usage-metrics
+  cancel-in-progress: false
+
+# The store is a git repository of files - PRODUCTION_PLAN.md 7.2 - and here it
+# is this repository, so the job needs to push. It pushes with GITHUB_TOKEN,
+# which by design does not trigger further workflows: the page is written on the
+# same push as the data, so nothing needs to react to it.
+permissions:
+  contents: write
+
+jobs:
+  collect:
+    # This fork only. Without the guard every fork of this repository runs the
+    # collector against the upstream repositories on the same schedule.
+    if: github.repository == 'eugeneng04/devops-bench'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # The traffic endpoints need push access on the repository being measured,
+      # and this job measures two repositories in two organisations. The default
+      # GITHUB_TOKEN is scoped to this fork, so it cannot answer for either; a
+      # 403 is recorded as null with the reason attached rather than as zero, so
+      # a missing or thin token degrades visibly instead of reading as no usage.
+      - name: Collect
+        env:
+          GH_TOKEN: ${{ secrets.USAGE_METRICS_TOKEN || secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          SKIP=""; [[ "${{ inputs.skip_forks }}" == "true" ]] && SKIP="--skip-forks"
+          python3 hack/usage-metrics/collect.py --store "file:hack/usage-metrics/data" $SKIP
+
+      # --reclassify re-runs the current taxonomy over every snapshot ever
+      # stored, which is the whole reason collection and classification are
+      # separate programs. A record this version cannot read is reported and
+      # skipped; it does not stop the walk.
+      - name: Build the series
+        run: |
+          set -euo pipefail
+          python3 hack/usage-metrics/series.py --store "file:hack/usage-metrics/data" \
+            --reclassify --out hack/usage-metrics/data/series/latest.json
+
+      # docs/ is the Pages source, so writing the page here publishes it.
+      - name: Render the dashboard
+        run: |
+          set -euo pipefail
+          LATEST="$(ls hack/usage-metrics/data/classified/*.json | sort | tail -1)"
+          python3 hack/usage-metrics/render.py "$LATEST" \
+            --series hack/usage-metrics/data/series/latest.json --out docs/index.html
+
+      # Commit directly to the default branch, and never force-push. Nothing
+      # here rewrites a dated record: collect.py refuses to replace a fuller run
+      # from the same day with a thinner one, so the history only ever grows.
+      #
+      # Consecutive snapshots are near-identical, so git deltas them to about
+      # 12 KB each against 2.4 MB on disk - measured. Size is not the reason to
+      # move this to a bucket, and 7.2 lists the three reasons that are.
+      - name: Commit
+        run: |
+          set -euo pipefail
+          git config user.name "devops-bench-metrics"
+          git config user.email "devops-bench-metrics@users.noreply.github.com"
+          git add -A hack/usage-metrics/data docs/index.html
+          # Nothing to commit is not a failure. It does mean the collector
+          # produced a byte-identical run, which is worth seeing in the log.
+          if git diff --cached --quiet; then
+            echo "::warning::no change to commit - the collector produced an identical run"
+            exit 0
+          fi
+          git commit -m "usage metrics: $(date -u +%Y-%m-%d)
+
+          Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          git push
+
+      # Ninety-day retention, so this is a convenience for reading the page
+      # without cloning - never the record of it.
+      - name: Upload the dashboard
+        uses: actions/upload-artifact@v4
+        with:
+          name: dashboard
+          path: docs/index.html

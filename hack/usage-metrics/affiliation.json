@@ -1,0 +1,26 @@
+{
+  "_comment": [
+    "Overrides for the inside/outside decision. This is NOT the roster.",
+    "",
+    "Affiliation is derived per run: the contributors API says who has merged",
+    "commits, and the compare responses say who authored the commits on every",
+    "fork branch. Anyone not named here is decided that way and needs no entry.",
+    "",
+    "Name someone here only when the derived answer is wrong:",
+    "  inside  - an organisation account that holds repositories for the team,",
+    "            or a teammate who has not merged anything yet, or someone the",
+    "            contributors API missed because their commits were squashed",
+    "            under another author.",
+    "  outside - someone the contributors API counts as a contributor who is not",
+    "            on the team. A reviewer from another project who landed one fix",
+    "            reads as inside and pushes the outside share down.",
+    "",
+    "A name here beats everything, including the freeze in collect.py. A name in",
+    "both lists is an error, not a tie-break. Logins are lowercase."
+  ],
+  "inside": [
+    "gke-labs",
+    "kubernetes-sigs"
+  ],
+  "outside": []
+}
