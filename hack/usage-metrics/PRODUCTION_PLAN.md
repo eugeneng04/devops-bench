@@ -622,9 +622,17 @@ axes are date-proportional — spacing runs by index would draw a fortnight's
 silence and a day's gap the same width. The series is optional: with none, the
 page says it has no history rather than drawing an empty chart.
 
-Three things it must get right, all now enforced:
+Four things it must get right, all now enforced:
 
 - **Escape the payload properly** (Stage −1).
+- **Count distinct changes in the chart, not branches** — 3.2 settled this for
+  the headline and the chart went on counting copies. People fork a fork and
+  carry every branch with them: four accounts hold byte-identical copies of nine
+  changes, and one person pushed the same work twice under two names. 248
+  branches are 218 distinct changes; Infrastructure falls from 48 to 40 and
+  Changing grading from 16 to 7, which is enough to hand the top bar to Tests.
+  The bar was measuring how often work is copied, and reading as how much of the
+  benchmark people extend.
 - **Show the extension mix for outside forks separately.** 188 of 210 branches
   are on contributor-owned forks, so the current "extension hotspots" chart is
   the team describing itself, presented as adoption. The outside-only mix is 22

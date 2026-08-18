@@ -189,6 +189,8 @@ edit this template and re-render.
   #ext-detail .note { color: var(--text-muted); font-size: 12px; margin: 10px 0 0; line-height: 1.55; }
   #ext-detail td.path a { text-decoration: none; border-bottom: 1px solid var(--border); }
   #ext-detail td.path a:hover { border-bottom-color: var(--text-secondary); }
+  #ext-detail .copies { color: var(--text-muted); cursor: help; }
+  #ext-detail .upstream { color: var(--text-muted); }
 
   footer { margin-top: 32px; color: var(--text-muted); font-size: 12px; line-height: 1.7; }
   footer code { font-size: 11px; }
@@ -272,7 +274,7 @@ edit this template and re-render.
     <div class="card-head">
       <div>
         <h2>Extension hotspots</h2>
-        <p class="sub">Divergent fork branches by primary class. One branch counts once — select a bar to list them.</p>
+        <p class="sub">Distinct changes on fork branches, by primary class. A change copied onto several forks counts once — select a bar to list them.</p>
       </div>
       <div class="spacer"></div>
       <button type="button" data-toggle="ext" aria-pressed="false">Table</button>
@@ -371,15 +373,56 @@ edit this template and re-render.
   const repoNames = Object.keys(DATA.repos);
   const selected = () => repoNames.filter((r) => repoFilter === "all" || r === repoFilter);
 
+  // One change, counted once. People fork a fork and carry every branch with
+  // them, and they push the same work again under a second name, so the same
+  // change arrives several times over. The signature is the change's content -
+  // classify.py - so it survives both.
+  //
+  // Deduplicate within an affiliation group and never across it, the same rule
+  // classify.py applies to distinctChanges: merging an outside branch into a
+  // byte-identical inside one would make the outside share depend on a tie-break
+  // nobody chose.
+  function distinctChanges(branches) {
+    // Prefer the fork whose owner wrote the change. The copies sit on other
+    // people's forks, so that is the one link that leads to the origin; owner
+    // and branch name break the tie when no fork is the author's own.
+    const origin = (b) => ((b.authors || []).includes(b.fork.owner) ? 0 : 1);
+    const ordered = [...branches].sort((a, b) =>
+      origin(a) - origin(b) ||
+      a.fork.owner.localeCompare(b.fork.owner) ||
+      a.name.localeCompare(b.name));
+
+    const byChange = new Map(), distinct = [];
+    for (const b of ordered) {
+      // No signature means the branch could not be read. It cannot be matched
+      // to anything, so it stands alone rather than merging with the other
+      // unreadable ones.
+      const key = b.signature ? `${b.external} ${b.signature}` : distinct.length;
+      const seen = byChange.get(key);
+      if (seen) { seen.copies.push(b); continue; }
+      const rep = { ...b, copies: [] };
+      byChange.set(key, rep);
+      distinct.push(rep);
+    }
+    return distinct;
+  }
+
   function aggregate() {
-    const repos = selected().map((n) => DATA.repos[n]);
+    const names = selected();
+    const repos = names.map((n) => DATA.repos[n]);
     const withTraffic = repos.filter((r) => r.traffic);
-    const forks = repos.flatMap((r) => r.forks || []);
+    // Carry the upstream name down as well. One owner has a fork of each
+    // repository with a branch of the same name in both, so with both selected
+    // a row labelled owner:branch would appear twice and read as a duplicate
+    // that was missed.
+    const forks = names.flatMap((n) => (DATA.repos[n].forks || []).map((f) => ({ ...f, upstream: n })));
     // Carry the fork down onto the branch. A branch's name is only meaningful
     // beside the fork it is on - "main" appears on almost every one of them.
-    const branches = forks
-      .flatMap((f) => (f.branches || []).map((b) => ({ ...b, fork: f })))
-      .filter((b) => b.primary);
+    const branches = distinctChanges(
+      forks
+        .flatMap((f) => (f.branches || []).map((b) => ({ ...b, fork: f })))
+        .filter((b) => b.primary)
+    );
     const externalForks = forks.filter((f) => f.external);
     // Owners, not repositories. Contributors fork both repositories and get
     // counted twice; every outside owner is counted once, so a per-repository
@@ -387,10 +430,11 @@ edit this template and re-render.
     const owners = new Set(forks.map((f) => f.owner));
     const externalOwners = new Set(externalForks.map((f) => f.owner));
 
+    // Counted here rather than read from repos[].extensions, which counts every
+    // copy: a change carried onto four forks is one extension of the benchmark,
+    // not four, and the bars are what the reader compares.
     const extensions = {};
-    for (const r of repos) {
-      for (const k in r.extensions || {}) extensions[k] = (extensions[k] || 0) + r.extensions[k];
-    }
+    for (const b of branches) extensions[b.primary] = (extensions[b.primary] || 0) + 1;
 
     const sum = (fn) => withTraffic.reduce((a, r) => a + fn(r), 0);
     const uniqueVisitors = sum((r) => r.traffic.views.unique);
@@ -481,7 +525,7 @@ edit this template and re-render.
       return;
     }
     if (!rows.length) {
-      host.appendChild(emptyState("No branch matched the taxonomy", "Every divergent branch is unclassified."));
+      host.appendChild(emptyState("No change matched the taxonomy", "Every divergent branch is unclassified."));
       return;
     }
 
@@ -491,7 +535,7 @@ edit this template and re-render.
     const max = Math.max(...rows.map((r) => r[1]));
     const color = css("--series-1");
 
-    const svg = svgEl("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Divergent fork branches by primary class" });
+    const svg = svgEl("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Distinct changes on fork branches by primary class" });
     rows.forEach(([key, value], i) => {
       const cy = m.t + i * rowH + rowH / 2;
       const w = Math.max((value / max) * iw, 2);
@@ -516,7 +560,7 @@ edit this template and re-render.
         "data-class": key,
       });
       const show = (evt) => showTooltip(evt, label, [
-        { color, value: num(value), name: value === 1 ? "branch" : "branches" },
+        { color, value: num(value), name: value === 1 ? "change" : "changes" },
       ]);
       const choose = (refocus) => {
         extClass = chosen ? null : key;
@@ -548,7 +592,7 @@ edit this template and re-render.
     host.appendChild(svg);
 
     holder.appendChild(buildTable(
-      ["Class", "Branches", "Share"],
+      ["Class", "Changes", "Share"],
       rows.map(([k, v]) => [
         DATA.classLabels[k] || k, num(v), pct(v / agg.branches.length),
       ]),
@@ -579,10 +623,22 @@ edit this template and re-render.
     const alsoTouch = agg.branches.filter(
       (b) => b.primary !== extClass && (b.secondary || []).includes(extClass)
     ).length;
+    // Counted over the copies of the changes on this bar, not over every copy
+    // in the selection - the note sits under this list and has to add up to it.
+    const copies = listed.reduce((a, b) => a + b.copies.length, 0);
+    // One owner has a fork of each repository with a branch of the same name in
+    // both, so with both selected two rows read alike and the second looks like
+    // a duplicate that was missed. Name the upstream on those rows only: on all
+    // forty it is noise that wraps the column onto a third line.
+    const seenLabel = {};
+    for (const b of listed) {
+      const k = `${b.fork.owner}:${b.name}`;
+      seenLabel[k] = (seenLabel[k] || 0) + 1;
+    }
     const external = listed.filter((b) => b.external).length;
 
     const head = el("div", { class: "detail-head" });
-    head.appendChild(el("h3", {}, `${label} — ${num(listed.length)} ${listed.length === 1 ? "branch" : "branches"}`));
+    head.appendChild(el("h3", {}, `${label} — ${num(listed.length)} ${listed.length === 1 ? "change" : "changes"}`));
     const close = el("button", { type: "button" }, "Clear");
     close.addEventListener("click", () => {
       extClass = null;
@@ -595,16 +651,32 @@ edit this template and re-render.
     host.appendChild(buildTable(
       ["Branch", "Also touches", "Lines"],
       listed.map((b) => {
-        const link = el("a", {
+        const where = el("span", {});
+        where.appendChild(el("a", {
           href: `https://github.com/${b.fork.fullName}/tree/${refPath(b.name)}`,
           target: "_blank", rel: "noopener noreferrer",
-        }, `${b.fork.owner}:${b.name}`);
+        }, `${b.fork.owner}:${b.name}`));
+        // The owning org, not the repository name: both upstreams are called
+        // devops-bench, so the name is the half that does not distinguish them.
+        if (seenLabel[`${b.fork.owner}:${b.name}`] > 1) {
+          where.appendChild(el("span", { class: "upstream", title: `Forked from ${b.fork.upstream}` },
+            ` ${b.fork.upstream.split("/")[0]}`));
+        }
+        // The copies are named on hover rather than dropped. Someone looking
+        // for their own fork here has to be able to find out that the row is
+        // theirs too, and not that their work went missing.
+        if (b.copies.length) {
+          where.appendChild(el("span", {
+            class: "copies",
+            title: `Same change on ${b.copies.map((c) => `${c.fork.owner}:${c.name}`).join(", ")}`,
+          }, ` +${b.copies.length}`));
+        }
         // A wide branch touches ten classes. Spelling all of them out in a
         // half-width card pushes the line count off the edge, so the cell shows
         // three and keeps the rest on hover.
         const also = (b.secondary || []).map((k) => DATA.classLabels[k] || k);
         const shown = also.length > 3 ? `${also.slice(0, 3).join(", ")} +${also.length - 3} more` : also.join(", ");
-        return [link, also.length ? el("span", { title: also.join(", ") }, shown) : "—", num(b.changedLines)];
+        return [where, also.length ? el("span", { title: also.join(", ") }, shown) : "—", num(b.changedLines)];
       }),
       [false, false, true],
       true
@@ -612,8 +684,12 @@ edit this template and re-render.
 
     const notes = [];
     if (external) notes.push(`${num(external)} from outside the team.`);
+    if (copies) {
+      notes.push(`${num(copies)} further ${copies === 1 ? "branch is" : "branches are"} ` +
+        `the same change on another fork, folded into the row it duplicates and marked +n.`);
+    }
     if (alsoTouch) {
-      notes.push(`${num(alsoTouch)} more ${alsoTouch === 1 ? "branch touches" : "branches touch"} ` +
+      notes.push(`${num(alsoTouch)} more ${alsoTouch === 1 ? "change touches" : "changes touch"} ` +
         `${label} without it being their primary class, so they are counted under another bar.`);
     }
     if (notes.length) host.appendChild(el("p", { class: "note" }, notes.join(" ")));

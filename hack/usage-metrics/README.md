@@ -182,7 +182,10 @@ confusing them is how a trend chart lies.
   — as a harness name. Nine branches reported a provider as a harness.
 - **A change is identified by its content, not its branch name.** The signature
   hashes the sorted path list together with additions and deletions. 242
-  branches are 225 distinct changes.
+  branches are 225 distinct changes. Every count on the page follows this,
+  extension hotspots included: people fork a fork and carry every branch with
+  them, so a change sitting on four forks is one extension of the benchmark and
+  the bar that counted four was counting the copying.
 - **Deduplicate within an affiliation group, never across it.** Fourteen outside
   branches are byte-identical to branches on a contributor's fork; merging them
   across the boundary makes the outside share depend on an arbitrary tie-break.
