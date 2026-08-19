@@ -310,6 +310,55 @@ def test_our_own_repositories_are_not_adoption():
     assert classify_reference(hit, '"import devops_bench"') is None
 
 
+def _reference_block(*queries):
+    return {
+        "control": {"value": {"totalCount": 5, "hits": []}, "unavailable": None},
+        "trustworthy": True,
+        "queries": [
+            {"value": {"query": q, "totalCount": len(hits), "hits": hits}, "unavailable": None}
+            for q, hits in queries
+        ],
+    }
+
+
+def test_a_reference_is_attributed_to_the_repository_it_names():
+    out = classify_references(
+        _reference_block(
+            ('"gke-labs/devops-bench"', [{"repo": "someone/else", "path": "docs/a.md"}]),
+            ('"kubernetes-sigs/devops-bench"', [{"repo": "other/repo", "path": "docs/b.md"}]),
+        )
+    )
+    assert {h["path"]: h["targets"] for h in out["referenceHits"]} == {
+        "docs/a.md": ["gke-labs/devops-bench"],
+        "docs/b.md": ["kubernetes-sigs/devops-bench"],
+    }
+
+
+def test_a_package_import_takes_the_repository_the_rest_of_its_project_names():
+    """The package is byte-identical in both repositories, so the import itself
+    says nothing. The project around it does."""
+    out = classify_references(
+        _reference_block(
+            ('"from devops_bench"', [{"repo": "someone/else", "path": "app/main.py"}]),
+            ('"kubernetes-sigs/devops-bench"', [{"repo": "someone/else", "path": "README.md"}]),
+        )
+    )
+    assert {h["path"]: h["targets"] for h in out["referenceHits"]} == {
+        "app/main.py": ["kubernetes-sigs/devops-bench"],
+        "README.md": ["kubernetes-sigs/devops-bench"],
+    }
+
+
+def test_a_project_naming_no_repository_leaves_its_references_unattributed():
+    out = classify_references(
+        _reference_block(
+            ('"from devops_bench"', [{"repo": "someone/else", "path": "app/main.py"}]),
+        )
+    )
+    assert out["referenceHits"][0]["targets"] == []
+    assert out["references"]["depending"] == 1
+
+
 # --- 3.5 ratios ----------------------------------------------------------------
 
 

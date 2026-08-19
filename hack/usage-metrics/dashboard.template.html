@@ -730,15 +730,30 @@ edit this template and re-render.
 
   /* ---------- usage mix ---------- */
 
+  // A reference names a repository - classify.py attributes each hit to the
+  // canonical path the referencing file writes down - so the filter applies to
+  // it. Under "All" the unattributed ones are counted too; under one repository
+  // they cannot be, because nothing says they belong to it.
+  function selectedHits() {
+    const hits = DATA.referenceHits || [];
+    if (repoFilter === "all") return hits;
+    return hits.filter((h) => (h.targets || []).includes(repoFilter));
+  }
+
   function renderUsageMix(agg) {
     const host = document.getElementById("usage-mix");
     clear(host);
     const order = [["running", "Running", "--series-1"], ["depending", "Depending", "--series-2"], ["citing", "Citing", "--series-3"]];
 
     const queryTable = () => {
+      // The other repository's path query answers a question this selection is
+      // not asking, and leaving it in is what made both repositories read alike.
+      const rows = DATA.referenceQueries.filter(
+        (r) => repoFilter === "all" || !repoNames.some((n) => n !== repoFilter && r.query === `"${n}"`)
+      );
       const q = buildTable(
         ["Query", "Matches", "Examined"],
-        DATA.referenceQueries.map((r) => [
+        rows.map((r) => [
           r.query || "—",
           r.totalCount === null ? "—" : num(r.totalCount),
           r.hits === null ? "—" : r.capped ? `${num(r.hits)} (capped)` : num(r.hits),
@@ -757,7 +772,12 @@ edit this template and re-render.
       return;
     }
 
-    const total = order.reduce((a, [k]) => a + DATA.references[k], 0);
+    const counts = { running: 0, depending: 0, citing: 0 };
+    for (const h of selectedHits()) counts[h.class] += 1;
+    const total = order.reduce((a, [k]) => a + counts[k], 0);
+    // A repository filter that empties a kind must not leave its list open
+    // underneath a segment that is no longer on the bar.
+    if (usageClass && !counts[usageClass]) usageClass = null;
 
     if (total === 0) {
       host.appendChild(emptyState("No external references found", ""));
@@ -781,7 +801,7 @@ edit this template and re-render.
     const svg = svgEl("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "External references by kind" });
     let cursor = 0;
     for (const [k, name, v] of order) {
-      const value = DATA.references[k];
+      const value = counts[k];
       if (!value) continue;
       const w = (value / total) * W - gap;
       const color = css(v);
@@ -823,7 +843,7 @@ edit this template and re-render.
     host.appendChild(svg);
     host.appendChild(buildTable(
       ["Kind", "References"],
-      order.map(([k, name]) => [name, num(DATA.references[k])]),
+      order.map(([k, name]) => [name, num(counts[k])]),
       [false, true]
     ));
     host.appendChild(queryTable());
@@ -842,7 +862,7 @@ edit this template and re-render.
     const host = document.getElementById("usage-detail");
     clear(host);
     const sub = document.getElementById("usage-sub");
-    const hits = DATA.referenceHits || [];
+    const hits = selectedHits();
     sub.textContent = "External references by type" +
       (hits.length ? ", select type to list files" : "");
     if (!usageClass) return;

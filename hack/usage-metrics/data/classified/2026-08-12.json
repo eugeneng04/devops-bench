@@ -5533,67 +5533,106 @@
     {
       "repo": "LeslieLeung/opensource-lighthouse",
       "path": "page/Cloud Native Computing Foundation (CNCF).md",
-      "class": "citing"
+      "class": "citing",
+      "targets": [
+        "kubernetes-sigs/devops-bench"
+      ]
     },
     {
       "repo": "LeslieLeung/opensource-lighthouse",
       "path": "page/en/Cloud Native Computing Foundation (CNCF).md",
-      "class": "citing"
+      "class": "citing",
+      "targets": [
+        "kubernetes-sigs/devops-bench"
+      ]
     },
     {
       "repo": "gke-labs/kube-agents",
       "path": "AGENTS.md",
-      "class": "citing"
+      "class": "citing",
+      "targets": [
+        "kubernetes-sigs/devops-bench"
+      ]
     },
     {
       "repo": "gke-labs/kube-agents",
       "path": "bench/CUSTOM-TASKS.md",
-      "class": "citing"
+      "class": "citing",
+      "targets": [
+        "kubernetes-sigs/devops-bench"
+      ]
     },
     {
       "repo": "gke-labs/kube-agents",
       "path": "bench/README.md",
-      "class": "citing"
+      "class": "citing",
+      "targets": [
+        "kubernetes-sigs/devops-bench"
+      ]
     },
     {
       "repo": "gke-labs/kube-agents",
       "path": "bench/kube_agents_bench/parsing.py",
-      "class": "depending"
+      "class": "depending",
+      "targets": [
+        "kubernetes-sigs/devops-bench"
+      ]
     },
     {
       "repo": "gke-labs/kube-agents",
       "path": "bench/pyproject.toml",
-      "class": "depending"
+      "class": "depending",
+      "targets": [
+        "kubernetes-sigs/devops-bench"
+      ]
     },
     {
       "repo": "gke-labs/kube-agents",
       "path": "bench/tf/prebuilt/gpu-stress-test/main.tf",
-      "class": "citing"
+      "class": "citing",
+      "targets": [
+        "kubernetes-sigs/devops-bench"
+      ]
     },
     {
       "repo": "gke-labs/kube-agents",
       "path": "docs/README.md",
-      "class": "citing"
+      "class": "citing",
+      "targets": [
+        "kubernetes-sigs/devops-bench"
+      ]
     },
     {
       "repo": "kubernetes/community",
       "path": "sig-apps/README.md",
-      "class": "citing"
+      "class": "citing",
+      "targets": [
+        "kubernetes-sigs/devops-bench"
+      ]
     },
     {
       "repo": "kubernetes/community",
       "path": "sigs.yaml",
-      "class": "citing"
+      "class": "citing",
+      "targets": [
+        "kubernetes-sigs/devops-bench"
+      ]
     },
     {
       "repo": "kubernetes/test-infra",
       "path": "config/jobs/kubernetes-sigs/devops-bench/devops-bench-presubmits.yaml",
-      "class": "running"
+      "class": "running",
+      "targets": [
+        "kubernetes-sigs/devops-bench"
+      ]
     },
     {
       "repo": "kubernetes/test-infra",
       "path": "config/prow/config.yaml",
-      "class": "citing"
+      "class": "citing",
+      "targets": [
+        "kubernetes-sigs/devops-bench"
+      ]
     }
   ],
   "referenceQueries": [

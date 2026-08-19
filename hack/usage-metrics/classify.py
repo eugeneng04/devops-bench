@@ -143,6 +143,11 @@ MANIFEST_PATH = re.compile(r"(^|/)(pyproject\.toml|requirements[^/]*\.txt|setup\
 PROSE_PATH = re.compile(r"\.(md|rst|txt|adoc)$")
 IMPORT_QUERIES = ('"import devops_bench"', '"from devops_bench"')
 
+# Which canonical repository a reference is about. The import queries name the
+# package, which is byte-identical in both repositories, so only the two queries
+# that are the repository paths carry an answer.
+TARGET_QUERIES = {f'"{repo}"': repo for repo in sorted(CANONICAL_REPOS)}
+
 
 def classify_file(path: str) -> tuple[str, int]:
     for parent in HARNESS_PARENTS:
@@ -271,6 +276,23 @@ def classify_reference(hit: dict[str, Any], query: str) -> str | None:
     return "citing"
 
 
+def resolve_targets(named: dict[tuple[str, str], set[str]]) -> None:
+    """Fill in the files that matched only a package query, in place.
+
+    Such a file names no repository, so it takes what the rest of its own
+    repository names: a project that writes the sigs path in six files and
+    imports the package in a seventh is using the sigs repository. A referencing
+    repository that names neither path leaves its files unattributed, which is
+    reported as such rather than split or assigned to one of them.
+    """
+    by_repo: dict[str, set[str]] = {}
+    for (repo, _), targets in named.items():
+        by_repo.setdefault(repo, set()).update(targets)
+    for (repo, _), targets in named.items():
+        if not targets:
+            targets.update(by_repo[repo])
+
+
 def classify_references(block: dict[str, Any]) -> dict[str, Any]:
     """Classify code-search hits, but only if the control query stands up.
 
@@ -285,6 +307,9 @@ def classify_references(block: dict[str, Any]) -> dict[str, Any]:
     # that both imports the package and declares it is depending on it.
     strongest = {"depending": 0, "running": 1, "citing": 2}
     best: dict[tuple[str, str], dict[str, Any]] = {}
+    # Kept beside best rather than on it: the strongest class replaces the entry,
+    # and which repositories a file names is true of the file either way.
+    named: dict[tuple[str, str], set[str]] = {}
     capped = False
 
     for result in block["queries"]:
@@ -305,6 +330,7 @@ def classify_references(block: dict[str, Any]) -> dict[str, Any]:
         )
         if not value:
             continue
+        target = TARGET_QUERIES.get(value["query"])
         for hit in value["hits"]:
             cls = classify_reference(hit, value["query"])
             if cls is None:
@@ -312,8 +338,12 @@ def classify_references(block: dict[str, Any]) -> dict[str, Any]:
             key = (hit["repo"], hit["path"])
             if key not in best or strongest[cls] < strongest[best[key]["class"]]:
                 best[key] = {**hit, "class": cls}
+            named.setdefault(key, set())
+            if target:
+                named[key].add(target)
 
-    hits = [best[k] for k in sorted(best)]
+    resolve_targets(named)
+    hits = [{**best[k], "targets": sorted(named[k])} for k in sorted(best)]
     counts: dict[str, int | None] = {"depending": 0, "running": 0, "citing": 0}
     for hit in hits:
         counts[hit["class"]] += 1

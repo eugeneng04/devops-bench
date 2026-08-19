@@ -298,3 +298,13 @@ classified record. Those are the files the search **returned**, so a capped
 query lists fewer than the bar counts — the capped note above the list is the
 only thing that reconciles the two. Links use `blob/HEAD`, because a hit carries
 no ref and the default branch differs per repository.
+
+The repository filter applies to Usage mix through `targets` on each hit, which
+`classify.py` fills in from the canonical path the referencing file writes down.
+The import queries name the package, which is identical in both repositories, so
+a file that matched only those takes what the rest of its own repository names;
+one that names neither path stays unattributed and is counted under **All**
+alone. A file naming both is counted for both, so the per-repository numbers can
+add up to more than the total — they are two answers to two questions, not a
+split of one. The card also drops the other repository's path query from the
+query table, because it answers a question the selection is not asking.
