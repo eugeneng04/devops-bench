@@ -185,11 +185,12 @@ edit this template and re-render.
   #tooltip .tt-val { font-weight: 600; font-variant-numeric: tabular-nums; }
   #tooltip .tt-name { color: var(--text-secondary); }
 
-  /* The branches behind one hotspot bar. Separated by a rule rather than a
-     second card, because it is the same measurement at a finer grain. */
-  #ext-detail:not(:empty) { margin-top: 18px; border-top: 1px solid var(--border); padding-top: 14px; }
-  #ext-detail .detail-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 10px; }
-  #ext-detail h3 { font-size: 13px; font-weight: 600; margin: 0; }
+  /* The branches behind one hotspot bar, and the files behind one usage kind.
+     Separated by a rule rather than a second card, because it is the same
+     measurement at a finer grain. */
+  #ext-detail:not(:empty), #usage-detail:not(:empty) { margin-top: 18px; border-top: 1px solid var(--border); padding-top: 14px; }
+  #ext-detail .detail-head, #usage-detail .detail-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 10px; }
+  #ext-detail h3, #usage-detail h3 { font-size: 13px; font-weight: 600; margin: 0; }
   #ext-detail .note { color: var(--text-muted); font-size: 12px; margin: 10px 0 0; line-height: 1.55; }
   #ext-detail td.path a { text-decoration: none; border-bottom: 1px solid var(--border); }
   #ext-detail td.path a:hover { border-bottom-color: var(--text-secondary); }
@@ -250,7 +251,7 @@ edit this template and re-render.
     <div class="card-head">
       <div>
         <h2>Traffic history</h2>
-        <p class="sub" id="history-sub">Every run's fourteen-day window, stitched. A break in the line is a stretch nobody collected, not a stretch with no visitors.</p>
+        <p class="sub" id="history-sub" hidden></p>
       </div>
       <div class="spacer"></div>
       <button type="button" data-toggle="history" aria-pressed="false">Table</button>
@@ -293,10 +294,11 @@ edit this template and re-render.
     <div class="card-head">
       <div>
         <h2>Usage mix</h2>
-        <p class="sub">External references by kind, from exact-qualified code search.</p>
+        <p class="sub" id="usage-sub">External references by kind, from exact-qualified code search.</p>
       </div>
     </div>
     <div id="usage-mix"></div>
+    <div id="usage-detail"></div>
   </div>
 </div>
 
@@ -351,6 +353,7 @@ edit this template and re-render.
   // match the traffic window, so both halves of the page describe the same
   // fortnight; null is every branch there has ever been.
   let extRange = 14;
+  let usageClass = null; // the usage-mix segment whose files are listed, if any
 
   /* ---------- small helpers ---------- */
 
@@ -762,6 +765,7 @@ edit this template and re-render.
     if (DATA.referencesUnavailable) {
       host.appendChild(emptyState("References not measured", DATA.referencesUnavailable));
       host.appendChild(queryTable());
+      renderUsageDetail();
       return;
     }
 
@@ -774,6 +778,7 @@ edit this template and re-render.
         "This is a measured zero, not a missing measurement — the queries ran and matched nothing outside the project."
       ));
       host.appendChild(queryTable());
+      renderUsageDetail();
       return;
     }
 
@@ -796,9 +801,38 @@ edit this template and re-render.
       if (!value) continue;
       const w = (value / total) * W - gap;
       const color = css(v);
-      const rect = svgEl("rect", { x: cursor, y: 6, width: Math.max(w, 1), height: 20, rx: 3, fill: color });
-      rect.addEventListener("pointermove", (e) => showTooltip(e, name, [{ color, value: num(value), name: "references" }]));
+      const chosen = k === usageClass;
+      const rect = svgEl("rect", {
+        x: cursor, y: 6, width: Math.max(w, 1), height: 20, rx: 3, fill: color,
+        // Recede the rest rather than repaint the choice, as the hotspot bars do.
+        "fill-opacity": usageClass && !chosen ? 0.4 : 1,
+        tabindex: 0, role: "button", "aria-pressed": String(chosen), style: "cursor:pointer",
+        "data-usage": k,
+      });
+      const show = (e) => showTooltip(e, name, [{ color, value: num(value), name: "references" }]);
+      const choose = (refocus) => {
+        usageClass = chosen ? null : k;
+        hideTooltip();
+        renderUsageMix(agg);
+        // Keyboard only: the segments are rebuilt, so a keyboard reader would
+        // otherwise be dropped to the top of the document by its own selection.
+        if (refocus) {
+          const again = host.querySelector(`[data-usage="${k}"]`);
+          if (again) again.focus();
+        }
+      };
+      rect.addEventListener("pointermove", show);
       rect.addEventListener("pointerleave", hideTooltip);
+      rect.addEventListener("focus", (e) => {
+        const b = e.target.getBoundingClientRect();
+        showTooltip({ clientX: b.left + b.width / 2, clientY: b.top }, name,
+          [{ color, value: num(value), name: "references" }]);
+      });
+      rect.addEventListener("blur", hideTooltip);
+      rect.addEventListener("click", () => choose(false));
+      rect.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); choose(true); }
+      });
       svg.appendChild(rect);
       cursor += w + gap;
     }
@@ -814,6 +848,52 @@ edit this template and re-render.
       host.appendChild(el("p", { class: "muted" },
         "A query matched more files than GitHub will return, so these counts are a floor."));
     }
+    renderUsageDetail();
+  }
+
+  // The files behind one kind. The hits are the files the search returned, so a
+  // capped query lists fewer of them than the bar counts - said on the list
+  // rather than left for the reader to notice the two disagree.
+  function renderUsageDetail() {
+    const host = document.getElementById("usage-detail");
+    clear(host);
+    const sub = document.getElementById("usage-sub");
+    const hits = DATA.referenceHits || [];
+    sub.textContent = "External references by kind, from exact-qualified code search." +
+      (hits.length ? " Select a kind to list the files." : "");
+    if (!usageClass) return;
+
+    const names = { running: "Running", depending: "Depending", citing: "Citing" };
+    const listed = hits.filter((h) => h.class === usageClass);
+
+    const head = el("div", { class: "detail-head" });
+    head.appendChild(el("h3", {}, `${names[usageClass]} — ${num(listed.length)} ${listed.length === 1 ? "file" : "files"}`));
+    const close = el("button", { type: "button" }, "Clear");
+    close.addEventListener("click", () => { usageClass = null; renderUsageMix(); });
+    head.appendChild(el("div", { class: "spacer" }));
+    head.appendChild(close);
+    host.appendChild(head);
+
+    if (!listed.length) {
+      host.appendChild(emptyState("No files to list",
+        "The bar counts these references, but the search did not return the files behind them."));
+      return;
+    }
+
+    host.appendChild(buildTable(
+      ["Repository", "File"],
+      listed.map((h) => {
+        const link = el("a", {
+          // HEAD, not a branch name: the default branch differs per repository
+          // and the hit carries no ref. Each segment is escaped on its own so a
+          // path with spaces or brackets in it still resolves.
+          href: `https://github.com/${h.repo}/blob/HEAD/${h.path.split("/").map(encodeURIComponent).join("/")}`,
+          target: "_blank", rel: "noopener noreferrer",
+        }, h.path);
+        return [h.repo, link];
+      }),
+      [false, false]
+    ));
   }
 
   /* ---------- tables ---------- */
@@ -1126,9 +1206,13 @@ edit this template and re-render.
           ` — ${Math.max(total - DATA.windowDays, 0)} more than GitHub retains.`,
     });
 
-    document.getElementById("history-sub").textContent = repos.length > 1
-      ? "Every run's fourteen-day window, stitched. One line per repository: unique visitors do not add across repositories."
-      : "Every run's fourteen-day window, stitched. A break in the line is a stretch nobody collected, not a stretch with no visitors.";
+    // Only the cross-repository caveat is left, and only when it applies: the
+    // gaps are already named under the chart, so saying it twice adds nothing.
+    const historySub = document.getElementById("history-sub");
+    historySub.textContent = repos.length > 1
+      ? "One line per repository: unique visitors do not add across repositories."
+      : "";
+    historySub.hidden = !historySub.textContent;
 
     const rows = [];
     for (const n of repos) {
@@ -1174,18 +1258,7 @@ edit this template and re-render.
     lineChart(host, lines, {
       label: "Fork owners, active owners and outside owners at each collection",
       dots: true,
-      note: runs.length < 3
-        ? `${runs.length} collection${runs.length > 1 ? "s" : ""} so far. Owner counts are for both repositories together, so the repository filter does not change them.`
-        : "Owner counts are for both repositories together, so the repository filter does not change them.",
     });
-
-    const unreadable = (SERIES.unreadable || []).length;
-    if (unreadable) {
-      host.appendChild(el("p", { class: "sub" },
-        `${unreadable} stored record${unreadable > 1 ? "s are" : " is"} in a format this page cannot read and ` +
-        `${unreadable > 1 ? "are" : "is"} absent from the chart: ` +
-        SERIES.unreadable.map((u) => u.date).join(", ") + "."));
-    }
 
     holder.appendChild(buildTable(
       ["Run", "Fork owners", "Committed", "Outside", "Outside share", "Traffic from"],

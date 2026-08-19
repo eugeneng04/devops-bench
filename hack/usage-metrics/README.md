@@ -292,3 +292,9 @@ the range, never before — collapsing first can keep the copy that falls outsid
 the window and drop the ones inside. A branch with no commit date is held out of
 a bounded range and counted under **All**, with a line under the chart saying
 how many; every snapshot from format 2 on carries the date.
+
+Usage mix segments open the files behind one kind, from `referenceHits` in the
+classified record. Those are the files the search **returned**, so a capped
+query lists fewer than the bar counts — the capped note above the list is the
+only thing that reconciles the two. Links use `blob/HEAD`, because a hit carries
+no ref and the default branch differs per repository.
