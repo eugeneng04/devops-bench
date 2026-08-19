@@ -111,6 +111,12 @@ edit this template and re-render.
   .top { align-items: start; }
   @media (max-width: 900px) { .cols-2, .cols-4 { grid-template-columns: 1fr; } }
 
+  /* The page is long enough that the cards need naming from outside them. */
+  h2.section {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--text-muted); margin: 28px 0 12px;
+  }
+
   .card {
     background: var(--surface-1);
     border: 1px solid var(--border);
@@ -272,6 +278,86 @@ edit this template and re-render.
     <div id="runs-table" hidden></div>
   </div>
 </div>
+
+<h2 class="section">Contributions</h2>
+
+<div class="grid cols-4" style="margin-bottom:16px">
+  <div class="card tile">
+    <div class="label">Contributors</div>
+    <div class="value" id="tile-contributors">—</div>
+    <div class="note" id="tile-contributors-note"></div>
+  </div>
+  <div class="card tile">
+    <div class="label">New contributors</div>
+    <div class="value" id="tile-new-contributors">—</div>
+    <div class="note" id="tile-new-contributors-note"></div>
+  </div>
+  <div class="card tile">
+    <div class="label">Median time to merge</div>
+    <div class="value" id="tile-merge-time">—</div>
+    <div class="note" id="tile-merge-time-note"></div>
+  </div>
+  <div class="card tile">
+    <div class="label">Absence factor</div>
+    <div class="value" id="tile-absence">—</div>
+    <div class="note" id="tile-absence-note"></div>
+  </div>
+</div>
+
+<div class="grid cols-2 top" style="margin-bottom:16px">
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <h2>Pull requests by month</h2>
+        <p class="sub" id="prs-sub"></p>
+      </div>
+      <div class="spacer"></div>
+      <button type="button" data-toggle="prs" aria-pressed="false">Table</button>
+    </div>
+    <div id="prs-chart"></div>
+    <div id="prs-table" hidden></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <h2>Contributors by month</h2>
+        <p class="sub" id="people-sub"></p>
+      </div>
+      <div class="spacer"></div>
+      <button type="button" data-toggle="people" aria-pressed="false">Table</button>
+    </div>
+    <div id="people-chart"></div>
+    <div id="people-table" hidden></div>
+  </div>
+</div>
+
+<div class="grid cols-2 top" style="margin-bottom:16px">
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <h2>Review latency</h2>
+        <p class="sub" id="latency-sub"></p>
+      </div>
+      <div class="spacer"></div>
+      <button type="button" data-toggle="latency" aria-pressed="false">Table</button>
+    </div>
+    <div id="latency-chart"></div>
+    <div id="latency-table" hidden></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <h2>Review load</h2>
+        <p class="sub" id="reviewers-sub"></p>
+      </div>
+    </div>
+    <div id="reviewers-table"></div>
+  </div>
+</div>
+
+<h2 class="section">Forks and references</h2>
 
 <div class="grid cols-2 top" style="margin-bottom:16px">
   <div class="card">
@@ -1061,11 +1147,14 @@ edit this template and re-render.
     const W = 520, H = 268, m = { t: 14, r: 52, b: 26, l: 38 };
     const iw = W - m.l - m.r, ih = H - m.t - m.b;
 
+    const fv = opts.fmt || num;
+    const fx = opts.fmtX || fmtDate;
     const allPoints = lines.flatMap((s) => s.points);
+    const bands = lines.flatMap((s) => s.band || []);
     const lo = Math.min(...allPoints.map((p) => dayNum(p.date)));
     const hi = Math.max(...allPoints.map((p) => dayNum(p.date)));
     const span = Math.max(hi - lo, 1);
-    const scale = niceScale(Math.max(...allPoints.map((p) => p.value), 1));
+    const scale = niceScale(Math.max(...allPoints.map((p) => p.value), ...bands.map((b) => b.hi), 1));
     const x = (d) => m.l + ((dayNum(d) - lo) / span) * iw;
     const y = (v) => m.t + ih - (v / scale.max) * ih;
 
@@ -1085,7 +1174,7 @@ edit this template and re-render.
     for (let i = 0; i <= scale.ticks; i++) {
       const v = scale.step * i;
       svg.appendChild(svgEl("line", { class: "grid-line", x1: m.l, x2: m.l + iw, y1: y(v), y2: y(v) }));
-      svg.appendChild(svgEl("text", { class: "tick", x: m.l - 8, y: y(v) + 4, "text-anchor": "end" }, num(v)));
+      svg.appendChild(svgEl("text", { class: "tick", x: m.l - 8, y: y(v) + 4, "text-anchor": "end" }, fv(v)));
     }
     svg.appendChild(svgEl("line", { class: "axis-line", x1: m.l, x2: m.l + iw, y1: y(0), y2: y(0) }));
 
@@ -1094,7 +1183,16 @@ edit this template and re-render.
                    [midDate, "middle"],
                    [new Date(hi * DAY_MS).toISOString().slice(0, 10), "end"]];
     for (const [d, anchor] of edges) {
-      if (d) svg.appendChild(svgEl("text", { class: "tick", x: x(d), y: H - 6, "text-anchor": anchor }, fmtDate(d)));
+      if (d) svg.appendChild(svgEl("text", { class: "tick", x: x(d), y: H - 6, "text-anchor": anchor }, fx(d)));
+    }
+
+    /* A spread, drawn under the medians it belongs to. Two overlapping washes
+       mix into a third colour nobody chose, so only one series carries one. */
+    for (const s of lines) {
+      if (!s.band || s.band.length < 2) continue;
+      const up = s.band.map((b, i) => `${i ? "L" : "M"}${x(b.date)},${y(b.hi)}`).join(" ");
+      const down = [...s.band].reverse().map((b) => `L${x(b.date)},${y(b.lo)}`).join(" ");
+      svg.appendChild(svgEl("path", { d: `${up} ${down} Z`, fill: s.color, "fill-opacity": 0.14, stroke: "none" }));
     }
 
     for (const s of lines) {
@@ -1130,7 +1228,7 @@ edit this template and re-render.
         cx: x(last.date), cy: y(last.value), r: 4,
         fill: s.color, stroke: css("--surface-1"), "stroke-width": 2,
       }));
-      svg.appendChild(svgEl("text", { class: "val", x: x(last.date) + 9, y: y(last.value) + 4 }, num(last.value)));
+      svg.appendChild(svgEl("text", { class: "val", x: x(last.date) + 9, y: y(last.value) + 4 }, fv(last.value)));
     }
 
     /* Hover snaps to a date that exists. A pointer over a gap finds the nearest
@@ -1157,9 +1255,9 @@ edit this template and re-render.
         const p = s.points.find((q) => q.date === date);
         if (!p) { dots[k].setAttribute("opacity", 0); return; }
         dots[k].setAttribute("cx", x(date)); dots[k].setAttribute("cy", y(p.value)); dots[k].setAttribute("opacity", 1);
-        rows.push({ color: s.color, value: num(p.value), name: s.name.toLowerCase() });
+        rows.push({ color: s.color, value: fv(p.value), name: s.name.toLowerCase() });
       });
-      showTooltip(evt, fmtDate(date), rows);
+      showTooltip(evt, fx(date), rows);
     });
     hit.addEventListener("pointerleave", () => {
       hideTooltip(); cross.setAttribute("opacity", 0); dots.forEach((d) => d.setAttribute("opacity", 0));
@@ -1267,12 +1365,318 @@ edit this template and re-render.
     ));
   }
 
+  /* ---------- contributions ----------
+
+     Pull requests belong to one repository, so all of this answers to the
+     repository filter. People do not: somebody who works on both is one
+     contributor, so the counts of people are unions and never sums. */
+
+  const fmtMonth = (d) =>
+    new Date(d + "T00:00:00Z").toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: "UTC" });
+
+  // Linear interpolation between the two nearest ranks, the same convention
+  // numpy and DevStats use.
+  function quantile(sorted, q) {
+    if (!sorted.length) return null;
+    const i = (sorted.length - 1) * q;
+    const lo = Math.floor(i), hi = Math.ceil(i);
+    return sorted[lo] + (sorted[hi] - sorted[lo]) * (i - lo);
+  }
+
+  /* Hours are the unit the data is in and days are the unit a reader thinks
+     in. One chart picks one of them, so its axis does not mix the two. */
+  const durUnit = (max) => (max >= 48 ? { div: 24, suffix: "d" } : { div: 1, suffix: "h" });
+  const dur = (h) => {
+    if (h === null || h === undefined) return "—";
+    const u = durUnit(h);
+    const v = h / u.div;
+    return (v < 10 ? v.toFixed(1) : Math.round(v).toLocaleString("en-US")) + " " + u.suffix;
+  };
+
+  // The smallest number of people who between them produce half the pull
+  // requests. CHAOSS calls it the contributor absence factor: how many people
+  // would have to leave before half the work stopped.
+  function absenceFactor(counts) {
+    const values = Object.values(counts).sort((a, b) => b - a);
+    const total = values.reduce((a, b) => a + b, 0);
+    if (!total) return null;
+    let running = 0;
+    for (let i = 0; i < values.length; i++) {
+      running += values[i];
+      if (running * 2 >= total) return i + 1;
+    }
+    return values.length;
+  }
+
+  function contributionData() {
+    const names = selected();
+    const missing = names.filter((n) => !DATA.repos[n].contributions || DATA.repos[n].contributions.unavailable);
+    const live = names.map((n) => DATA.repos[n].contributions).filter((c) => c && !c.unavailable);
+
+    const byMonth = new Map();
+    for (const c of live) {
+      for (const m of c.months) {
+        let t = byMonth.get(m.month);
+        if (!t) {
+          t = { month: m.month, opened: 0, merged: 0, closedUnmerged: 0, partial: false,
+                authors: new Set(), newContributors: new Set(), reviewers: new Set(),
+                mergeHours: [], engageHours: [] };
+          byMonth.set(m.month, t);
+        }
+        t.opened += m.opened;
+        t.merged += m.merged;
+        t.closedUnmerged += m.closedUnmerged;
+        t.partial = t.partial || m.partial;
+        for (const a of m.authors) t.authors.add(a);
+        for (const a of m.newContributors) t.newContributors.add(a);
+        for (const a of m.reviewers) t.reviewers.add(a);
+        t.mergeHours.push(...m.mergeHours);
+        t.engageHours.push(...m.engageHours);
+      }
+    }
+    const sum = (field) => {
+      const out = {};
+      for (const c of live) for (const k in c[field]) out[k] = (out[k] || 0) + c[field][k];
+      return out;
+    };
+    const flat = (field) => live.flatMap((c) => c[field]).sort((a, b) => a - b);
+    const months = [...byMonth.values()].sort((a, b) => a.month.localeCompare(b.month));
+    for (const m of months) { m.mergeHours.sort((a, b) => a - b); m.engageHours.sort((a, b) => a - b); }
+
+    return {
+      missing, live, months,
+      authorCounts: sum("authorCounts"),
+      reviewerCounts: sum("reviewerCounts"),
+      mergeHours: months.flatMap((m) => m.mergeHours).sort((a, b) => a - b),
+      engageHours: months.flatMap((m) => m.engageHours).sort((a, b) => a - b),
+      openToApproval: flat("openToApprovalHours"),
+      approvalToMerge: flat("approvalToMergeHours"),
+      openPRs: flat("openPRAgeHours"),
+      withoutApproval: live.reduce((a, c) => a + c.mergedWithoutApproval, 0),
+      truncated: live.reduce((a, c) => a + c.truncatedThreads, 0),
+    };
+  }
+
+  /* A month with a handful of merges has a median but not a spread, and a month
+     with two has neither. Both are held back rather than drawn as a reading. */
+  const MEDIAN_MIN = 3, BAND_MIN = 5;
+
+  function renderContributionTiles(d) {
+    const authors = Object.keys(d.authorCounts);
+    const reviewers = Object.keys(d.reviewerCounts);
+    const people = new Set([...authors, ...reviewers]);
+    const both = authors.filter((a) => reviewers.includes(a)).length;
+
+    setValue(document.getElementById("tile-contributors"), d.live.length ? num(people.size) : null);
+    document.getElementById("tile-contributors-note").textContent = d.live.length
+      ? `${num(authors.length)} opened pull requests, ${num(reviewers.length)} reviewed, ${num(both)} did both.`
+      : "Pull requests were not collected.";
+
+    // Three whole months rather than ninety days: a new contributor is placed
+    // in the month their first merge landed, so a day-level window would cut a
+    // month in half and count part of it.
+    const recent = d.months.slice(-3);
+    const fresh = new Set(recent.flatMap((m) => [...m.newContributors]));
+    setValue(document.getElementById("tile-new-contributors"), d.live.length ? num(fresh.size) : null);
+    document.getElementById("tile-new-contributors-note").textContent = recent.length
+      ? `First merged pull request since ${fmtMonth(recent[0].month + "-01")}.`
+      : "No pull requests in this selection.";
+
+    const median = quantile(d.mergeHours, 0.5);
+    setValue(document.getElementById("tile-merge-time"), median === null ? null : dur(median));
+    document.getElementById("tile-merge-time-note").textContent = median === null
+      ? "Nothing merged in this selection."
+      : `${dur(quantile(d.mergeHours, 0.85))} at the 85th percentile of ${num(d.mergeHours.length)} merged.`;
+
+    const absence = absenceFactor(d.authorCounts);
+    setValue(document.getElementById("tile-absence"), absence === null ? null : num(absence));
+    document.getElementById("tile-absence-note").textContent = absence === null
+      ? "No pull requests to attribute."
+      : `${absence === 1 ? "One person opens" : `${num(absence)} people open`} half the pull requests.`;
+  }
+
+  function renderPullRequests(d) {
+    const host = document.getElementById("prs-chart");
+    const holder = document.getElementById("prs-table");
+    clear(host); clear(holder);
+    document.getElementById("prs-sub").textContent =
+      d.months.length ? "A merge counts in the month it merged, not the month it opened." : "";
+
+    if (!d.months.length) {
+      host.appendChild(emptyState(
+        d.live.length ? "No pull requests in this selection" : "Pull requests not collected", ""));
+      return;
+    }
+
+    lineChart(host, [
+      { name: "Opened", color: css("--series-1"),
+        points: d.months.map((m) => ({ date: m.month + "-01", value: m.opened })) },
+      { name: "Merged", color: css("--series-2"),
+        points: d.months.map((m) => ({ date: m.month + "-01", value: m.merged })) },
+    ], {
+      label: "Pull requests opened and merged each month",
+      fmtX: fmtMonth, dots: true,
+      note: d.months[d.months.length - 1].partial ? `${fmtMonth(d.months[d.months.length - 1].month + "-01")} is still in progress.` : "",
+    });
+
+    holder.appendChild(buildTable(
+      ["Month", "Opened", "Merged", "Closed unmerged"],
+      d.months.map((m) => [
+        fmtMonth(m.month + "-01") + (m.partial ? " (in progress)" : ""),
+        num(m.opened), num(m.merged), num(m.closedUnmerged),
+      ]),
+      [false, true, true, true]
+    ));
+  }
+
+  function renderPeople(d) {
+    const host = document.getElementById("people-chart");
+    const holder = document.getElementById("people-table");
+    clear(host); clear(holder);
+    document.getElementById("people-sub").textContent =
+      d.months.length ? "New means a first merged pull request anywhere in the project." : "";
+
+    if (!d.months.length) {
+      host.appendChild(emptyState(
+        d.live.length ? "No pull requests in this selection" : "Pull requests not collected", ""));
+      return;
+    }
+
+    lineChart(host, [
+      { name: "Opened or reviewed", color: css("--series-1"),
+        points: d.months.map((m) => ({ date: m.month + "-01", value: new Set([...m.authors, ...m.reviewers]).size })) },
+      { name: "New contributors", color: css("--series-2"),
+        points: d.months.map((m) => ({ date: m.month + "-01", value: m.newContributors.size })) },
+    ], {
+      label: "People active on pull requests each month, and first-time contributors",
+      fmtX: fmtMonth, dots: true,
+    });
+
+    holder.appendChild(buildTable(
+      ["Month", "Active", "Opened", "Reviewed", "New"],
+      d.months.map((m) => [
+        fmtMonth(m.month + "-01") + (m.partial ? " (in progress)" : ""),
+        num(new Set([...m.authors, ...m.reviewers]).size),
+        num(m.authors.size), num(m.reviewers.size), num(m.newContributors.size),
+      ]),
+      [false, true, true, true, true]
+    ));
+  }
+
+  function renderLatency(d) {
+    const host = document.getElementById("latency-chart");
+    const holder = document.getElementById("latency-table");
+    clear(host); clear(holder);
+    const sub = document.getElementById("latency-sub");
+
+    const enough = (m, field) => m[field].length >= MEDIAN_MIN;
+    const merge = d.months.filter((m) => enough(m, "mergeHours"));
+    const engage = d.months.filter((m) => enough(m, "engageHours"));
+    sub.textContent = merge.length || engage.length
+      ? `Median per month, from months with at least ${MEDIAN_MIN} measurements.` : "";
+
+    if (!merge.length && !engage.length) {
+      host.appendChild(emptyState(
+        d.live.length ? "Not enough merged pull requests to trend" : "Pull requests not collected", ""));
+      return;
+    }
+
+    // One unit for the whole chart, chosen from the largest thing on it.
+    const peak = Math.max(
+      ...merge.map((m) => quantile(m.mergeHours, m.mergeHours.length >= BAND_MIN ? 0.85 : 0.5)),
+      ...engage.map((m) => quantile(m.engageHours, 0.5)), 1);
+    const u = durUnit(peak);
+    const scaled = (v) => v / u.div;
+    const fmt = (v) => (v < 10 ? v.toFixed(1) : Math.round(v).toLocaleString("en-US")) + " " + u.suffix;
+
+    const lines = [];
+    if (merge.length) {
+      lines.push({
+        name: "Time to merge", color: css("--series-1"),
+        points: merge.map((m) => ({ date: m.month + "-01", value: scaled(quantile(m.mergeHours, 0.5)) })),
+        band: merge.filter((m) => m.mergeHours.length >= BAND_MIN).map((m) => ({
+          date: m.month + "-01",
+          lo: scaled(quantile(m.mergeHours, 0.15)),
+          hi: scaled(quantile(m.mergeHours, 0.85)),
+        })),
+      });
+    }
+    if (engage.length) {
+      lines.push({
+        name: "Time to first response", color: css("--series-2"),
+        points: engage.map((m) => ({ date: m.month + "-01", value: scaled(quantile(m.engageHours, 0.5)) })),
+      });
+    }
+
+    lineChart(host, lines, {
+      label: "Median time to merge and to first response, by month",
+      fmtX: fmtMonth, fmt, dots: true,
+      // The same threshold the chart draws on: a band of one month is a dot
+      // with no area, and the note must not promise one that is not there.
+      note: (lines[0].band || []).length >= 2 ? "Shaded: the middle 70% of time to merge." : "",
+    });
+
+    const cell = (values, q) => (values.length >= MEDIAN_MIN ? dur(quantile(values, q)) : "—");
+    holder.appendChild(buildTable(
+      ["Month", "Merge median", "Merge 85th", "Response median", "Merged"],
+      d.months.map((m) => [
+        fmtMonth(m.month + "-01") + (m.partial ? " (in progress)" : ""),
+        cell(m.mergeHours, 0.5), cell(m.mergeHours, 0.85), cell(m.engageHours, 0.5), num(m.merged),
+      ]),
+      [false, true, true, true, true]
+    ));
+  }
+
+  function renderReviewers(d) {
+    const host = document.getElementById("reviewers-table");
+    clear(host);
+    const sub = document.getElementById("reviewers-sub");
+    const entries = Object.entries(d.reviewerCounts).sort((a, b) => b[1] - a[1]);
+    sub.textContent = entries.length ? "Reviews of other people's pull requests" : "";
+
+    if (!entries.length) {
+      host.appendChild(emptyState(
+        d.live.length ? "No reviews in this selection" : "Pull requests not collected", ""));
+      return;
+    }
+
+    const rows = entries.slice(0, 10);
+    host.appendChild(buildTable(
+      ["Reviewer", "Reviews", "Opened"],
+      rows.map(([login, count]) => [login, num(count), num(d.authorCounts[login] || 0)]),
+      [false, true, true], true
+    ));
+
+    const notes = [];
+    if (entries.length > rows.length) notes.push(`Top ${rows.length} of ${num(entries.length)} reviewers.`);
+    const approval = quantile(d.openToApproval, 0.5);
+    if (approval !== null) {
+      notes.push(`Median ${dur(approval)} to a first approval, then ${dur(quantile(d.approvalToMerge, 0.5))} to merge.`);
+    }
+    if (d.withoutApproval) {
+      notes.push(`${num(d.withoutApproval)} merged with no approval on the pull request.`);
+    }
+    if (d.openPRs.length) {
+      notes.push(`${num(d.openPRs.length)} still open, the oldest for ${dur(Math.max(...d.openPRs))}.`);
+    }
+    if (d.truncated) {
+      notes.push(`${num(d.truncated)} discussion${d.truncated === 1 ? "" : "s"} longer than the collector reads, so a first response there can only be earlier than shown.`);
+    }
+    if (notes.length) host.appendChild(el("p", { class: "sub muted" }, notes.join(" ")));
+  }
+
   function render() {
     const agg = aggregate();
     renderBanners(agg);
     renderHeadline(agg);
     renderHistory();
     renderRuns();
+    const contrib = contributionData();
+    renderContributionTiles(contrib);
+    renderPullRequests(contrib);
+    renderPeople(contrib);
+    renderLatency(contrib);
+    renderReviewers(contrib);
     renderExtensions(agg);
     renderUsageMix(agg);
     renderForks(agg);

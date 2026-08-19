@@ -26,10 +26,12 @@ Undefined values stay null. A ratio with a zero denominator is null, not zero.
 from __future__ import annotations
 
 import argparse
+import collections
 import hashlib
 import json
 import re
 import sys
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -435,12 +437,187 @@ def ratio(numerator: int, denominator: int) -> float | None:
     return None if denominator == 0 else numerator / denominator
 
 
+# --- contributions ------------------------------------------------------------
+#
+# Every duration is bucketed by the month the thing being measured *finished* -
+# a merge lands in the month it merged, a first response in the month it was
+# written. Bucketing by the month the pull request opened is what DevStats does,
+# and it makes the newest months look fast: the slow pull requests of that month
+# have not merged yet, so they are not in the sample. Percentiles are not
+# summarised here. The raw durations go to the page, because the median of two
+# repositories is not the median of their medians and the filter has to be able
+# to ask for either.
+
+
+def _login(node: dict[str, Any]) -> str | None:
+    return (node.get("author") or {}).get("login")
+
+
+def _is_bot(node: dict[str, Any]) -> bool:
+    return bool((node.get("author") or {}).get("isBot"))
+
+
+def _hours(start: str, end: str) -> float:
+    delta = datetime.fromisoformat(end.replace("Z", "+00:00")) - datetime.fromisoformat(
+        start.replace("Z", "+00:00")
+    )
+    return round(delta.total_seconds() / 3600, 2)
+
+
+def first_response(pr: dict[str, Any]) -> str | None:
+    """When somebody other than the author first said anything.
+
+    CHAOSS calls this Time to First Response and DevStats calls it engagement.
+    Bot activity is not a person responding, and neither is the author replying
+    to themselves.
+    """
+    author = _login(pr)
+    times = [
+        event[field]
+        for field, events in (("submittedAt", pr["reviews"]), ("createdAt", pr["comments"]))
+        for event in events
+        if event.get(field) and not _is_bot(event) and _login(event) not in (author, None)
+    ]
+    return min(times) if times else None
+
+
+def first_approval(pr: dict[str, Any]) -> str | None:
+    times = [r["submittedAt"] for r in pr["reviews"] if r["state"] == "APPROVED" and r.get("submittedAt")]
+    return min(times) if times else None
+
+
+def classify_contributions(
+    entry: dict[str, Any], first_merge: dict[str, str], collected_at: str
+) -> dict[str, Any]:
+    block = entry["pullRequests"]
+    if not block["value"]:
+        return {"unavailable": block["unavailable"] or "pull requests were not collected"}
+
+    prs = [pr for pr in block["value"]["items"] if not _is_bot(pr)]
+    months: dict[str, dict[str, Any]] = {}
+
+    def bucket(stamp: str) -> dict[str, Any]:
+        return months.setdefault(
+            stamp[:7],
+            {
+                "month": stamp[:7],
+                "opened": 0,
+                "merged": 0,
+                "closedUnmerged": 0,
+                "authors": set(),
+                "newContributors": set(),
+                "reviewers": set(),
+                "mergeHours": [],
+                "engageHours": [],
+            },
+        )
+
+    open_prs, to_approval, to_merge, without_approval = [], [], [], 0
+    for pr in prs:
+        author = _login(pr)
+        opened = bucket(pr["createdAt"])
+        opened["opened"] += 1
+        if author:
+            opened["authors"].add(author)
+
+        if pr["merged"] and pr["mergedAt"]:
+            merged = bucket(pr["mergedAt"])
+            merged["merged"] += 1
+            merged["mergeHours"].append(_hours(pr["createdAt"], pr["mergedAt"]))
+            # New contributor: the first pull request this person ever had
+            # merged, anywhere in the project. First opened is not a
+            # contribution - a pull request that never lands did not land.
+            if author and first_merge.get(author) == pr["mergedAt"]:
+                merged["newContributors"].add(author)
+            approved = first_approval(pr)
+            if approved:
+                to_approval.append(_hours(pr["createdAt"], approved))
+                to_merge.append(_hours(approved, pr["mergedAt"]))
+            else:
+                without_approval += 1
+        elif pr["closedAt"]:
+            bucket(pr["closedAt"])["closedUnmerged"] += 1
+        else:
+            open_prs.append(_hours(pr["createdAt"], collected_at))
+
+        responded = first_response(pr)
+        if responded:
+            bucket(responded)["engageHours"].append(_hours(pr["createdAt"], responded))
+        for review in pr["reviews"]:
+            reviewer = _login(review)
+            if reviewer and reviewer != author and not _is_bot(review) and review.get("submittedAt"):
+                bucket(review["submittedAt"])["reviewers"].add(reviewer)
+
+    authored = collections.Counter(_login(pr) for pr in prs if _login(pr))
+    reviewed = collections.Counter(
+        _login(r)
+        for pr in prs
+        for r in pr["reviews"]
+        if _login(r) and _login(r) != _login(pr) and not _is_bot(r)
+    )
+    # A pull request whose thread hit the collection cap has reviews and
+    # comments the page never saw, so its first response can only be later than
+    # the truth, never earlier.
+    truncated = sum(
+        1
+        for pr in prs
+        if pr["reviewCount"] > len(pr["reviews"]) or pr["commentCount"] > len(pr["comments"])
+    )
+    return {
+        "unavailable": None,
+        "totalPRs": block["value"]["totalCount"],
+        "collectedPRs": len(prs),
+        "truncatedThreads": truncated,
+        # The month the collection ran is still being written. It is reported
+        # rather than dropped, and marked so nothing reads it as a fall-off.
+        "months": [
+            {
+                **m,
+                "authors": sorted(m["authors"]),
+                "newContributors": sorted(m["newContributors"]),
+                "reviewers": sorted(m["reviewers"]),
+                "partial": m["month"] == collected_at[:7],
+            }
+            for m in sorted(months.values(), key=lambda m: m["month"])
+        ],
+        "authorCounts": dict(authored.most_common()),
+        "reviewerCounts": dict(reviewed.most_common()),
+        "openToApprovalHours": to_approval,
+        "approvalToMergeHours": to_merge,
+        "mergedWithoutApproval": without_approval,
+        "openPRAgeHours": open_prs,
+    }
+
+
+def first_merge_by_author(snapshot: dict[str, Any]) -> dict[str, str]:
+    """Earliest merge per person across every repository, not per repository.
+
+    Somebody whose first merge landed upstream is not a new contributor again
+    the day they merge into the donated copy.
+    """
+    earliest: dict[str, str] = {}
+    for entry in snapshot["repos"].values():
+        if not entry["pullRequests"]["value"]:
+            continue
+        for pr in entry["pullRequests"]["value"]["items"]:
+            author = _login(pr)
+            if not author or _is_bot(pr) or not (pr["merged"] and pr["mergedAt"]):
+                continue
+            if author not in earliest or pr["mergedAt"] < earliest[author]:
+                earliest[author] = pr["mergedAt"]
+    return earliest
+
+
 def classify(snapshot: dict[str, Any]) -> dict[str, Any]:
     affiliation = snapshot["affiliation"]
     outside = set(affiliation["outsideLogins"])
 
+    first_merge = first_merge_by_author(snapshot)
     repos = {
-        name: classify_repo(entry, outside)
+        name: {
+            **classify_repo(entry, outside),
+            "contributions": classify_contributions(entry, first_merge, snapshot["collectedAt"]),
+        }
         for name, entry in snapshot["repos"].items()
     }
 

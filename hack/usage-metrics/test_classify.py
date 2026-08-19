@@ -79,6 +79,8 @@ def snapshot_like():
                 "repo": {"value": {"stars": 1}, "unavailable": None},
                 "traffic": {"value": None, "unavailable": "needs push access"},
                 "contributors": {"value": {"humans": ["dev"], "bots": []}, "unavailable": None},
+                "pullRequests": {"value": {"totalCount": 0, "collected": 0, "items": []}, "unavailable": None},
+                "issues": {"value": {"totalCount": 0, "collected": 0, "items": []}, "unavailable": None},
                 "forks": {
                     "value": {
                         "countReported": 3,
@@ -455,3 +457,130 @@ def test_one_outside_commit_does_not_charge_the_whole_fork(snapshot_like):
     assert held["external"] is True
     assert [b["external"] for b in held["branches"]] == [False, True]
     assert result["totals"]["externalDivergentBranches"] == 2  # not 3
+
+
+# --- 3.6 contributions ---------------------------------------------------------
+
+
+def pull_request(number, author, created, merged=None, closed=None, reviews=(), comments=()):
+    return {
+        "number": number,
+        "state": "MERGED" if merged else ("CLOSED" if closed else "OPEN"),
+        "merged": bool(merged),
+        "isDraft": False,
+        "createdAt": created,
+        "mergedAt": merged,
+        "closedAt": merged or closed,
+        "author": {"login": author, "type": "User", "isBot": author.endswith("[bot]")},
+        "additions": 1,
+        "deletions": 0,
+        "changedFiles": 1,
+        "files": [],
+        "reviews": [
+            {"state": state, "submittedAt": at, "author": {"login": who, "isBot": who.endswith("[bot]")}}
+            for who, state, at in reviews
+        ],
+        "reviewCount": len(reviews),
+        "comments": [
+            {"createdAt": at, "author": {"login": who, "isBot": who.endswith("[bot]")}}
+            for who, at in comments
+        ],
+        "commentCount": len(comments),
+    }
+
+
+def contributions(items, first_merge=None, collected="2026-08-18T00:00:00Z"):
+    entry = {"pullRequests": {"value": {"totalCount": len(items), "collected": len(items), "items": items}, "unavailable": None}}
+    return classify.classify_contributions(entry, first_merge or {}, collected)
+
+
+def month(result, key):
+    return next(m for m in result["months"] if m["month"] == key)
+
+
+def test_a_merge_is_counted_in_the_month_it_merged_not_the_month_it_opened():
+    """Bucketing a duration by the month the pull request opened makes the
+    newest month look fast: its slow pull requests have not merged yet."""
+    out = contributions([pull_request(1, "dev", "2026-06-30T00:00:00Z", merged="2026-07-02T00:00:00Z")])
+    assert month(out, "2026-06")["opened"] == 1
+    assert month(out, "2026-06")["merged"] == 0
+    assert month(out, "2026-07")["merged"] == 1
+    assert month(out, "2026-07")["mergeHours"] == [48.0]
+
+
+def test_a_new_contributor_is_a_first_merge_not_a_first_pull_request():
+    opened_never_merged = pull_request(1, "newcomer", "2026-06-01T00:00:00Z", closed="2026-06-02T00:00:00Z")
+    landed = pull_request(2, "newcomer", "2026-07-01T00:00:00Z", merged="2026-07-02T00:00:00Z")
+    out = contributions(
+        [opened_never_merged, landed], first_merge={"newcomer": "2026-07-02T00:00:00Z"}
+    )
+    assert month(out, "2026-06")["newContributors"] == []
+    assert month(out, "2026-07")["newContributors"] == ["newcomer"]
+
+
+def test_a_second_repository_does_not_make_an_existing_contributor_new_again():
+    """The first merge is project-wide. Somebody whose work landed upstream is
+    not a newcomer the day they merge into the donated copy."""
+    snapshot = {
+        "repos": {
+            "a/b": {"pullRequests": {"value": {"items": [
+                pull_request(1, "dev", "2026-05-01T00:00:00Z", merged="2026-05-02T00:00:00Z")]}, "unavailable": None}},
+            "c/d": {"pullRequests": {"value": {"items": [
+                pull_request(1, "dev", "2026-07-01T00:00:00Z", merged="2026-07-02T00:00:00Z")]}, "unavailable": None}},
+        }
+    }
+    first = classify.first_merge_by_author(snapshot)
+    assert first == {"dev": "2026-05-02T00:00:00Z"}
+    later = contributions(snapshot["repos"]["c/d"]["pullRequests"]["value"]["items"], first_merge=first)
+    assert month(later, "2026-07")["newContributors"] == []
+
+
+def test_a_bot_is_not_engagement_and_neither_is_the_author():
+    pr = pull_request(
+        1, "dev", "2026-07-01T00:00:00Z",
+        comments=[("dev", "2026-07-01T01:00:00Z"), ("ci[bot]", "2026-07-01T02:00:00Z"), ("reviewer", "2026-07-01T05:00:00Z")],
+    )
+    assert classify.first_response(pr) == "2026-07-01T05:00:00Z"
+    out = contributions([pr])
+    assert month(out, "2026-07")["engageHours"] == [5.0]
+
+
+def test_a_pull_request_nobody_answered_is_absent_rather_than_zero():
+    out = contributions([pull_request(1, "dev", "2026-07-01T00:00:00Z")])
+    assert month(out, "2026-07")["engageHours"] == []
+    assert out["openPRAgeHours"] == [1152.0]
+
+
+def test_a_merge_with_no_approval_is_counted_separately():
+    approved = pull_request(
+        1, "dev", "2026-07-01T00:00:00Z", merged="2026-07-03T00:00:00Z",
+        reviews=[("reviewer", "APPROVED", "2026-07-02T00:00:00Z")],
+    )
+    out = contributions([approved, pull_request(2, "dev", "2026-07-01T00:00:00Z", merged="2026-07-01T12:00:00Z")])
+    assert out["openToApprovalHours"] == [24.0]
+    assert out["approvalToMergeHours"] == [24.0]
+    assert out["mergedWithoutApproval"] == 1
+
+
+def test_the_month_the_collection_ran_is_marked_partial():
+    out = contributions(
+        [pull_request(1, "dev", "2026-07-01T00:00:00Z"), pull_request(2, "dev", "2026-08-02T00:00:00Z")],
+        collected="2026-08-18T00:00:00Z",
+    )
+    assert [m["partial"] for m in out["months"]] == [False, True]
+
+
+def test_pull_requests_that_were_not_collected_are_unavailable_not_empty():
+    entry = {"pullRequests": {"value": None, "unavailable": "GraphQL rate limit"}}
+    assert classify.classify_contributions(entry, {}, "2026-08-18T00:00:00Z") == {
+        "unavailable": "GraphQL rate limit"
+    }
+
+
+def test_a_thread_that_hit_the_collection_cap_is_counted():
+    """Reviews are collected 100 at a time and comments 50. A cut-off thread can
+    only push a first response later than it was."""
+    pr = pull_request(1, "dev", "2026-07-01T00:00:00Z", comments=[("reviewer", "2026-07-01T05:00:00Z")])
+    pr["commentCount"] = 80
+    out = contributions([pr])
+    assert (out["collectedPRs"], out["truncatedThreads"]) == (1, 1)

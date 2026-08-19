@@ -206,6 +206,27 @@ confusing them is how a trend chart lies.
 - **The unclassified share is weighted by changed lines**, because a branch gets
   a category from whatever else it touched. 26,000 lines under a directory that
   has since been deleted upstream were hiding behind a 2.4% branch-level figure.
+- **A new contributor is a first *merged* pull request, project-wide.** That is
+  DevStats' definition. A pull request that never landed did not land, and
+  somebody whose first merge went upstream is not new again the day they merge
+  into the donated copy — so the first merge is looked up across both
+  repositories before either is classified.
+- **Every duration is bucketed by the month it finished**, not the month the
+  pull request opened. Bucketing by the opening month makes the newest month
+  look fast, because that month's slow pull requests have not merged yet and so
+  are not in the sample. The cost is the other direction: an old pull request
+  answered this month puts a long duration in this month.
+- **Percentiles are computed on the page, never stored pre-summarised.** The
+  median of two repositories is not the median of their medians, and the
+  repository filter has to be able to ask for either.
+- **A month needs 3 measurements for a median and 5 for a percentile band.**
+  Below that the chart holds the point back rather than drawing noise.
+- **People are unions, pull requests are sums.** Somebody who works on both
+  repositories is one contributor, so "All" deduplicates logins while the counts
+  of pull requests add up.
+- **A discussion longer than the collector reads is counted and said.** Reviews
+  come 100 at a time and comments 50; a cut-off thread can only push a first
+  response later than it was, never earlier.
 - **The conversion ratio and clones-per-cloner are gone.** The first divided
   four months of forks across both repositories by fourteen days of visitors to
   one; the second is 39 clones per cloner against 511 page views, which is
