@@ -1263,8 +1263,13 @@ edit this template and re-render.
   /* ---------- chrome ---------- */
 
   const collected = new Date(DATA.collectedAt);
-  document.getElementById("subtitle").textContent =
-    "Collected " + collected.toLocaleString("en-US", { dateStyle: "long", timeStyle: "short", timeZone: "UTC" }) + " UTC";
+  const subtitle = document.getElementById("subtitle");
+  subtitle.textContent =
+    "Collected " + collected.toLocaleString("en-US", { dateStyle: "long", timeStyle: "short", timeZone: "UTC" }) + " UTC · ";
+  subtitle.appendChild(el("a", {
+    href: "https://github.com/eugeneng04/devops-bench/actions",
+    target: "_blank", rel: "noopener noreferrer",
+  }, "Refresh data"));
   document.getElementById("window-note").textContent = `Traffic window: last ${DATA.windowDays} days`;
 
   const filterHost = document.getElementById("repo-filter");
