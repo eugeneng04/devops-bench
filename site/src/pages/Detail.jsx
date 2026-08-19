@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams, useSearchParams, Link } from "react-router-dom";
 import { useBenchmark } from "../context/BenchmarkContext.jsx";
 import { setupScore, setupLabel } from "../lib/accessors.js";
-import { METRIC_LABELS, availableMetrics } from "../lib/vocab.js";
+import { METRIC_LABELS, availableMetrics, formatMetric, metricBarFraction, isLowerBetter } from "../lib/vocab.js";
 import { SetupIdentity } from "../components/SetupIdentity.jsx";
 import { MetricToggle } from "../components/MetricToggle.jsx";
 import { TrendChart } from "../components/TrendChart.jsx";
@@ -40,6 +40,13 @@ function TaskTable({ setup, metric }) {
         );
     }, [setup, metric, sort]);
 
+    // Largest value across this setup's tasks, so an absolute metric's bar has a
+    // scale (percentage metrics ignore it).
+    const taskMax = useMemo(() => {
+        const vals = setup.tasks.map(t => t.scores[metric]).filter(v => v != null);
+        return vals.length ? Math.max(...vals) : null;
+    }, [setup, metric]);
+
     function sortBy(key) {
         setSort(prev => prev.key === key
             ? { key, dir: prev.dir === "asc" ? "desc" : "asc" }
@@ -64,6 +71,7 @@ function TaskTable({ setup, metric }) {
                     {tasks.map(task => {
                         // Null-safe: an unscored task shows an empty bar and "—".
                         const s = task.scores[metric];
+                        const barPct = metricBarFraction(metric, s, taskMax) * 100;
                         return (
                             <tr key={task.folder} className="border-t border-slate-100 dark:border-slate-800">
                                 <td className="py-3 pr-4">
@@ -75,9 +83,9 @@ function TaskTable({ setup, metric }) {
                                 <td className="py-3 pr-4 w-1/2">
                                     <div className="flex items-center gap-3">
                                         <div className="flex-grow bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
-                                            <div className="progress-bar-fill h-full rounded-full" style={{ width: `${s ?? 0}%`, backgroundColor: setup.color }} />
+                                            <div className="progress-bar-fill h-full rounded-full" style={{ width: `${barPct}%`, backgroundColor: setup.color }} />
                                         </div>
-                                        <span className="text-sm font-semibold text-slate-700 dark:text-slate-200 w-12 text-right shrink-0">{s == null ? "—" : `${s}%`}</span>
+                                        <span className="text-sm font-semibold text-slate-700 dark:text-slate-200 w-14 text-right shrink-0">{formatMetric(metric, s)}</span>
                                     </div>
                                 </td>
                             </tr>
@@ -131,17 +139,18 @@ export function Detail() {
 
     const model = models[setup.model];
     const harness = harnesses[setup.harness];
-    const score = setupScore(setup, metric) ?? 0;
+    const score = setupScore(setup, metric);
 
     // Null-safe summary stats: drop tasks with no score for this metric, and
     // guard the all-empty case so a sparse setup renders "—" instead of NaN /
     // -Infinity. Mirrors setupScore()'s null handling; `vals.length` is the
     // number of *scored* tasks, which is what "Average over N tasks" should mean.
     const vals = setup.tasks.map(t => t.scores[metric]).filter(v => v != null);
-    const best = vals.length ? Math.max(...vals) : null;
+    // "Best" follows the metric's direction: the fastest task, not the slowest.
+    const best = vals.length ? (isLowerBetter(metric) ? Math.min(...vals) : Math.max(...vals)) : null;
     const avg = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
     const med = vals.length ? median(vals) : null;
-    const pct = v => (v == null ? "—" : `${v.toFixed(1)}%`);
+    const pct = v => formatMetric(metric, v);
 
     return (
         <main className="w-full max-w-5xl flex flex-col items-center gap-6">
@@ -155,7 +164,7 @@ export function Detail() {
                     </div>
                     <div className="flex flex-col items-start lg:items-end gap-2 shrink-0">
                         <div className="flex items-baseline gap-1.5">
-                            <span className="text-4xl font-bold text-slate-900 dark:text-slate-100">{score.toFixed(1)}<span className="text-2xl">%</span></span>
+                            <span className="text-4xl font-bold text-slate-900 dark:text-slate-100">{formatMetric(metric, score)}</span>
                             <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide">{METRIC_LABELS[metric]}</span>
                         </div>
                         <MetricToggle value={metric} onChange={setMetric} available={available} />

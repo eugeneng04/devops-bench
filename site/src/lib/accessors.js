@@ -7,7 +7,7 @@
 // so it stays a pure, easily-tested function.
 // =============================================================================
 
-import { AUGMENTATIONS, augmentationLabel } from "./vocab.js";
+import { AUGMENTATIONS, augmentationLabel, metricMeta } from "./vocab.js";
 
 /**
  * @typedef {import('./schema').Setup} Setup
@@ -107,8 +107,17 @@ export function yAxisBounds(setupsList, metric) {
         .map(p => p.y)
         .filter(y => y != null);
     if (!ys.length) return { min: 0, max: 100 };
-    const min = Math.max(0, Math.floor((Math.min(...ys) - 5) / 10) * 10);
-    const max = Math.min(100, Math.ceil((Math.max(...ys) + 5) / 10) * 10);
+    const lo = Math.min(...ys);
+    const hi = Math.max(...ys);
+    // Absolute metrics (latency, tokens) have no 100 ceiling — clamping them
+    // there would flatten every series onto the top gridline. Pad by a tenth of
+    // the range instead and let the axis follow the data.
+    if (!metricMeta(metric).percentage) {
+        const pad = Math.max((hi - lo) * 0.1, hi * 0.05, 1);
+        return { min: Math.max(0, lo - pad), max: hi + pad };
+    }
+    const min = Math.max(0, Math.floor((lo - 5) / 10) * 10);
+    const max = Math.min(100, Math.ceil((hi + 5) / 10) * 10);
     // Guard against a zero-height axis when all points sit in one 10-wide band.
     return { min, max: max > min ? max : Math.min(100, min + 10) };
 }

@@ -6,7 +6,7 @@ import { useMemo, useState } from "react";
 import { useBenchmark } from "../context/BenchmarkContext.jsx";
 import { buildFilterGroups, getFilteredSetups, emptyFilterState } from "../lib/filters.js";
 import { setupScore } from "../lib/accessors.js";
-import { availableMetrics, metricDescription } from "../lib/vocab.js";
+import { availableMetrics, metricDescription, isLowerBetter } from "../lib/vocab.js";
 import { FilterBar } from "../components/FilterBar.jsx";
 import { LeaderboardRow } from "../components/LeaderboardRow.jsx";
 import { MetricToggle } from "../components/MetricToggle.jsx";
@@ -27,10 +27,27 @@ export function Leaderboard() {
     );
 
     // Sort the filtered setups by aggregated score under the selected metric.
-    const sorted = useMemo(
-        () => [...filtered].sort((a, b) => (setupScore(b, metric) ?? 0) - (setupScore(a, metric) ?? 0)),
-        [filtered, metric]
-    );
+    // Efficiency metrics rank ascending (lower latency / fewer tokens is better).
+    // A setup with no value for the metric sorts last either way rather than
+    // being treated as a 0, which would make it look like the best latency.
+    const sorted = useMemo(() => {
+        const lower = isLowerBetter(metric);
+        return [...filtered].sort((a, b) => {
+            const av = setupScore(a, metric);
+            const bv = setupScore(b, metric);
+            if (av == null && bv == null) return 0;
+            if (av == null) return 1;
+            if (bv == null) return -1;
+            return lower ? av - bv : bv - av;
+        });
+    }, [filtered, metric]);
+
+    // Largest value on screen, so an absolute metric's bar has a scale. Null for
+    // percentage metrics, which need none.
+    const metricMax = useMemo(() => {
+        const vals = sorted.map(s => setupScore(s, metric)).filter(v => v != null);
+        return vals.length ? Math.max(...vals) : null;
+    }, [sorted, metric]);
 
     function toggleFilter(groupKey, value) {
         setFilterState(prev => {
@@ -104,7 +121,7 @@ export function Leaderboard() {
                         : error ? <LoadError />
                         : sorted.length === 0 ? <EmptyState onClear={clearFilters} />
                         : sorted.map(setup => (
-                            <LeaderboardRow key={setup.id} setup={setup} models={models} harnesses={harnesses} metric={metric} />
+                            <LeaderboardRow key={setup.id} setup={setup} models={models} harnesses={harnesses} metric={metric} metricMax={metricMax} />
                         ))}
                 </div>
             </div>

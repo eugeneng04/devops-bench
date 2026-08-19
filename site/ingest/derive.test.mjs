@@ -81,7 +81,12 @@ describe("derive — data-driven", () => {
             passMax: null,
             composite: null,
             correctness: null,
-            recoverableSafety: null
+            recoverableSafety: null,
+            // Efficiency is telemetry, not a score: an iteration that never
+            // scored still consumed wall-clock, so latency survives while every
+            // score is null. Tokens stay null because the fixture captured none.
+            latency: 1,
+            tokens: null
         });
     });
 });

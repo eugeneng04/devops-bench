@@ -95,7 +95,7 @@ describe("derive", () => {
         const task = derive(blanked)
             .find(x => x.id === s.id)
             .tasks.find(t => t.folder === folder);
-        expect(task.scores).toEqual({
+        expect(task.scores).toMatchObject({
             pass1: null,
             pass5: null,
             passMax: null,
@@ -103,5 +103,9 @@ describe("derive", () => {
             correctness: null,
             recoverableSafety: null
         });
+        // Efficiency is telemetry, not a score: the blanked cell still consumed
+        // wall-clock and tokens, so those survive while every score is null.
+        expect(task.scores.latency).toBeGreaterThan(0);
+        expect(task.scores.tokens).toBeGreaterThan(0);
     });
 });

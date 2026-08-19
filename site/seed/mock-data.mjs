@@ -260,8 +260,18 @@ function scoresFor(rows) {
     // denominator. With nothing scored there is no rate to report: null, not NaN.
     const scored = rows.filter(r => Number.isFinite(r.outcomeScore));
     const n = scored.length;
+    // Efficiency is telemetry, not a score: averaged over ALL rows (an unscored
+    // iteration still consumed time and tokens) and survives the early return.
+    const efficiency = {
+        latency: rawMean(rows, r => r.latencySec),
+        tokens: rawMean(rows, r => sumTokens(r))
+    };
     if (n === 0) {
-        return { pass1: null, pass5: null, passMax: null, composite: null, correctness: null, recoverableSafety: null };
+        return {
+            pass1: null, pass5: null, passMax: null,
+            composite: null, correctness: null, recoverableSafety: null,
+            ...efficiency
+        };
     }
     // pass1 thresholds on CORRECTNESS `c` (falling back to outcomeScore for
     // pre-v1 rows), so the pass rate isn't distorted by the √/gate composite.
@@ -282,8 +292,24 @@ function scoresFor(rows) {
         passMax: null,
         composite: mean("outcomeScore"),
         correctness: mean("correctnessScore"),
-        recoverableSafety: mean("recoverableSafetyScore")
+        recoverableSafety: mean("recoverableSafetyScore"),
+        ...efficiency
     };
+}
+
+// Mean of a raw (already-absolute) per-row value — seconds, token counts. No
+// ×100: these are not fractions, and the UI formats them by unit.
+function rawMean(rows, pick) {
+    const vals = rows.map(pick).filter(v => Number.isFinite(v));
+    return vals.length ? round(vals.reduce((a, b) => a + b, 0) / vals.length, 1) : null;
+}
+
+// Total tokens for one row; null when the harness captured no usage at all.
+function sumTokens(row) {
+    if (Number.isFinite(row.totalTokens)) return row.totalTokens;
+    const parts = [row.inputTokens, row.outputTokens, row.cachedTokens, row.cacheWriteTokens]
+        .filter(v => Number.isFinite(v));
+    return parts.length ? parts.reduce((a, b) => a + b, 0) : null;
 }
 
 // Mean over a list of score objects, per metric. Skips non-numeric entries so a
@@ -299,7 +325,9 @@ function meanScores(scoreList) {
         passMax: avg("passMax"),
         composite: avg("composite"),
         correctness: avg("correctness"),
-        recoverableSafety: avg("recoverableSafety")
+        recoverableSafety: avg("recoverableSafety"),
+        latency: avg("latency"),
+        tokens: avg("tokens")
     };
 }
 

@@ -4,11 +4,16 @@
 import { Link } from "react-router-dom";
 import { SetupIdentity } from "./SetupIdentity.jsx";
 import { setupScore, setupLabel } from "../lib/accessors.js";
+import { formatMetric, metricBarFraction } from "../lib/vocab.js";
 
-export function LeaderboardRow({ setup, models, harnesses, metric }) {
+// `metricMax` is the largest value for this metric across the visible rows —
+// absolute metrics (latency, tokens) have no natural ceiling, so the bar is
+// scaled against it. Unused by percentage metrics.
+export function LeaderboardRow({ setup, models, harnesses, metric, metricMax }) {
     const model = models[setup.model];
     const harness = harnesses[setup.harness];
-    const score = setupScore(setup, metric) ?? 0;
+    const score = setupScore(setup, metric);
+    const barPct = metricBarFraction(metric, score, metricMax) * 100;
     const to = `/setup/${encodeURIComponent(setup.id)}?metric=${encodeURIComponent(metric)}`;
 
     return (
@@ -36,10 +41,10 @@ export function LeaderboardRow({ setup, models, harnesses, metric }) {
                     )}
                 </span>
                 <span className="text-sm font-semibold text-slate-900 dark:text-slate-100 w-12 min-w-[48px]">
-                    {score.toFixed(1)}%
+                    {formatMetric(metric, score)}
                 </span>
                 <div className="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden relative">
-                    <div className="progress-bar-fill h-full rounded-full" style={{ width: `${score}%`, backgroundColor: setup.color }} />
+                    <div className="progress-bar-fill h-full rounded-full" style={{ width: `${barPct}%`, backgroundColor: setup.color }} />
                 </div>
             </div>
 
