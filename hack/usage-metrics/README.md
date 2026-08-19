@@ -283,3 +283,12 @@ Edit `dashboard.template.html` and re-run `render.py`. Do not edit the generated
 Chart colors come from a validated categorical palette; slots 1–3 clear the
 colorblind-separation and contrast gates in both light and dark mode. If you
 change a series color, re-validate the set rather than eyeballing it.
+
+Extension hotspots opens on the last 14 days, the same window the traffic cards
+use. The range filters on a branch's **last commit**, so it means "still being
+worked on in the window", not "started in it", and a `main` branch that took one
+commit yesterday brings its whole divergence with it. Copies are collapsed after
+the range, never before — collapsing first can keep the copy that falls outside
+the window and drop the ones inside. A branch with no commit date is held out of
+a bounded range and counted under **All**, with a line under the chart saying
+how many; every snapshot from format 2 on carries the date.

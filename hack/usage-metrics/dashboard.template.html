@@ -91,6 +91,10 @@ edit this template and re-render.
   button:hover { background: var(--hover-wash); }
   button[aria-pressed="true"] { color: var(--text-primary); font-weight: 600; }
 
+  /* A range that scopes one card sits inside it, above the chart it scopes. */
+  .range { display: flex; gap: 6px; flex-wrap: wrap; margin: -6px 0 14px; }
+  .range button { padding: 3px 9px; font-size: 12px; }
+
   /* One filter row, above everything it scopes. */
   .filters {
     display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
@@ -274,11 +278,12 @@ edit this template and re-render.
     <div class="card-head">
       <div>
         <h2>Extension hotspots</h2>
-        <p class="sub">Distinct changes on fork branches, by primary class. A change copied onto several forks counts once — select a bar to list them.</p>
+        <p class="sub" id="ext-sub"></p>
       </div>
       <div class="spacer"></div>
       <button type="button" data-toggle="ext" aria-pressed="false">Table</button>
     </div>
+    <div class="range" id="ext-range" role="group" aria-label="Date range"></div>
     <div id="ext-chart"></div>
     <div id="ext-table" hidden></div>
     <div id="ext-detail"></div>
@@ -342,6 +347,10 @@ edit this template and re-render.
   const tooltip = document.getElementById("tooltip");
   let repoFilter = "all";
   let extClass = null;   // the hotspot bar whose branches are listed, if any
+  // Days back from the collection, for the hotspots card only. Fourteen to
+  // match the traffic window, so both halves of the page describe the same
+  // fortnight; null is every branch there has ever been.
+  let extRange = 14;
 
   /* ---------- small helpers ---------- */
 
@@ -418,23 +427,19 @@ edit this template and re-render.
     const forks = names.flatMap((n) => (DATA.repos[n].forks || []).map((f) => ({ ...f, upstream: n })));
     // Carry the fork down onto the branch. A branch's name is only meaningful
     // beside the fork it is on - "main" appears on almost every one of them.
-    const branches = distinctChanges(
-      forks
-        .flatMap((f) => (f.branches || []).map((b) => ({ ...b, fork: f })))
-        .filter((b) => b.primary)
-    );
+    const allBranches = forks
+      .flatMap((f) => (f.branches || []).map((b) => ({ ...b, fork: f })))
+      .filter((b) => b.primary);
+    // Kept undeduplicated as well, because the hotspots card narrows to a date
+    // range and has to collapse the copies that survive it: deduplicating first
+    // can keep the one copy that falls outside the window and drop the rest.
+    const branches = distinctChanges(allBranches);
     const externalForks = forks.filter((f) => f.external);
     // Owners, not repositories. Contributors fork both repositories and get
     // counted twice; every outside owner is counted once, so a per-repository
     // denominator is inflated with insiders and pushes the number down.
     const owners = new Set(forks.map((f) => f.owner));
     const externalOwners = new Set(externalForks.map((f) => f.owner));
-
-    // Counted here rather than read from repos[].extensions, which counts every
-    // copy: a change carried onto four forks is one extension of the benchmark,
-    // not four, and the bars are what the reader compares.
-    const extensions = {};
-    for (const b of branches) extensions[b.primary] = (extensions[b.primary] || 0) + 1;
 
     const sum = (fn) => withTraffic.reduce((a, r) => a + fn(r), 0);
     const uniqueVisitors = sum((r) => r.traffic.views.unique);
@@ -451,7 +456,7 @@ edit this template and re-render.
     return {
       repos,
       missingTraffic: repos.filter((r) => !r.traffic),
-      forks, branches, externalForks, extensions, owners, externalOwners,
+      forks, branches, allBranches, externalForks, owners, externalOwners,
       changedLines, unclassifiedLines,
       uniqueVisitors, uniqueCloners, totalClones,
       totalViews: sum((r) => r.traffic.views.total),
@@ -506,26 +511,55 @@ edit this template and re-render.
 
   /* ---------- extension hotspots: one series, horizontal bars ---------- */
 
+  // Branches whose last commit falls inside the range, deduplicated after the
+  // range and not before: collapsing first can keep the copy that falls outside
+  // the window and drop the ones inside it.
+  //
+  // The window is measured back from the collection, not from the moment the
+  // page is opened. A page read a month later would otherwise empty itself.
+  function inExtRange(agg) {
+    const dated = agg.allBranches.filter((b) => b.headCommittedAt);
+    if (extRange === null) return { listed: distinctChanges(agg.allBranches), undated: 0 };
+    const floor = new Date(DATA.collectedAt).getTime() - extRange * 86400000;
+    return {
+      listed: distinctChanges(dated.filter((b) => new Date(b.headCommittedAt).getTime() >= floor)),
+      // A branch with no date cannot be placed in or out of a window. It is
+      // held out and said so, rather than counted at either end.
+      undated: agg.allBranches.length - dated.length,
+    };
+  }
+
   function renderExtensions(agg) {
     const host = document.getElementById("ext-chart");
     const holder = document.getElementById("ext-table");
     clear(host); clear(holder);
 
-    const rows = Object.entries(agg.extensions)
+    const { listed: inRange, undated } = inExtRange(agg);
+    // What the bars count, said where the reader is looking. The range filters
+    // on the branch's last commit, so it reads "still being worked on in the
+    // window", not "started in it".
+    document.getElementById("ext-sub").textContent =
+      (extRange === null
+        ? "Every divergent fork branch, by primary class."
+        : `Fork branches committed to in the last ${extRange} days, by primary class.`) +
+      " A change copied onto several forks counts once — select a bar to list them.";
+    const extensions = {};
+    for (const b of inRange) extensions[b.primary] = (extensions[b.primary] || 0) + 1;
+    const rows = Object.entries(extensions)
       .filter(([, v]) => v > 0)
       .sort((a, b) => b[1] - a[1]);
 
-    // A class the repository filter just emptied must not keep a list open
-    // underneath a bar that is no longer on the chart.
+    // A class the repository filter or the range just emptied must not keep a
+    // list open underneath a bar that is no longer on the chart.
     if (extClass && !rows.some(([k]) => k === extClass)) extClass = null;
 
-    if (!agg.branches.length) {
-      host.appendChild(emptyState("No divergent fork branches in this selection",
-        "Nothing has been pushed to a fork that is ahead of upstream."));
-      return;
-    }
     if (!rows.length) {
-      host.appendChild(emptyState("No change matched the taxonomy", "Every divergent branch is unclassified."));
+      host.appendChild(agg.allBranches.length
+        ? emptyState("Nothing in this range",
+            `No fork branch was committed to in the last ${extRange} days. Widen the range.`)
+        : emptyState("No divergent fork branches in this selection",
+            "Nothing has been pushed to a fork that is ahead of upstream."));
+      renderExtDetail(agg, inRange, undated);
       return;
     }
 
@@ -590,16 +624,21 @@ edit this template and re-render.
     });
     svg.appendChild(svgEl("line", { class: "axis-line", x1: m.l, x2: m.l, y1: m.t, y2: H - m.b }));
     host.appendChild(svg);
+    if (undated) {
+      host.appendChild(el("p", { class: "sub" },
+        `${num(undated)} ${undated === 1 ? "branch has" : "branches have"} no commit date and cannot be placed in a range. ` +
+        `They are held out of this chart; "All" counts them.`));
+    }
 
     holder.appendChild(buildTable(
       ["Class", "Changes", "Share"],
       rows.map(([k, v]) => [
-        DATA.classLabels[k] || k, num(v), pct(v / agg.branches.length),
+        DATA.classLabels[k] || k, num(v), pct(v / inRange.length),
       ]),
       [false, true, true]
     ));
 
-    renderExtDetail(agg);
+    renderExtDetail(agg, inRange, undated);
   }
 
   /* ---------- the branches behind one bar ---------- */
@@ -608,19 +647,19 @@ edit this template and re-render.
   // "?" and spaces. Slashes stay literal - the tree endpoint expects them.
   const refPath = (name) => name.split("/").map(encodeURIComponent).join("/");
 
-  function renderExtDetail(agg) {
+  function renderExtDetail(agg, inRange) {
     const host = document.getElementById("ext-detail");
     clear(host);
     if (!extClass) return;
 
     const label = DATA.classLabels[extClass] || extClass;
-    const listed = agg.branches
+    const listed = inRange
       .filter((b) => b.primary === extClass)
       .sort((a, b) => b.changedLines - a.changedLines);
     // The bar counts primary class only. Without saying so, a reader who knows
     // a branch touched infrastructure and cannot find it here concludes the
     // number is wrong rather than that it means something narrower.
-    const alsoTouch = agg.branches.filter(
+    const alsoTouch = inRange.filter(
       (b) => b.primary !== extClass && (b.secondary || []).includes(extClass)
     ).length;
     // Counted over the copies of the changes on this bar, not over every copy
@@ -655,6 +694,9 @@ edit this template and re-render.
         where.appendChild(el("a", {
           href: `https://github.com/${b.fork.fullName}/tree/${refPath(b.name)}`,
           target: "_blank", rel: "noopener noreferrer",
+          // The date the range filters on, on the row it filtered. A column of
+          // its own does not fit a half-width card beside the class list.
+          title: b.headCommittedAt ? `Last commit ${b.headCommittedAt.slice(0, 10)}` : "No commit date",
         }, `${b.fork.owner}:${b.name}`));
         // The owning org, not the repository name: both upstreams are called
         // devops-bench, so the name is the half that does not distinguish them.
@@ -858,7 +900,7 @@ edit this template and re-render.
     document.getElementById("hero-note").textContent =
       agg.clonesPerCloner === null
         ? "No clone data in this selection."
-        : `${num(agg.totalClones)} clones total — ${agg.clonesPerCloner.toFixed(1)}× per cloner, a ratio that reads as CI, not people.`;
+        : `${num(agg.totalClones)} clones over ${DATA.windowDays} days, ${agg.clonesPerCloner.toFixed(1)} per cloner.`;
 
     setValue(document.getElementById("tile-visitors"), agg.repos.some((r) => r.traffic) ? num(agg.uniqueVisitors) : null);
     document.getElementById("tile-visitors-note").textContent =
@@ -1185,6 +1227,21 @@ edit this template and re-render.
       render();
     });
     filterHost.appendChild(b);
+  }
+
+  // Fourteen days first, matching the traffic window above it. The wider steps
+  // exist because most fork work is older than a fortnight and a reader who
+  // sees only the recent slice has no way to know that.
+  const rangeHost = document.getElementById("ext-range");
+  for (const opt of [[14, "14 days"], [30, "30 days"], [90, "90 days"], [null, "All"]]) {
+    const b = el("button", { type: "button", "aria-pressed": String(opt[0] === extRange) }, opt[1]);
+    b.addEventListener("click", () => {
+      extRange = opt[0];
+      [...rangeHost.children].forEach((c) => c.setAttribute("aria-pressed", String(c === b)));
+      hideTooltip();
+      renderExtensions(aggregate());
+    });
+    rangeHost.appendChild(b);
   }
 
   for (const btn of document.querySelectorAll("[data-toggle]")) {

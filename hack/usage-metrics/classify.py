@@ -233,6 +233,10 @@ def classify_branch(branch: dict[str, Any], outside: set[str], owner: str) -> di
         # Ownership is the fallback only when there is no commit to read.
         "external": bool(authors & outside) or (not authors and owner in outside),
         "signature": change_signature(branch["files"], additions, deletions),
+        # When the branch was last committed to, not when the work started. It
+        # is what a date range on the page can honestly filter on: whether the
+        # branch was still being worked on inside the window.
+        "headCommittedAt": branch.get("headCommittedAt"),
         "changedFiles": len(branch["files"]),
         "additions": additions,
         "deletions": deletions,

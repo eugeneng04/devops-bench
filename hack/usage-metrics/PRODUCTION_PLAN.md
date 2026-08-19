@@ -642,6 +642,12 @@ Four things it must get right, all now enforced:
 - **Distinguish unmeasurable from zero**, for the reference classes in 3.4 and
   for kubernetes-sigs traffic.
 
+The hotspots card opens on the last 14 days, the traffic window, so both halves
+of the page describe the same fortnight. It filters on the branch's last commit,
+which is the only date the snapshot carries; 41 of the 218 distinct changes fall
+in a fortnight, 82 in 30 days and 211 in 90, so a reader who sees only the recent
+slice needs the wider steps to know what it is a slice of.
+
 **Done when.** The page opens with no network, every chart's table view agrees
 with the underlying file, and a golden-file test covers the escaping, the
 missing-measurement placeholder, and the null-traffic banner.
