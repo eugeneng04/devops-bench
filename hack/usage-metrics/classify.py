@@ -494,13 +494,13 @@ def classify_contributions(
         return {"unavailable": block["unavailable"] or "pull requests were not collected"}
 
     prs = [pr for pr in block["value"]["items"] if not _is_bot(pr)]
-    months: dict[str, dict[str, Any]] = {}
+    days: dict[str, dict[str, Any]] = {}
 
     def bucket(stamp: str) -> dict[str, Any]:
-        return months.setdefault(
-            stamp[:7],
+        return days.setdefault(
+            stamp[:10],
             {
-                "month": stamp[:7],
+                "date": stamp[:10],
                 "opened": 0,
                 "merged": 0,
                 "closedUnmerged": 0,
@@ -568,17 +568,18 @@ def classify_contributions(
         "totalPRs": block["value"]["totalCount"],
         "collectedPRs": len(prs),
         "truncatedThreads": truncated,
-        # The month the collection ran is still being written. It is reported
-        # rather than dropped, and marked so nothing reads it as a fall-off.
-        "months": [
+        # Stored by day and rolled up on the page, so the granularity control
+        # there costs nothing here. Which bucket is still being written is the
+        # page's question too: it depends on the grain, and a day nothing
+        # happened on has no bucket to carry the mark.
+        "days": [
             {
-                **m,
-                "authors": sorted(m["authors"]),
-                "newContributors": sorted(m["newContributors"]),
-                "reviewers": sorted(m["reviewers"]),
-                "partial": m["month"] == collected_at[:7],
+                **d,
+                "authors": sorted(d["authors"]),
+                "newContributors": sorted(d["newContributors"]),
+                "reviewers": sorted(d["reviewers"]),
             }
-            for m in sorted(months.values(), key=lambda m: m["month"])
+            for d in sorted(days.values(), key=lambda d: d["date"])
         ],
         "authorCounts": dict(authored.most_common()),
         "reviewerCounts": dict(reviewed.most_common()),

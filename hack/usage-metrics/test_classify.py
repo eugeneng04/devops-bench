@@ -494,18 +494,18 @@ def contributions(items, first_merge=None, collected="2026-08-18T00:00:00Z"):
     return classify.classify_contributions(entry, first_merge or {}, collected)
 
 
-def month(result, key):
-    return next(m for m in result["months"] if m["month"] == key)
+def day(result, key):
+    return next(d for d in result["days"] if d["date"] == key)
 
 
-def test_a_merge_is_counted_in_the_month_it_merged_not_the_month_it_opened():
-    """Bucketing a duration by the month the pull request opened makes the
-    newest month look fast: its slow pull requests have not merged yet."""
+def test_a_merge_is_counted_on_the_day_it_merged_not_the_day_it_opened():
+    """Bucketing a duration by when the pull request opened makes the newest
+    bucket look fast: its slow pull requests have not merged yet."""
     out = contributions([pull_request(1, "dev", "2026-06-30T00:00:00Z", merged="2026-07-02T00:00:00Z")])
-    assert month(out, "2026-06")["opened"] == 1
-    assert month(out, "2026-06")["merged"] == 0
-    assert month(out, "2026-07")["merged"] == 1
-    assert month(out, "2026-07")["mergeHours"] == [48.0]
+    assert day(out, "2026-06-30")["opened"] == 1
+    assert day(out, "2026-06-30")["merged"] == 0
+    assert day(out, "2026-07-02")["merged"] == 1
+    assert day(out, "2026-07-02")["mergeHours"] == [48.0]
 
 
 def test_a_new_contributor_is_a_first_merge_not_a_first_pull_request():
@@ -514,8 +514,8 @@ def test_a_new_contributor_is_a_first_merge_not_a_first_pull_request():
     out = contributions(
         [opened_never_merged, landed], first_merge={"newcomer": "2026-07-02T00:00:00Z"}
     )
-    assert month(out, "2026-06")["newContributors"] == []
-    assert month(out, "2026-07")["newContributors"] == ["newcomer"]
+    assert day(out, "2026-06-02")["newContributors"] == []
+    assert day(out, "2026-07-02")["newContributors"] == ["newcomer"]
 
 
 def test_a_second_repository_does_not_make_an_existing_contributor_new_again():
@@ -532,7 +532,7 @@ def test_a_second_repository_does_not_make_an_existing_contributor_new_again():
     first = classify.first_merge_by_author(snapshot)
     assert first == {"dev": "2026-05-02T00:00:00Z"}
     later = contributions(snapshot["repos"]["c/d"]["pullRequests"]["value"]["items"], first_merge=first)
-    assert month(later, "2026-07")["newContributors"] == []
+    assert day(later, "2026-07-02")["newContributors"] == []
 
 
 def test_a_bot_is_not_engagement_and_neither_is_the_author():
@@ -542,12 +542,12 @@ def test_a_bot_is_not_engagement_and_neither_is_the_author():
     )
     assert classify.first_response(pr) == "2026-07-01T05:00:00Z"
     out = contributions([pr])
-    assert month(out, "2026-07")["engageHours"] == [5.0]
+    assert day(out, "2026-07-01")["engageHours"] == [5.0]
 
 
 def test_a_pull_request_nobody_answered_is_absent_rather_than_zero():
     out = contributions([pull_request(1, "dev", "2026-07-01T00:00:00Z")])
-    assert month(out, "2026-07")["engageHours"] == []
+    assert day(out, "2026-07-01")["engageHours"] == []
     assert out["openPRAgeHours"] == [1152.0]
 
 
@@ -562,12 +562,15 @@ def test_a_merge_with_no_approval_is_counted_separately():
     assert out["mergedWithoutApproval"] == 1
 
 
-def test_the_month_the_collection_ran_is_marked_partial():
+def test_buckets_are_days_so_the_page_can_choose_the_grain():
+    """Which bucket is still being written depends on the grain the reader
+    picked, so the page decides that and not this file."""
     out = contributions(
         [pull_request(1, "dev", "2026-07-01T00:00:00Z"), pull_request(2, "dev", "2026-08-02T00:00:00Z")],
         collected="2026-08-18T00:00:00Z",
     )
-    assert [m["partial"] for m in out["months"]] == [False, True]
+    assert [d["date"] for d in out["days"]] == ["2026-07-01", "2026-08-02"]
+    assert "partial" not in out["days"][0]
 
 
 def test_pull_requests_that_were_not_collected_are_unavailable_not_empty():

@@ -211,11 +211,18 @@ confusing them is how a trend chart lies.
   somebody whose first merge went upstream is not new again the day they merge
   into the donated copy — so the first merge is looked up across both
   repositories before either is classified.
-- **Every duration is bucketed by the month it finished**, not the month the
-  pull request opened. Bucketing by the opening month makes the newest month
-  look fast, because that month's slow pull requests have not merged yet and so
-  are not in the sample. The cost is the other direction: an old pull request
-  answered this month puts a long duration in this month.
+- **Everything is bucketed by the day it finished**, not the day the pull
+  request opened. Bucketing by the opening date makes the newest bucket look
+  fast, because its slow pull requests have not merged yet and so are not in the
+  sample. The cost is the other direction: an old pull request answered this
+  month puts a long duration in this month.
+- **Days are the stored grain; day, week and month are page controls.** Each
+  contributions card has its own — the grain that suits a count is not the grain
+  that suits a median. A week starts Monday, UTC.
+- **An empty bucket between two full ones is drawn as zero, not as a gap.**
+  Every pull request in the period is in the snapshot, so a quiet weekend is a
+  measured zero. Traffic is the opposite and breaks its line: a day nobody
+  collected is not a day nobody visited.
 - **Percentiles are computed on the page, never stored pre-summarised.** The
   median of two repositories is not the median of their medians, and the
   repository filter has to be able to ask for either.

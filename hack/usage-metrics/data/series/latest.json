@@ -2,11 +2,11 @@
   "apiVersion": "usage-metrics/v1",
   "kind": "UsageSeries",
   "formatVersion": 1,
-  "generatedAt": "2026-08-19T23:00:44Z",
+  "generatedAt": "2026-08-19T23:50:40Z",
   "provenance": {
-    "collectorSha": "294f42bddd008afb800960bf4648910d44c485e5",
+    "collectorSha": "7ae6957c19f150d7299a6cf141a808e7cc9b4740",
     "workflowRunUrl": null,
-    "writtenAt": "2026-08-19T23:00:44Z"
+    "writtenAt": "2026-08-19T23:50:40Z"
   },
   "unreadable": [
     {

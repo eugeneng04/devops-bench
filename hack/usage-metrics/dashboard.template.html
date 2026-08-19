@@ -308,12 +308,13 @@ edit this template and re-render.
   <div class="card">
     <div class="card-head">
       <div>
-        <h2>Pull requests by month</h2>
+        <h2>Pull requests</h2>
         <p class="sub" id="prs-sub"></p>
       </div>
       <div class="spacer"></div>
       <button type="button" data-toggle="prs" aria-pressed="false">Table</button>
     </div>
+    <div class="range" id="prs-grain" role="group" aria-label="Granularity"></div>
     <div id="prs-chart"></div>
     <div id="prs-table" hidden></div>
   </div>
@@ -321,12 +322,13 @@ edit this template and re-render.
   <div class="card">
     <div class="card-head">
       <div>
-        <h2>Contributors by month</h2>
+        <h2>Contributor activity</h2>
         <p class="sub" id="people-sub"></p>
       </div>
       <div class="spacer"></div>
       <button type="button" data-toggle="people" aria-pressed="false">Table</button>
     </div>
+    <div class="range" id="people-grain" role="group" aria-label="Granularity"></div>
     <div id="people-chart"></div>
     <div id="people-table" hidden></div>
   </div>
@@ -342,6 +344,7 @@ edit this template and re-render.
       <div class="spacer"></div>
       <button type="button" data-toggle="latency" aria-pressed="false">Table</button>
     </div>
+    <div class="range" id="latency-grain" role="group" aria-label="Granularity"></div>
     <div id="latency-chart"></div>
     <div id="latency-table" hidden></div>
   </div>
@@ -432,6 +435,9 @@ edit this template and re-render.
   // fortnight; null is every branch there has ever been.
   let extRange = 14;
   let usageClass = null; // the usage-mix segment whose files are listed, if any
+  // Grain per contributions card. Counts read well by month; latency needs a
+  // week to have enough pull requests in a bucket to take a median of.
+  let prsGrain = "month", peopleGrain = "month", latencyGrain = "week";
 
   /* ---------- small helpers ---------- */
 
@@ -1408,30 +1414,97 @@ edit this template and re-render.
     return values.length;
   }
 
+  /* Stored by day, drawn by day, week or month. Counts add up across a bucket
+     and people do not - the same person opening a pull request on Monday and
+     another on Thursday is one contributor that week - so the sets are merged
+     and never summed, the same rule the repository filter follows. */
+
+  const weekStart = (date) => {
+    const t = Date.parse(date + "T00:00:00Z");
+    const monday = (new Date(t).getUTCDay() + 6) % 7;
+    return new Date(t - monday * DAY_MS).toISOString().slice(0, 10);
+  };
+  const bucketKey = (date, grain) =>
+    grain === "day" ? date : grain === "week" ? weekStart(date) : date.slice(0, 8) + "01";
+  const grainLabel = (grain) => (grain === "month" ? fmtMonth : fmtDate);
+
+  function rollup(days, grain) {
+    // The bucket the collection landed in is still being written. A bucket with
+    // nothing in it does not exist, so there is nothing to mark and nothing to
+    // mislead.
+    const current = bucketKey(DATA.collectedAt.slice(0, 10), grain);
+    const map = new Map();
+    for (const d of days) {
+      const key = bucketKey(d.date, grain);
+      let b = map.get(key);
+      if (!b) {
+        b = { key, opened: 0, merged: 0, closedUnmerged: 0, partial: key === current,
+              authors: new Set(), newContributors: new Set(), reviewers: new Set(),
+              mergeHours: [], engageHours: [] };
+        map.set(key, b);
+      }
+      b.opened += d.opened;
+      b.merged += d.merged;
+      b.closedUnmerged += d.closedUnmerged;
+      for (const a of d.authors) b.authors.add(a);
+      for (const a of d.newContributors) b.newContributors.add(a);
+      for (const a of d.reviewers) b.reviewers.add(a);
+      b.mergeHours.push(...d.mergeHours);
+      b.engageHours.push(...d.engageHours);
+    }
+    const buckets = [...map.values()].sort((a, b) => a.key.localeCompare(b.key));
+    for (const b of buckets) { b.mergeHours.sort((x, y) => x - y); b.engageHours.sort((x, y) => x - y); }
+
+    /* A day nobody opened a pull request on is a day of no pull requests, not a
+       day nobody measured - every pull request in the period is in the
+       snapshot. Skipping it draws a line straight over the quiet weekend and
+       makes it look busy, so the empty buckets between the first and the last
+       are filled in. */
+    const filled = [];
+    for (const b of buckets) {
+      while (filled.length) {
+        const next = nextKey(filled[filled.length - 1].key, grain);
+        if (next >= b.key) break;
+        filled.push({ key: next, opened: 0, merged: 0, closedUnmerged: 0, partial: next === current,
+                      authors: new Set(), newContributors: new Set(), reviewers: new Set(),
+                      mergeHours: [], engageHours: [] });
+      }
+      filled.push(b);
+    }
+    return filled;
+  }
+
+  function nextKey(key, grain) {
+    if (grain === "month") {
+      const [y, m] = key.split("-").map(Number);
+      return m === 12 ? `${y + 1}-01-01` : `${y}-${String(m + 1).padStart(2, "0")}-01`;
+    }
+    return new Date(Date.parse(key + "T00:00:00Z") + (grain === "week" ? 7 : 1) * DAY_MS)
+      .toISOString().slice(0, 10);
+  }
+
   function contributionData() {
     const names = selected();
     const missing = names.filter((n) => !DATA.repos[n].contributions || DATA.repos[n].contributions.unavailable);
     const live = names.map((n) => DATA.repos[n].contributions).filter((c) => c && !c.unavailable);
 
-    const byMonth = new Map();
+    const byDay = new Map();
     for (const c of live) {
-      for (const m of c.months) {
-        let t = byMonth.get(m.month);
+      for (const d of c.days) {
+        let t = byDay.get(d.date);
         if (!t) {
-          t = { month: m.month, opened: 0, merged: 0, closedUnmerged: 0, partial: false,
-                authors: new Set(), newContributors: new Set(), reviewers: new Set(),
-                mergeHours: [], engageHours: [] };
-          byMonth.set(m.month, t);
+          t = { date: d.date, opened: 0, merged: 0, closedUnmerged: 0,
+                authors: [], newContributors: [], reviewers: [], mergeHours: [], engageHours: [] };
+          byDay.set(d.date, t);
         }
-        t.opened += m.opened;
-        t.merged += m.merged;
-        t.closedUnmerged += m.closedUnmerged;
-        t.partial = t.partial || m.partial;
-        for (const a of m.authors) t.authors.add(a);
-        for (const a of m.newContributors) t.newContributors.add(a);
-        for (const a of m.reviewers) t.reviewers.add(a);
-        t.mergeHours.push(...m.mergeHours);
-        t.engageHours.push(...m.engageHours);
+        t.opened += d.opened;
+        t.merged += d.merged;
+        t.closedUnmerged += d.closedUnmerged;
+        t.authors.push(...d.authors);
+        t.newContributors.push(...d.newContributors);
+        t.reviewers.push(...d.reviewers);
+        t.mergeHours.push(...d.mergeHours);
+        t.engageHours.push(...d.engageHours);
       }
     }
     const sum = (field) => {
@@ -1440,15 +1513,14 @@ edit this template and re-render.
       return out;
     };
     const flat = (field) => live.flatMap((c) => c[field]).sort((a, b) => a - b);
-    const months = [...byMonth.values()].sort((a, b) => a.month.localeCompare(b.month));
-    for (const m of months) { m.mergeHours.sort((a, b) => a - b); m.engageHours.sort((a, b) => a - b); }
+    const days = [...byDay.values()].sort((a, b) => a.date.localeCompare(b.date));
 
     return {
-      missing, live, months,
+      missing, live, days,
       authorCounts: sum("authorCounts"),
       reviewerCounts: sum("reviewerCounts"),
-      mergeHours: months.flatMap((m) => m.mergeHours).sort((a, b) => a - b),
-      engageHours: months.flatMap((m) => m.engageHours).sort((a, b) => a - b),
+      mergeHours: days.flatMap((d) => d.mergeHours).sort((a, b) => a - b),
+      engageHours: days.flatMap((d) => d.engageHours).sort((a, b) => a - b),
       openToApproval: flat("openToApprovalHours"),
       approvalToMerge: flat("approvalToMergeHours"),
       openPRs: flat("openPRAgeHours"),
@@ -1457,9 +1529,11 @@ edit this template and re-render.
     };
   }
 
-  /* A month with a handful of merges has a median but not a spread, and a month
+  /* A bucket with a handful of merges has a median but not a spread, and one
      with two has neither. Both are held back rather than drawn as a reading. */
   const MEDIAN_MIN = 3, BAND_MIN = 5;
+  const cellQ = (values, q) => (values.length >= MEDIAN_MIN ? dur(quantile(values, q)) : "—");
+  const GRAIN_HEAD = { day: "Day", week: "Week of", month: "Month" };
 
   function renderContributionTiles(d) {
     const authors = Object.keys(d.authorCounts);
@@ -1472,14 +1546,13 @@ edit this template and re-render.
       ? `${num(authors.length)} opened pull requests, ${num(reviewers.length)} reviewed, ${num(both)} did both.`
       : "Pull requests were not collected.";
 
-    // Three whole months rather than ninety days: a new contributor is placed
-    // in the month their first merge landed, so a day-level window would cut a
-    // month in half and count part of it.
-    const recent = d.months.slice(-3);
+    // Three whole months, whatever grain the charts below are set to: the tile
+    // is a headline, not a reading off one of them.
+    const recent = rollup(d.days, "month").slice(-3);
     const fresh = new Set(recent.flatMap((m) => [...m.newContributors]));
     setValue(document.getElementById("tile-new-contributors"), d.live.length ? num(fresh.size) : null);
     document.getElementById("tile-new-contributors-note").textContent = recent.length
-      ? `First merged pull request since ${fmtMonth(recent[0].month + "-01")}.`
+      ? `First merged pull request since ${fmtMonth(recent[0].key)}.`
       : "No pull requests in this selection.";
 
     const median = quantile(d.mergeHours, 0.5);
@@ -1499,31 +1572,34 @@ edit this template and re-render.
     const host = document.getElementById("prs-chart");
     const holder = document.getElementById("prs-table");
     clear(host); clear(holder);
+    const buckets = rollup(d.days, prsGrain);
+    const fx = grainLabel(prsGrain);
     document.getElementById("prs-sub").textContent =
-      d.months.length ? "A merge counts in the month it merged, not the month it opened." : "";
+      buckets.length ? "A merge counts when it merged, not when it opened." : "";
 
-    if (!d.months.length) {
+    if (!buckets.length) {
       host.appendChild(emptyState(
         d.live.length ? "No pull requests in this selection" : "Pull requests not collected", ""));
       return;
     }
 
+    const last = buckets[buckets.length - 1];
     lineChart(host, [
       { name: "Opened", color: css("--series-1"),
-        points: d.months.map((m) => ({ date: m.month + "-01", value: m.opened })) },
+        points: buckets.map((b) => ({ date: b.key, value: b.opened })) },
       { name: "Merged", color: css("--series-2"),
-        points: d.months.map((m) => ({ date: m.month + "-01", value: m.merged })) },
+        points: buckets.map((b) => ({ date: b.key, value: b.merged })) },
     ], {
-      label: "Pull requests opened and merged each month",
-      fmtX: fmtMonth, dots: true,
-      note: d.months[d.months.length - 1].partial ? `${fmtMonth(d.months[d.months.length - 1].month + "-01")} is still in progress.` : "",
+      label: `Pull requests opened and merged each ${prsGrain}`,
+      fmtX: fx, dots: prsGrain !== "day",
+      note: last.partial ? `${fx(last.key)} is still in progress.` : "",
     });
 
     holder.appendChild(buildTable(
-      ["Month", "Opened", "Merged", "Closed unmerged"],
-      d.months.map((m) => [
-        fmtMonth(m.month + "-01") + (m.partial ? " (in progress)" : ""),
-        num(m.opened), num(m.merged), num(m.closedUnmerged),
+      [GRAIN_HEAD[prsGrain], "Opened", "Merged", "Closed unmerged"],
+      buckets.map((b) => [
+        fx(b.key) + (b.partial ? " (in progress)" : ""),
+        num(b.opened), num(b.merged), num(b.closedUnmerged),
       ]),
       [false, true, true, true]
     ));
@@ -1533,10 +1609,12 @@ edit this template and re-render.
     const host = document.getElementById("people-chart");
     const holder = document.getElementById("people-table");
     clear(host); clear(holder);
+    const buckets = rollup(d.days, peopleGrain);
+    const fx = grainLabel(peopleGrain);
     document.getElementById("people-sub").textContent =
-      d.months.length ? "New means a first merged pull request anywhere in the project." : "";
+      buckets.length ? "New means a first merged pull request anywhere in the project." : "";
 
-    if (!d.months.length) {
+    if (!buckets.length) {
       host.appendChild(emptyState(
         d.live.length ? "No pull requests in this selection" : "Pull requests not collected", ""));
       return;
@@ -1544,20 +1622,20 @@ edit this template and re-render.
 
     lineChart(host, [
       { name: "Opened or reviewed", color: css("--series-1"),
-        points: d.months.map((m) => ({ date: m.month + "-01", value: new Set([...m.authors, ...m.reviewers]).size })) },
+        points: buckets.map((b) => ({ date: b.key, value: new Set([...b.authors, ...b.reviewers]).size })) },
       { name: "New contributors", color: css("--series-2"),
-        points: d.months.map((m) => ({ date: m.month + "-01", value: m.newContributors.size })) },
+        points: buckets.map((b) => ({ date: b.key, value: b.newContributors.size })) },
     ], {
-      label: "People active on pull requests each month, and first-time contributors",
-      fmtX: fmtMonth, dots: true,
+      label: `People active on pull requests each ${peopleGrain}, and first-time contributors`,
+      fmtX: fx, dots: peopleGrain !== "day",
     });
 
     holder.appendChild(buildTable(
-      ["Month", "Active", "Opened", "Reviewed", "New"],
-      d.months.map((m) => [
-        fmtMonth(m.month + "-01") + (m.partial ? " (in progress)" : ""),
-        num(new Set([...m.authors, ...m.reviewers]).size),
-        num(m.authors.size), num(m.reviewers.size), num(m.newContributors.size),
+      [GRAIN_HEAD[peopleGrain], "Active", "Opened", "Reviewed", "New"],
+      buckets.map((b) => [
+        fx(b.key) + (b.partial ? " (in progress)" : ""),
+        num(new Set([...b.authors, ...b.reviewers]).size),
+        num(b.authors.size), num(b.reviewers.size), num(b.newContributors.size),
       ]),
       [false, true, true, true, true]
     ));
@@ -1568,23 +1646,46 @@ edit this template and re-render.
     const holder = document.getElementById("latency-table");
     clear(host); clear(holder);
     const sub = document.getElementById("latency-sub");
+    const buckets = rollup(d.days, latencyGrain);
+    const fx = grainLabel(latencyGrain);
+    const period = latencyGrain === "day" ? "day" : latencyGrain;
 
-    const enough = (m, field) => m[field].length >= MEDIAN_MIN;
-    const merge = d.months.filter((m) => enough(m, "mergeHours"));
-    const engage = d.months.filter((m) => enough(m, "engageHours"));
+    const enough = (b, field) => b[field].length >= MEDIAN_MIN;
+    const merge = buckets.filter((b) => enough(b, "mergeHours"));
+    const engage = buckets.filter((b) => enough(b, "engageHours"));
     sub.textContent = merge.length || engage.length
-      ? `Median per month, from months with at least ${MEDIAN_MIN} measurements.` : "";
+      ? `Median per ${period}, from ${period}s with at least ${MEDIAN_MIN} measurements.` : "";
+
+    const writeTable = () => holder.appendChild(buildTable(
+      [GRAIN_HEAD[latencyGrain], "Merge median", "Merge 85th", "Response median", "Merged"],
+      buckets.map((b) => [
+        fx(b.key) + (b.partial ? " (in progress)" : ""),
+        cellQ(b.mergeHours, 0.5), cellQ(b.mergeHours, 0.85), cellQ(b.engageHours, 0.5), num(b.merged),
+      ]),
+      [false, true, true, true, true]
+    ));
+
+    /* A typical day has three merges, so a daily median is one pull request
+       taking its time. The card says so rather than drawing a line of it. */
+    if (latencyGrain === "day") {
+      sub.textContent = "";
+      host.appendChild(emptyState("A day is too few pull requests for a median",
+        "Pick week or month. The table lists the days."));
+      writeTable();
+      return;
+    }
 
     if (!merge.length && !engage.length) {
       host.appendChild(emptyState(
         d.live.length ? "Not enough merged pull requests to trend" : "Pull requests not collected", ""));
+      writeTable();
       return;
     }
 
     // One unit for the whole chart, chosen from the largest thing on it.
     const peak = Math.max(
-      ...merge.map((m) => quantile(m.mergeHours, m.mergeHours.length >= BAND_MIN ? 0.85 : 0.5)),
-      ...engage.map((m) => quantile(m.engageHours, 0.5)), 1);
+      ...merge.map((b) => quantile(b.mergeHours, b.mergeHours.length >= BAND_MIN ? 0.85 : 0.5)),
+      ...engage.map((b) => quantile(b.engageHours, 0.5)), 1);
     const u = durUnit(peak);
     const scaled = (v) => v / u.div;
     const fmt = (v) => (v < 10 ? v.toFixed(1) : Math.round(v).toLocaleString("en-US")) + " " + u.suffix;
@@ -1593,38 +1694,30 @@ edit this template and re-render.
     if (merge.length) {
       lines.push({
         name: "Time to merge", color: css("--series-1"),
-        points: merge.map((m) => ({ date: m.month + "-01", value: scaled(quantile(m.mergeHours, 0.5)) })),
-        band: merge.filter((m) => m.mergeHours.length >= BAND_MIN).map((m) => ({
-          date: m.month + "-01",
-          lo: scaled(quantile(m.mergeHours, 0.15)),
-          hi: scaled(quantile(m.mergeHours, 0.85)),
+        points: merge.map((b) => ({ date: b.key, value: scaled(quantile(b.mergeHours, 0.5)) })),
+        band: merge.filter((b) => b.mergeHours.length >= BAND_MIN).map((b) => ({
+          date: b.key,
+          lo: scaled(quantile(b.mergeHours, 0.15)),
+          hi: scaled(quantile(b.mergeHours, 0.85)),
         })),
       });
     }
     if (engage.length) {
       lines.push({
         name: "Time to first response", color: css("--series-2"),
-        points: engage.map((m) => ({ date: m.month + "-01", value: scaled(quantile(m.engageHours, 0.5)) })),
+        points: engage.map((b) => ({ date: b.key, value: scaled(quantile(b.engageHours, 0.5)) })),
       });
     }
 
     lineChart(host, lines, {
-      label: "Median time to merge and to first response, by month",
-      fmtX: fmtMonth, fmt, dots: true,
-      // The same threshold the chart draws on: a band of one month is a dot
+      label: `Median time to merge and to first response, by ${period}`,
+      fmtX: fx, fmt, dots: true,
+      // The same threshold the chart draws on: a band of one bucket is a dot
       // with no area, and the note must not promise one that is not there.
       note: (lines[0].band || []).length >= 2 ? "Shaded: the middle 70% of time to merge." : "",
     });
 
-    const cell = (values, q) => (values.length >= MEDIAN_MIN ? dur(quantile(values, q)) : "—");
-    holder.appendChild(buildTable(
-      ["Month", "Merge median", "Merge 85th", "Response median", "Merged"],
-      d.months.map((m) => [
-        fmtMonth(m.month + "-01") + (m.partial ? " (in progress)" : ""),
-        cell(m.mergeHours, 0.5), cell(m.mergeHours, 0.85), cell(m.engageHours, 0.5), num(m.merged),
-      ]),
-      [false, true, true, true, true]
-    ));
+    writeTable();
   }
 
   function renderReviewers(d) {
@@ -1705,6 +1798,26 @@ edit this template and re-render.
       render();
     });
     filterHost.appendChild(b);
+  }
+
+  // One per card rather than one for the section: the grain that suits a count
+  // is not the grain that suits a median, so they are set apart.
+  for (const [card, get, set] of [
+    ["prs", () => prsGrain, (g) => { prsGrain = g; }],
+    ["people", () => peopleGrain, (g) => { peopleGrain = g; }],
+    ["latency", () => latencyGrain, (g) => { latencyGrain = g; }],
+  ]) {
+    const host = document.getElementById(card + "-grain");
+    for (const [value, label] of [["day", "Day"], ["week", "Week"], ["month", "Month"]]) {
+      const b = el("button", { type: "button", "aria-pressed": String(value === get()) }, label);
+      b.addEventListener("click", () => {
+        set(value);
+        [...host.children].forEach((c) => c.setAttribute("aria-pressed", String(c === b)));
+        hideTooltip();
+        render();
+      });
+      host.appendChild(b);
+    }
   }
 
   // Fourteen days first, matching the traffic window above it. The wider steps
