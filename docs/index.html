@@ -264,7 +264,6 @@ edit this template and re-render.
     <div class="card-head">
       <div>
         <h2>Adoption over time</h2>
-        <p class="sub">One point per collection, plotted where it was taken. Runs are irregular and nothing between two of them is measured.</p>
       </div>
       <div class="spacer"></div>
       <button type="button" data-toggle="runs" aria-pressed="false">Table</button>
@@ -294,7 +293,7 @@ edit this template and re-render.
     <div class="card-head">
       <div>
         <h2>Usage mix</h2>
-        <p class="sub" id="usage-sub">External references by kind, from exact-qualified code search.</p>
+        <p class="sub" id="usage-sub">External references by type</p>
       </div>
     </div>
     <div id="usage-mix"></div>
@@ -307,7 +306,6 @@ edit this template and re-render.
     <div class="card-head">
       <div>
         <h2>Who is forking</h2>
-        <p class="sub">External counts who authored the commits, not who holds the fork. A fork nobody has committed to falls back to its owner.</p>
       </div>
     </div>
     <div id="fork-table"></div>
@@ -316,24 +314,18 @@ edit this template and re-render.
 
 <div class="grid cols-2 top">
   <div class="card">
-    <div class="card-head"><div><h2>Popular paths</h2><p class="sub">What visitors actually opened.</p></div></div>
+    <div class="card-head"><div><h2>Popular paths</h2></div></div>
     <div id="paths-table"></div>
   </div>
   <div class="card">
-    <div class="card-head"><div><h2>Referrers</h2><p class="sub">Where visitors arrived from.</p></div></div>
+    <div class="card-head"><div><h2>Referrers</h2></div></div>
     <div id="referrers-table"></div>
   </div>
 </div>
 
 <footer>
   <p>
-    Mockup for <code>PROPOSAL_usage-metrics.md</code> §2. Every number on this page is
-    live GitHub data collected by <code>hack/usage-metrics/collect.py</code> and classified by
-    <code>classify.py</code>. Nothing here is hand-authored.
-  </p>
-  <p>
-    A dash (—) means the measurement could not be taken and the reason is stated; it never
-    means zero. Ratios with a zero denominator are undefined, not 0%.
+    A dash (—) is when data could not be collected.
   </p>
 </footer>
 
@@ -538,14 +530,13 @@ edit this template and re-render.
     clear(host); clear(holder);
 
     const { listed: inRange, undated } = inExtRange(agg);
-    // What the bars count, said where the reader is looking. The range filters
-    // on the branch's last commit, so it reads "still being worked on in the
-    // window", not "started in it".
+    // The range filters on the branch's last commit, so it reads "still being
+    // worked on in the window", not "started in it".
     document.getElementById("ext-sub").textContent =
       (extRange === null
-        ? "Every divergent fork branch, by primary class."
-        : `Fork branches committed to in the last ${extRange} days, by primary class.`) +
-      " A change copied onto several forks counts once — select a bar to list them.";
+        ? "All fork branches, "
+        : `Fork branches in the last ${extRange} days, `) +
+      "forks can be attributed to multiple classes. Select bar to list branches";
     const extensions = {};
     for (const b of inRange) extensions[b.primary] = (extensions[b.primary] || 0) + 1;
     const rows = Object.entries(extensions)
@@ -558,10 +549,8 @@ edit this template and re-render.
 
     if (!rows.length) {
       host.appendChild(agg.allBranches.length
-        ? emptyState("Nothing in this range",
-            `No fork branch was committed to in the last ${extRange} days. Widen the range.`)
-        : emptyState("No divergent fork branches in this selection",
-            "Nothing has been pushed to a fork that is ahead of upstream."));
+        ? emptyState("Nothing in this range", "")
+        : emptyState("No divergent fork branches", ""));
       renderExtDetail(agg, inRange, undated);
       return;
     }
@@ -629,8 +618,8 @@ edit this template and re-render.
     host.appendChild(svg);
     if (undated) {
       host.appendChild(el("p", { class: "sub" },
-        `${num(undated)} ${undated === 1 ? "branch has" : "branches have"} no commit date and cannot be placed in a range. ` +
-        `They are held out of this chart; "All" counts them.`));
+        `${num(undated)} ${undated === 1 ? "branch has" : "branches have"} no commit date and ` +
+        `${undated === 1 ? "is" : "are"} not in this range. "All" counts them.`));
     }
 
     holder.appendChild(buildTable(
@@ -730,12 +719,11 @@ edit this template and re-render.
     const notes = [];
     if (external) notes.push(`${num(external)} from outside the team.`);
     if (copies) {
-      notes.push(`${num(copies)} further ${copies === 1 ? "branch is" : "branches are"} ` +
-        `the same change on another fork, folded into the row it duplicates and marked +n.`);
+      notes.push(`${num(copies)} duplicate ${copies === 1 ? "branch" : "branches"}, marked +n.`);
     }
     if (alsoTouch) {
       notes.push(`${num(alsoTouch)} more ${alsoTouch === 1 ? "change touches" : "changes touch"} ` +
-        `${label} without it being their primary class, so they are counted under another bar.`);
+        `${label} as a secondary class.`);
     }
     if (notes.length) host.appendChild(el("p", { class: "note" }, notes.join(" ")));
   }
@@ -772,11 +760,7 @@ edit this template and re-render.
     const total = order.reduce((a, [k]) => a + DATA.references[k], 0);
 
     if (total === 0) {
-      host.appendChild(emptyState(
-        "No external references found",
-        "Every code-search match was inside the two canonical repositories. " +
-        "This is a measured zero, not a missing measurement — the queries ran and matched nothing outside the project."
-      ));
+      host.appendChild(emptyState("No external references found", ""));
       host.appendChild(queryTable());
       renderUsageDetail();
       return;
@@ -846,7 +830,7 @@ edit this template and re-render.
 
     if (DATA.referenceHitsCapped) {
       host.appendChild(el("p", { class: "muted" },
-        "A query matched more files than GitHub will return, so these counts are a floor."));
+        "* GitHub returns at most 100 results per query. Counts are a minimum."));
     }
     renderUsageDetail();
   }
@@ -859,8 +843,8 @@ edit this template and re-render.
     clear(host);
     const sub = document.getElementById("usage-sub");
     const hits = DATA.referenceHits || [];
-    sub.textContent = "External references by kind, from exact-qualified code search." +
-      (hits.length ? " Select a kind to list the files." : "");
+    sub.textContent = "External references by type" +
+      (hits.length ? ", select type to list files" : "");
     if (!usageClass) return;
 
     const names = { running: "Running", depending: "Depending", citing: "Citing" };
@@ -875,8 +859,7 @@ edit this template and re-render.
     host.appendChild(head);
 
     if (!listed.length) {
-      host.appendChild(emptyState("No files to list",
-        "The bar counts these references, but the search did not return the files behind them."));
+      host.appendChild(emptyState("No files to list", ""));
       return;
     }
 
@@ -919,7 +902,7 @@ edit this template and re-render.
   function emptyState(title, body) {
     const box = el("div", { class: "empty" });
     box.appendChild(el("strong", {}, title));
-    box.appendChild(el("span", {}, body));
+    if (body) box.appendChild(el("span", {}, body));
     return box;
   }
 
@@ -927,7 +910,7 @@ edit this template and re-render.
     const host = document.getElementById("fork-table");
     clear(host);
     if (!agg.forks.length) {
-      host.appendChild(emptyState("Fork data unavailable", "No fork listing in this snapshot."));
+      host.appendChild(emptyState("Fork data unavailable", ""));
       return;
     }
     // An org account holds 19 branches and outsiders wrote 3 of them. A flat
@@ -947,7 +930,7 @@ edit this template and re-render.
       ]);
     host.appendChild(buildTable(["Fork", "Affiliation", "Divergent branches", "Top classes"], rows, [false, false, true, false], true));
     if (agg.forks.length > rows.length) {
-      host.appendChild(el("p", { class: "sub muted" }, `Showing the 12 forks with the most divergent branches of ${agg.forks.length}.`));
+      host.appendChild(el("p", { class: "sub muted" }, `Top ${rows.length} of ${agg.forks.length} forks by divergent branches.`));
     }
   }
 
@@ -987,10 +970,17 @@ edit this template and re-render.
       agg.repos.some((r) => r.traffic) ? `${num(agg.totalViews)} views over ${DATA.windowDays} days.` : "Traffic API needs push access.";
 
     setValue(document.getElementById("tile-external"), pct(agg.externalOwnerRatio));
-    document.getElementById("tile-external-note").textContent =
-      agg.externalOwnerRatio === null
-        ? "No forks in this selection — undefined, not zero."
-        : `${agg.externalOwners.size} of ${agg.owners.size} fork owners have outside-authored work, or have never committed.`;
+    const externalNote = document.getElementById("tile-external-note");
+    clear(externalNote);
+    if (agg.externalOwnerRatio === null) {
+      externalNote.textContent = "No forks in this selection.";
+    } else {
+      externalNote.appendChild(document.createTextNode("Internal owners are listed at: "));
+      externalNote.appendChild(el("a", {
+        href: "https://github.com/eugeneng04/devops-bench/blob/main/hack/usage-metrics/affiliation.json",
+        target: "_blank", rel: "noopener noreferrer",
+      }, "affiliation.json"));
+    }
 
     setValue(document.getElementById("tile-unclassified"), pct(agg.unclassifiedRate));
     document.getElementById("tile-unclassified-note").textContent =
@@ -1005,9 +995,7 @@ edit this template and re-render.
     for (const r of agg.missingTraffic) {
       const b = el("div", { class: "banner" });
       b.appendChild(el("strong", {}, repoNames.find((n) => DATA.repos[n] === r) || "A repository"));
-      b.appendChild(document.createTextNode(
-        ` has no traffic data — ${r.trafficUnavailable}. Its views and clones are excluded from every figure on this page rather than counted as zero.`
-      ));
+      b.appendChild(document.createTextNode(` has no traffic data — ${r.trafficUnavailable}.`));
       host.appendChild(b);
     }
   }
@@ -1167,14 +1155,13 @@ edit this template and re-render.
     clear(host); clear(holder);
 
     if (!SERIES) {
-      host.appendChild(emptyState("This page carries no history",
-        "Build one with series.py and pass it to render.py with --series."));
+      host.appendChild(emptyState("This page carries no history", ""));
       return;
     }
     const repos = selected().filter((n) => SERIES.daily[n]);
     if (!repos.length) {
       host.appendChild(emptyState("No traffic history for this selection",
-        "The traffic API needs Administration: read on the repository being measured."));
+        "Requires traffic API access."));
       return;
     }
 
@@ -1193,21 +1180,11 @@ edit this template and re-render.
           points: SERIES.daily[n].points.map((p) => ({ date: p.date, value: p.uniqueVisitors })),
         }));
 
-    const gaps = repos.flatMap((n) => SERIES.daily[n].gaps);
-    const covered = repos.flatMap((n) => SERIES.daily[n].covered);
-    const total = covered.reduce((a, [s, e]) => a + (dayNum(e) - dayNum(s) + 1), 0);
     lineChart(host, lines, {
       label: "Daily traffic across every collection",
       breakGaps: true,
-      note: gaps.length
-        ? `${gaps.length} gap${gaps.length > 1 ? "s" : ""} where no run covered the days: ` +
-          gaps.map(([s, e]) => `${fmtDate(s)}–${fmtDate(e)}`).join(", ") + "."
-        : `${total} consecutive days, from ${repos.length} repositor${repos.length > 1 ? "ies" : "y"}` +
-          ` — ${Math.max(total - DATA.windowDays, 0)} more than GitHub retains.`,
     });
 
-    // Only the cross-repository caveat is left, and only when it applies: the
-    // gaps are already named under the chart, so saying it twice adds nothing.
     const historySub = document.getElementById("history-sub");
     historySub.textContent = repos.length > 1
       ? "One line per repository: unique visitors do not add across repositories."
@@ -1232,13 +1209,12 @@ edit this template and re-render.
     clear(host); clear(holder);
 
     if (!SERIES) {
-      host.appendChild(emptyState("This page carries no history",
-        "Build one with series.py and pass it to render.py with --series."));
+      host.appendChild(emptyState("This page carries no history", ""));
       return;
     }
     const runs = SERIES.runs;
     if (!runs.length) {
-      host.appendChild(emptyState("No runs in the series", "Nothing has been collected yet."));
+      host.appendChild(emptyState("No runs in the series", ""));
       return;
     }
 
@@ -1289,7 +1265,7 @@ edit this template and re-render.
   const collected = new Date(DATA.collectedAt);
   document.getElementById("subtitle").textContent =
     "Collected " + collected.toLocaleString("en-US", { dateStyle: "long", timeStyle: "short", timeZone: "UTC" }) + " UTC";
-  document.getElementById("window-note").textContent = `Traffic window: last ${DATA.windowDays} days (all GitHub retains)`;
+  document.getElementById("window-note").textContent = `Traffic window: last ${DATA.windowDays} days`;
 
   const filterHost = document.getElementById("repo-filter");
   for (const opt of [["all", "All"], ...repoNames.map((n) => [n, n.split("/")[0]])]) {
