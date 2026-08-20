@@ -583,13 +583,18 @@ edit this template and re-render.
   /* ---------- axes ---------- */
 
   /* Axis ticks land on clean numbers: try 4 and 5 divisions, keep the one with
-     the least headroom above the data. */
-  function niceScale(maxValue) {
+     the least headroom above the data. Counting things is the usual case and a
+     count has no halves - eleven people across five divisions is 2.5 people a
+     tick - so fractional steps are only offered where the quantity has them. */
+  function niceScale(maxValue, fractional) {
     let best = null;
     for (const ticks of [4, 5]) {
       const raw = Math.max(maxValue, 1) / ticks;
       const mag = Math.pow(10, Math.floor(Math.log10(raw)));
-      const step = [1, 2, 2.5, 5, 10].map((m) => m * mag).find((s) => s >= raw) || 10 * mag;
+      const steps = [1, 2, 2.5, 5, 10]
+        .map((m) => m * mag)
+        .filter((s) => fractional || Number.isInteger(s));
+      const step = steps.find((s) => s >= raw) || Math.max(10 * mag, 1);
       const candidate = { max: step * ticks, step, ticks };
       if (!best || candidate.max < best.max) best = candidate;
     }
@@ -1160,7 +1165,7 @@ edit this template and re-render.
     const lo = Math.min(...allPoints.map((p) => dayNum(p.date)));
     const hi = Math.max(...allPoints.map((p) => dayNum(p.date)));
     const span = Math.max(hi - lo, 1);
-    const scale = niceScale(Math.max(...allPoints.map((p) => p.value), ...bands.map((b) => b.hi), 1));
+    const scale = niceScale(Math.max(...allPoints.map((p) => p.value), ...bands.map((b) => b.hi), 1), opts.fractional);
     const x = (d) => m.l + ((dayNum(d) - lo) / span) * iw;
     const y = (v) => m.t + ih - (v / scale.max) * ih;
 
@@ -1711,7 +1716,7 @@ edit this template and re-render.
 
     lineChart(host, lines, {
       label: `Median time to merge and to first response, by ${period}`,
-      fmtX: fx, fmt, dots: true,
+      fmtX: fx, fmt, dots: true, fractional: true,
       // The same threshold the chart draws on: a band of one bucket is a dot
       // with no area, and the note must not promise one that is not there.
       note: (lines[0].band || []).length >= 2 ? "Shaded: the middle 70% of time to merge." : "",
