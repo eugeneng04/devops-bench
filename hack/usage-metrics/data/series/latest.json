@@ -2,11 +2,11 @@
   "apiVersion": "usage-metrics/v1",
   "kind": "UsageSeries",
   "formatVersion": 1,
-  "generatedAt": "2026-08-20T06:05:47Z",
+  "generatedAt": "2026-08-24T06:11:47Z",
   "provenance": {
-    "collectorSha": "84496ef1a20049d884accb6a111f154db2f5eb9d",
-    "workflowRunUrl": "https://github.com/eugeneng04/devops-bench/actions/runs/32337813075",
-    "writtenAt": "2026-08-20T06:05:47Z"
+    "collectorSha": "0d90857db3c880d3adeb7411a563af176fade89c",
+    "workflowRunUrl": "https://github.com/eugeneng04/devops-bench/actions/runs/32695952686",
+    "writtenAt": "2026-08-24T06:11:47Z"
   },
   "unreadable": [
     {
@@ -203,6 +203,69 @@
         "workflowRunUrl": "https://github.com/eugeneng04/devops-bench/actions/runs/32337813075",
         "writtenAt": "2026-08-20T06:00:43Z"
       }
+    },
+    {
+      "date": "2026-08-24",
+      "collectedAt": "2026-08-24T06:06:35Z",
+      "windowDays": 14,
+      "totals": {
+        "forks": 28,
+        "activeForks": 26,
+        "externalForks": 6,
+        "owners": 19,
+        "activeOwners": 17,
+        "externalOwners": 6,
+        "activeExternalOwners": 4,
+        "divergentBranches": 266,
+        "externalDivergentBranches": 11,
+        "distinctChanges": 239,
+        "externalDistinctChanges": 11,
+        "changedLines": 1365271,
+        "unclassifiedLines": 11177,
+        "trafficRepos": [
+          "gke-labs/devops-bench"
+        ]
+      },
+      "derived": {
+        "externalOwnerRatio": 0.3157894736842105,
+        "activeExternalOwnerRatio": 0.23529411764705882,
+        "externalBranchRatio": 0.041353383458646614,
+        "externalChangeRatio": 0.04602510460251046,
+        "unclassifiedLineRate": 0.008186653052763884
+      },
+      "affiliation": {
+        "inside": 19,
+        "outside": 10,
+        "frozenAt": "2026-08-24"
+      },
+      "references": {
+        "depending": 1,
+        "running": 1,
+        "citing": 11
+      },
+      "referencesUnavailable": null,
+      "traffic": {
+        "gke-labs/devops-bench": {
+          "views": 417,
+          "uniqueVisitors": 31,
+          "clones": 5060,
+          "uniqueCloners": 250
+        },
+        "kubernetes-sigs/devops-bench": null
+      },
+      "coverage": {
+        "partial": false,
+        "skipped": [],
+        "trafficRepos": [
+          "gke-labs/devops-bench"
+        ],
+        "forksUnavailable": []
+      },
+      "provenance": {
+        "collectorSha": "0d90857db3c880d3adeb7411a563af176fade89c",
+        "workflowRunUrl": "https://github.com/eugeneng04/devops-bench/actions/runs/32695952686",
+        "writtenAt": "2026-08-24T06:06:35Z"
+      }
     }
   ],
   "daily": {
@@ -210,7 +273,7 @@
       "covered": [
         [
           "2026-07-29",
-          "2026-08-19"
+          "2026-08-23"
         ]
       ],
       "gaps": [],
@@ -368,6 +431,34 @@
           "uniqueVisitors": 5,
           "clones": 62,
           "uniqueCloners": 15
+        },
+        {
+          "date": "2026-08-20",
+          "views": 23,
+          "uniqueVisitors": 5,
+          "clones": 60,
+          "uniqueCloners": 12
+        },
+        {
+          "date": "2026-08-21",
+          "views": 13,
+          "uniqueVisitors": 5,
+          "clones": 401,
+          "uniqueCloners": 14
+        },
+        {
+          "date": "2026-08-22",
+          "views": 13,
+          "uniqueVisitors": 5,
+          "clones": 705,
+          "uniqueCloners": 19
+        },
+        {
+          "date": "2026-08-23",
+          "views": 0,
+          "uniqueVisitors": 0,
+          "clones": 0,
+          "uniqueCloners": 0
         }
       ]
     }
