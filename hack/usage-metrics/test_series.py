@@ -233,3 +233,140 @@ def test_a_store_with_nothing_readable_is_an_error_not_an_empty_chart(tmp_path, 
     (tmp_path / "classified" / "2026-08-11.json").write_text("{}")
     monkeypatch.setattr("sys.argv", ["series.py", "--store", f"file:{tmp_path}"])
     assert series.main() == 2
+
+
+# --- what changed between two runs -----------------------------------------
+
+
+def branch(name: str, signature: str | None = "sig", **over) -> dict:
+    record = {
+        "name": name,
+        "primary": "agentFramework",
+        "secondary": [],
+        "external": False,
+        "authors": [],
+        "changedLines": 10,
+        "headCommittedAt": "2026-08-14T00:00:00Z",
+        "signature": signature,
+        "unavailable": None,
+    }
+    return {**record, **over}
+
+
+def forked(collected: str, forks: list[dict] | None, **over) -> dict:
+    entry = {
+        "repo": REPO,
+        "forks": forks,
+        "forksUnavailable": None if forks is not None else "listing failed",
+        "forksNotListed": 0,
+        "forksSkippedByCap": 0,
+        "traffic": None,
+        **over,
+    }
+    record = classified(collected, {})
+    record["repos"] = {REPO: entry}
+    return record
+
+
+def fork(full_name: str, branches: list[dict]) -> dict:
+    return {
+        "fullName": full_name,
+        "owner": full_name.split("/")[0],
+        "external": True,
+        "active": True,
+        "divergentBranches": len(branches),
+        "branches": branches,
+        "unavailable": None,
+    }
+
+
+def only(before, after):
+    return series.run_changes(before, after)["repos"][REPO]
+
+
+def test_a_fork_the_previous_run_did_not_have_is_new():
+    out = only(
+        forked("2026-08-12", [fork("a/f", [branch("main")])]),
+        forked("2026-08-18", [fork("a/f", [branch("main")]), fork("b/f", [branch("main")])]),
+    )
+    assert [f["fullName"] for f in out["newForks"]] == ["b/f"]
+    assert [b["branch"] for b in out["newBranches"]] == ["main"]
+    assert out["newBranches"][0]["fork"] == "b/f"
+
+
+def test_a_branch_whose_head_moved_is_updated_not_new():
+    out = only(
+        forked("2026-08-12", [fork("a/f", [branch("work", "one", changedLines=10)])]),
+        forked("2026-08-18", [fork("a/f", [branch("work", "two", changedLines=40)])]),
+    )
+    assert out["newBranches"] == []
+    assert [b["branch"] for b in out["updatedBranches"]] == ["work"]
+    assert out["updatedBranches"][0]["changedLinesBefore"] == 10
+    assert out["updatedBranches"][0]["changedLines"] == 40
+
+
+def test_a_branch_that_stood_still_is_not_reported():
+    out = only(
+        forked("2026-08-12", [fork("a/f", [branch("work", "one")])]),
+        forked("2026-08-18", [fork("a/f", [branch("work", "one")])]),
+    )
+    assert out["newBranches"] == [] and out["updatedBranches"] == []
+
+
+def test_a_branch_that_could_not_be_read_is_not_called_updated():
+    # No signature means no comparison ran. Calling that a change reports the
+    # failure of the collector as work somebody did.
+    unread = branch("work", None, unavailable="compare failed", changedLines=None)
+    out = only(
+        forked("2026-08-12", [fork("a/f", [branch("work", "one")])]),
+        forked("2026-08-18", [fork("a/f", [unread])]),
+    )
+    assert out["updatedBranches"] == []
+
+
+def test_a_run_that_could_not_list_forks_reports_no_changes_at_all():
+    # Every fork would otherwise look new the moment listing recovers.
+    out = only(forked("2026-08-12", None), forked("2026-08-18", [fork("a/f", [branch("main")])]))
+    assert out["comparable"] is False
+    assert "earlier run" in out["reason"]
+
+
+def test_a_capped_listing_never_publishes_a_deletion():
+    # A fork missing from a sample was not necessarily deleted.
+    out = only(
+        forked("2026-08-12", [fork("a/f", [branch("main")]), fork("b/f", [branch("main")])]),
+        forked("2026-08-18", [fork("a/f", [branch("main")])], forksSkippedByCap=3),
+    )
+    assert out["goneForks"] is None and out["goneBranches"] is None
+
+
+def test_an_uncapped_run_does_report_what_disappeared():
+    out = only(
+        forked("2026-08-12", [fork("a/f", [branch("main"), branch("work")])]),
+        forked("2026-08-18", [fork("a/f", [branch("main")])]),
+    )
+    assert out["goneForks"] == []
+    assert [(b["fork"], b["branch"]) for b in out["goneBranches"]] == [("a/f", "work")]
+    # Described from its last sighting: it has no current state to report.
+    assert out["goneBranches"][0]["primary"] == "agentFramework"
+
+
+def test_the_first_run_has_nothing_to_compare_against():
+    runs = series.build({"2026-08-12": forked("2026-08-12", [fork("a/f", [branch("main")])])})["runs"]
+    assert "changes" not in runs[0]
+
+
+def test_older_runs_keep_the_counts_and_drop_the_rows():
+    records = {
+        f"2026-06-{day:02d}": forked(
+            f"2026-06-{day:02d}", [fork("a/f", [branch(f"work-{n}") for n in range(day)])]
+        )
+        for day in range(1, 12)
+    }
+    runs = series.build(records)["runs"]
+
+    assert [r["date"] for r in runs if r.get("changeDetail")] == sorted(records)[-series.DETAIL_RUNS:]
+    dropped = next(r for r in runs if "changes" in r and not r["changeDetail"])
+    assert dropped["changes"]["repos"][REPO]["newBranches"] == 1
+    assert "newForks" in dropped["changes"]["repos"][REPO]
+    assert runs[-1]["changes"]["repos"][REPO]["newBranches"][0]["branch"] == "work-10"

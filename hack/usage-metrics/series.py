@@ -186,9 +186,129 @@ def run_point(run_date: str, record: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+# --- what changed between two runs --------------------------------------------
+#
+# New means the run before did not have that name, which is only a statement
+# about what the previous run could see. A run that could not list a repo's
+# forks, or that hit the listing cap, is not allowed to publish a deletion.
+#
+# The whole series is inlined into the page, so row detail is kept for the most
+# recent runs only; older runs keep the counts.
+
+DETAIL_RUNS = 8
+
+
+def fork_index(record: dict[str, Any], repo: str) -> tuple[dict, dict] | None:
+    """Forks and branches of one upstream, keyed by name, or None if unseen."""
+    entry = record["repos"].get(repo)
+    if entry is None or entry.get("forksUnavailable") or entry.get("forks") is None:
+        return None
+    forks = {f["fullName"]: f for f in entry["forks"]}
+    branches = {
+        (f["fullName"], b["name"]): b for f in entry["forks"] for b in f["branches"]
+    }
+    return forks, branches
+
+
+def capped(record: dict[str, Any], repo: str) -> bool:
+    entry = record["repos"].get(repo, {})
+    return bool(entry.get("forksNotListed") or entry.get("forksSkippedByCap"))
+
+
+def repo_changes(before: dict[str, Any], after: dict[str, Any], repo: str) -> dict[str, Any]:
+    was, now = fork_index(before, repo), fork_index(after, repo)
+    if was is None or now is None:
+        missing = "the earlier run" if was is None else "this run"
+        return {"comparable": False, "reason": f"{repo} forks were not listed by {missing}"}
+
+    old_forks, old_branches = was
+    new_forks, new_branches = now
+    # A branch that could not be compared against its upstream carries no
+    # signature, and an unreadable branch has not been shown to have changed.
+    updated = [
+        k
+        for k in old_branches.keys() & new_branches.keys()
+        if old_branches[k].get("signature")
+        and new_branches[k].get("signature")
+        and old_branches[k]["signature"] != new_branches[k]["signature"]
+    ]
+
+    def row(key: tuple[str, str], branch: dict[str, Any]) -> dict[str, Any]:
+        was_branch = old_branches.get(key) or {}
+        return {
+            "fork": key[0],
+            "branch": key[1],
+            "upstream": repo,
+            "primary": branch["primary"],
+            "external": branch["external"],
+            "changedLines": branch.get("changedLines"),
+            "changedLinesBefore": was_branch.get("changedLines"),
+            "headCommittedAt": branch.get("headCommittedAt"),
+            "unavailable": branch["unavailable"],
+        }
+    return {
+        "comparable": True,
+        "newForks": [
+            {"fullName": n, "owner": new_forks[n]["owner"], "external": new_forks[n]["external"]}
+            for n in sorted(new_forks.keys() - old_forks.keys())
+        ],
+        "newBranches": [row(k, new_branches[k]) for k in sorted(new_branches.keys() - old_branches.keys())],
+        "updatedBranches": [row(k, new_branches[k]) for k in sorted(updated)],
+        # A capped listing is a sample; a fork missing from a sample was not
+        # necessarily deleted. Null, not an empty list.
+        "goneForks": (
+            None
+            if capped(before, repo) or capped(after, repo)
+            else sorted(old_forks.keys() - new_forks.keys())
+        ),
+        # Described from its last sighting: a branch nobody can see any more has
+        # no current state to report.
+        "goneBranches": (
+            None
+            if capped(before, repo) or capped(after, repo)
+            else [row(k, old_branches[k]) for k in sorted(old_branches.keys() - new_branches.keys())]
+        ),
+    }
+
+
+def run_changes(before: dict[str, Any] | None, after: dict[str, Any]) -> dict[str, Any] | None:
+    """What one collection saw that the one before it did not."""
+    if before is None:
+        return None
+    return {
+        "since": before["collectedAt"][:10],
+        "repos": {repo: repo_changes(before, after, repo) for repo in after["repos"]},
+    }
+
+
+def change_counts(changes: dict[str, Any]) -> dict[str, Any]:
+    kinds = ("newForks", "newBranches", "updatedBranches", "goneForks", "goneBranches")
+    return {
+        "since": changes["since"],
+        "repos": {
+            repo: (
+                {"comparable": False, "reason": c["reason"]}
+                if not c["comparable"]
+                else {"comparable": True, **{k: (None if c[k] is None else len(c[k])) for k in kinds}}
+            )
+            for repo, c in changes["repos"].items()
+        },
+    }
+
+
 def build(
     records: dict[str, dict[str, Any]], unreadable: dict[str, str] | None = None
 ) -> dict[str, Any]:
+    dates = sorted(records)
+    detailed = set(dates[-DETAIL_RUNS:])
+    runs = []
+    for i, run_date in enumerate(dates):
+        point = run_point(run_date, records[run_date])
+        changes = run_changes(records[dates[i - 1]] if i else None, records[run_date])
+        if changes:
+            point["changes"] = changes if run_date in detailed else change_counts(changes)
+            point["changeDetail"] = run_date in detailed
+        runs.append(point)
     return {
         "apiVersion": "usage-metrics/v1",
         "kind": "UsageSeries",
@@ -200,7 +320,7 @@ def build(
         "unreadable": [
             {"date": d, "reason": r} for d, r in sorted((unreadable or {}).items())
         ],
-        "runs": [run_point(d, records[d]) for d in sorted(records)],
+        "runs": runs,
         "daily": daily_traffic(records),
     }
 

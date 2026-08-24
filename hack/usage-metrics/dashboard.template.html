@@ -93,6 +93,7 @@ edit this template and re-render.
 
   /* A range that scopes one card sits inside it, above the chart it scopes. */
   .range { display: flex; gap: 6px; flex-wrap: wrap; margin: -6px 0 14px; }
+  .range:empty { display: none; }
   .range button { padding: 3px 9px; font-size: 12px; }
 
   /* One filter row, above everything it scopes. */
@@ -394,6 +395,19 @@ edit this template and re-render.
   <div class="card">
     <div class="card-head">
       <div>
+        <h2>What changed</h2>
+        <p class="sub" id="changes-sub"></p>
+      </div>
+    </div>
+    <div class="range" id="changes-runs" role="group" aria-label="Collection run"></div>
+    <div id="changes-body"></div>
+  </div>
+</div>
+
+<div class="grid top" style="margin-bottom:16px">
+  <div class="card">
+    <div class="card-head">
+      <div>
         <h2>Who is forking</h2>
       </div>
     </div>
@@ -438,6 +452,7 @@ edit this template and re-render.
   // Grain per contributions card. Counts read well by month; latency needs a
   // week to have enough pull requests in a bucket to take a median of.
   let prsGrain = "month", peopleGrain = "month", latencyGrain = "week";
+  let changesRun = null; // the run the fork-change card compares; null is the latest
 
   /* ---------- small helpers ---------- */
 
@@ -1021,6 +1036,105 @@ edit this template and re-render.
     box.appendChild(el("strong", {}, title));
     if (body) box.appendChild(el("span", {}, body));
     return box;
+  }
+
+  /* ---------- what changed ----------
+
+     A fork branch is collected only while it is ahead of upstream, so a branch
+     appears here when it diverges and leaves when it is merged, deleted or
+     reset. Detail is kept for the most recent runs, and the picker offers
+     exactly the runs that still have it. */
+
+  const changeRuns = () => (SERIES ? SERIES.runs.filter((r) => r.changeDetail) : []);
+
+  function renderChanges() {
+    const host = document.getElementById("changes-body");
+    const sub = document.getElementById("changes-sub");
+    clear(host);
+    const runs = changeRuns();
+    if (!runs.length) {
+      sub.textContent = "";
+      host.appendChild(emptyState("Nothing to compare yet",
+        "Comparing needs two collection runs this page can read."));
+      return;
+    }
+    const run = runs.find((r) => r.date === changesRun) || runs[runs.length - 1];
+    const repos = selected().filter((n) => run.changes.repos[n]);
+    const blocked = repos.filter((n) => !run.changes.repos[n].comparable);
+    const rows = [];
+    let newForks = [], suppressed = [], measuredGone = 0;
+    for (const name of repos) {
+      const c = run.changes.repos[name];
+      if (!c.comparable) continue;
+      newForks = newForks.concat(c.newForks.map((f) => f.fullName));
+      if (c.goneBranches === null) suppressed.push(name.split("/")[0]);
+      else measuredGone++;
+      rows.push(
+        ...c.newBranches.map((b) => ({ ...b, change: "New" })),
+        ...c.updatedBranches.map((b) => ({ ...b, change: "Updated" })),
+        ...(c.goneBranches || []).map((b) => ({ ...b, change: "Gone" })),
+      );
+    }
+
+    // Every branch on a fork nobody had seen before is new to this page, which
+    // is not the same as somebody having written it this week. Those rows are
+    // named for what they are and sorted below the work on forks already known.
+    const arrived = new Set(newForks);
+    for (const r of rows) if (r.change === "New" && arrived.has(r.fork)) r.change = "New fork";
+
+    // A repository whose listing was capped contributes no count of what went
+    // away, so the total is a floor when one is in the selection and no figure
+    // at all when they all are.
+    const count = (kind) => rows.filter((r) => r.change === kind).length;
+    const tally = [`${count("New")} new`, `${count("Updated")} updated`];
+    if (measuredGone && (!suppressed.length || count("Gone"))) {
+      tally.push(`${suppressed.length ? "at least " : ""}${count("Gone")} gone`);
+    }
+    sub.textContent = `Since ${fmtDate(run.changes.since)} · ${tally.join(", ")} branches`
+      + (count("New fork") ? ` · ${num(count("New fork"))} more on forks that just appeared` : "");
+
+    const order = { New: 0, Updated: 1, "New fork": 2, Gone: 3 };
+    rows.sort((a, b) =>
+      order[a.change] - order[b.change] ||
+      (b.headCommittedAt || "").localeCompare(a.headCommittedAt || ""));
+
+    // A branch the collector could not compare has no line count, and a blank
+    // there would read as a branch that changed nothing.
+    const lines = (r) => {
+      if (r.change === "Gone") return "—";
+      if (r.unavailable || r.changedLines === null) return "Not compared";
+      const before = r.changedLinesBefore;
+      const delta = before === null || before === undefined ? null : r.changedLines - before;
+      return num(r.changedLines) + (delta ? ` (${delta > 0 ? "+" : "−"}${num(Math.abs(delta))})` : "");
+    };
+
+    const shown = rows.slice(0, 20);
+    if (shown.length) {
+      host.appendChild(buildTable(
+        ["Fork", "Branch", "Change", "Class", "Lines vs main", "Last commit"],
+        shown.map((r) => [
+          r.fork, r.branch, r.change,
+          DATA.classLabels[r.primary] || r.primary || "—",
+          lines(r),
+          r.headCommittedAt ? fmtDate(r.headCommittedAt.slice(0, 10)) : "—",
+        ]),
+        [false, false, false, false, true, false], true
+      ));
+    } else if (!blocked.length) {
+      host.appendChild(emptyState("No fork branches changed", `Nothing moved since ${fmtDate(run.changes.since)}.`));
+    }
+
+    const notes = [];
+    if (newForks.length) notes.push(`New forks: ${newForks.join(", ")}.`);
+    if (rows.length > shown.length) notes.push(`Showing ${shown.length} of ${rows.length} changes.`);
+    // Suppression and unavailability are stated rather than left as an absence
+    // a reader would take for a measurement of nothing.
+    if (suppressed.length) {
+      notes.push(`Branches that went away are not reported for ${suppressed.join(", ")}: `
+        + "the fork listing was capped, so a fork can drop out of it without being deleted.");
+    }
+    for (const name of blocked) notes.push(`${run.changes.repos[name].reason}, so nothing is compared for it.`);
+    if (notes.length) host.appendChild(el("p", { class: "sub muted" }, notes.join(" ")));
   }
 
   function renderForks(agg) {
@@ -1777,6 +1891,7 @@ edit this template and re-render.
     renderReviewers(contrib);
     renderExtensions(agg);
     renderUsageMix(agg);
+    renderChanges();
     renderForks(agg);
     renderPaths(agg);
     renderReferrers(agg);
@@ -1838,6 +1953,21 @@ edit this template and re-render.
       renderExtensions(aggregate());
     });
     rangeHost.appendChild(b);
+  }
+
+  // Oldest first so the newest run sits where the eye lands last, and only the
+  // runs that still carry row detail are offered.
+  const changesHost = document.getElementById("changes-runs");
+  const pickable = changeRuns();
+  for (const run of pickable.length > 1 ? pickable : []) {
+    const latest = run === pickable[pickable.length - 1];
+    const b = el("button", { type: "button", "aria-pressed": String(latest) }, fmtDate(run.date));
+    b.addEventListener("click", () => {
+      changesRun = run.date;
+      [...changesHost.children].forEach((c) => c.setAttribute("aria-pressed", String(c === b)));
+      renderChanges();
+    });
+    changesHost.appendChild(b);
   }
 
   for (const btn of document.querySelectorAll("[data-toggle]")) {

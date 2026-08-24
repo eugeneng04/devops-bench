@@ -2,11 +2,11 @@
   "apiVersion": "usage-metrics/v1",
   "kind": "UsageSeries",
   "formatVersion": 1,
-  "generatedAt": "2026-08-24T06:11:47Z",
+  "generatedAt": "2026-08-24T16:52:20Z",
   "provenance": {
-    "collectorSha": "0d90857db3c880d3adeb7411a563af176fade89c",
-    "workflowRunUrl": "https://github.com/eugeneng04/devops-bench/actions/runs/32695952686",
-    "writtenAt": "2026-08-24T06:11:47Z"
+    "collectorSha": "e116dc0e6af6ee7795f4a97cdb19828994b10b98",
+    "workflowRunUrl": null,
+    "writtenAt": "2026-08-24T16:52:20Z"
   },
   "unreadable": [
     {
@@ -139,7 +139,219 @@
         "collectorSha": "b73e51fa0ee01a1cb56df0d980019c89ab0d1683",
         "workflowRunUrl": "https://github.com/eugeneng04/devops-bench/actions/runs/32197315797",
         "writtenAt": "2026-08-18T23:28:35Z"
-      }
+      },
+      "changes": {
+        "since": "2026-08-12",
+        "repos": {
+          "gke-labs/devops-bench": {
+            "comparable": true,
+            "newForks": [],
+            "newBranches": [
+              {
+                "fork": "eugeneng04/devops-bench",
+                "branch": "feat/multi-server-mcp-and-skills",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "agentFramework",
+                "external": false,
+                "changedLines": 1743,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-14T17:31:36Z",
+                "unavailable": null
+              },
+              {
+                "fork": "eugeneng04/devops-bench",
+                "branch": "main",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 196535,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-18T23:24:01Z",
+                "unavailable": null
+              }
+            ],
+            "updatedBranches": [],
+            "goneForks": [],
+            "goneBranches": []
+          },
+          "kubernetes-sigs/devops-bench": {
+            "comparable": true,
+            "newForks": [],
+            "newBranches": [
+              {
+                "fork": "eugeneng04/devops-bench-sigs",
+                "branch": "multi-server-mcp-and-skills",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "agentFramework",
+                "external": false,
+                "changedLines": 1724,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-18T16:45:57Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "feat/chaos-dynamic-port-and-notes",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "infrastructure",
+                "external": true,
+                "changedLines": 1950,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-18T17:52:23Z",
+                "unavailable": null
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "cloud-resource-property",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingVerifiers",
+                "external": true,
+                "changedLines": 2205,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-14T00:36:06Z",
+                "unavailable": null
+              },
+              {
+                "fork": "pradeepvrd/devops-bench-1",
+                "branch": "docs/scoring-methodology",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 81,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-14T22:42:56Z",
+                "unavailable": null
+              }
+            ],
+            "updatedBranches": [
+              {
+                "fork": "geojaz/k8s-devops-bench",
+                "branch": "ehole/pin-checks-to-run-cluster",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "core",
+                "external": false,
+                "changedLines": 263,
+                "changedLinesBefore": 259,
+                "headCommittedAt": "2026-08-15T16:08:04Z",
+                "unavailable": null
+              },
+              {
+                "fork": "geojaz/k8s-devops-bench",
+                "branch": "ehole/verifier-http-probe",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingVerifiers",
+                "external": false,
+                "changedLines": 572,
+                "changedLinesBefore": 445,
+                "headCommittedAt": "2026-08-15T16:05:41Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "feat/vcluster-factory-and-smoke-test",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "infrastructure",
+                "external": true,
+                "changedLines": 1791,
+                "changedLinesBefore": 1800,
+                "headCommittedAt": "2026-08-18T20:04:43Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "feat/vcluster-provider-integration",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "infrastructure",
+                "external": true,
+                "changedLines": 1652,
+                "changedLinesBefore": 1661,
+                "headCommittedAt": "2026-08-18T20:04:35Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "feat/vcluster-tf-stack",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "infrastructure",
+                "external": true,
+                "changedLines": 653,
+                "changedLinesBefore": 662,
+                "headCommittedAt": "2026-08-18T20:02:08Z",
+                "unavailable": null
+              },
+              {
+                "fork": "itssimrank/migration",
+                "branch": "docs/roadmap-and-contribution-tracks",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 122,
+                "changedLinesBefore": 120,
+                "headCommittedAt": "2026-08-17T17:41:54Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "add-agents-docs",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 329,
+                "changedLinesBefore": 326,
+                "headCommittedAt": "2026-08-18T20:32:31Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "add-review-skills",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 526,
+                "changedLinesBefore": 930,
+                "headCommittedAt": "2026-08-18T20:31:31Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "fair-verification-budget",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "core",
+                "external": false,
+                "changedLines": 149,
+                "changedLinesBefore": 143,
+                "headCommittedAt": "2026-08-17T21:20:07Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "fix-parallel-child-handoff",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingVerifiers",
+                "external": false,
+                "changedLines": 51,
+                "changedLinesBefore": 48,
+                "headCommittedAt": "2026-08-17T21:22:25Z",
+                "unavailable": null
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "ehole/team-integration",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "infrastructure",
+                "external": true,
+                "changedLines": 18172,
+                "changedLinesBefore": 16817,
+                "headCommittedAt": "2026-08-14T18:58:36Z",
+                "unavailable": null
+              }
+            ],
+            "goneForks": null,
+            "goneBranches": null
+          }
+        }
+      },
+      "changeDetail": true
     },
     {
       "date": "2026-08-20",
@@ -202,7 +414,220 @@
         "collectorSha": "84496ef1a20049d884accb6a111f154db2f5eb9d",
         "workflowRunUrl": "https://github.com/eugeneng04/devops-bench/actions/runs/32337813075",
         "writtenAt": "2026-08-20T06:00:43Z"
-      }
+      },
+      "changes": {
+        "since": "2026-08-18",
+        "repos": {
+          "gke-labs/devops-bench": {
+            "comparable": true,
+            "newForks": [],
+            "newBranches": [
+              {
+                "fork": "eugeneng04/devops-bench",
+                "branch": "usage-metrics-dashboard",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 197689,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-19T17:28:33Z",
+                "unavailable": null
+              }
+            ],
+            "updatedBranches": [
+              {
+                "fork": "eugeneng04/devops-bench",
+                "branch": "main",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 204975,
+                "changedLinesBefore": 196535,
+                "headCommittedAt": "2026-08-20T00:10:28Z",
+                "unavailable": null
+              }
+            ],
+            "goneForks": [],
+            "goneBranches": []
+          },
+          "kubernetes-sigs/devops-bench": {
+            "comparable": true,
+            "newForks": [],
+            "newBranches": [
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "add-safety-checks-to-opa-remediation",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingTasks",
+                "external": false,
+                "changedLines": 93,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-19T18:58:52Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "add-task-cve-remediation",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 724,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-19T18:46:21Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "add-task-migration-and-upgrade",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 474,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-19T18:52:19Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "add-task-spot-rebalancing",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 649,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-19T18:47:46Z",
+                "unavailable": null
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "ehole/vcluster-provider",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 1157,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-20T03:25:33Z",
+                "unavailable": null
+              }
+            ],
+            "updatedBranches": [
+              {
+                "fork": "eugeneng04/devops-bench-sigs",
+                "branch": "multi-server-mcp-and-skills",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "agentFramework",
+                "external": false,
+                "changedLines": 1737,
+                "changedLinesBefore": 1724,
+                "headCommittedAt": "2026-08-19T22:24:06Z",
+                "unavailable": null
+              },
+              {
+                "fork": "geojaz/k8s-devops-bench",
+                "branch": "ehole/verifier-http-probe",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingVerifiers",
+                "external": false,
+                "changedLines": 605,
+                "changedLinesBefore": 572,
+                "headCommittedAt": "2026-08-19T21:28:11Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "feat/vcluster-factory-and-smoke-test",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "infrastructure",
+                "external": true,
+                "changedLines": 1813,
+                "changedLinesBefore": 1791,
+                "headCommittedAt": "2026-08-19T22:44:52Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "feat/vcluster-provider-integration",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "infrastructure",
+                "external": true,
+                "changedLines": 1656,
+                "changedLinesBefore": 1652,
+                "headCommittedAt": "2026-08-19T22:35:58Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "feat/vcluster-tf-stack",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "infrastructure",
+                "external": true,
+                "changedLines": 664,
+                "changedLinesBefore": 653,
+                "headCommittedAt": "2026-08-19T21:12:11Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "add-agents-docs",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 331,
+                "changedLinesBefore": 329,
+                "headCommittedAt": "2026-08-20T01:59:02Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "add-cleanup-skill",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 202,
+                "changedLinesBefore": 200,
+                "headCommittedAt": "2026-08-19T18:15:25Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "add-metrics-docs",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 209,
+                "changedLinesBefore": 198,
+                "headCommittedAt": "2026-08-20T00:06:06Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "add-review-skills",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 544,
+                "changedLinesBefore": 526,
+                "headCommittedAt": "2026-08-19T20:51:45Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "add-task-authoring-docs",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 197,
+                "changedLinesBefore": 165,
+                "headCommittedAt": "2026-08-19T20:16:31Z",
+                "unavailable": null
+              }
+            ],
+            "goneForks": null,
+            "goneBranches": null
+          }
+        }
+      },
+      "changeDetail": true
     },
     {
       "date": "2026-08-24",
@@ -265,7 +690,1145 @@
         "collectorSha": "0d90857db3c880d3adeb7411a563af176fade89c",
         "workflowRunUrl": "https://github.com/eugeneng04/devops-bench/actions/runs/32695952686",
         "writtenAt": "2026-08-24T06:06:35Z"
-      }
+      },
+      "changes": {
+        "since": "2026-08-20",
+        "repos": {
+          "gke-labs/devops-bench": {
+            "comparable": true,
+            "newForks": [
+              {
+                "fullName": "onix-net/devops-bench",
+                "owner": "onix-net",
+                "external": false
+              }
+            ],
+            "newBranches": [
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "AishSundar-patch-1",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:AishSundar-patch-1: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "add-gcp-task-explicit-provider",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:add-gcp-task-explicit-provider: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "agents",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "agentFramework",
+                "external": false,
+                "changedLines": 170,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-05-05T00:41:57Z",
+                "unavailable": null
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "backsync/from-upstream",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:backsync/from-upstream: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "chore/ruff-format-baseline",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:chore/ruff-format-baseline: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "dependabot/npm_and_yarn/site/postcss-8.5.25",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:dependabot/npm_and_yarn/site/postcss-8.5.25: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "dependabot/npm_and_yarn/site/seed/fast-xml-parser-5.10.1",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:dependabot/npm_and_yarn/site/seed/fast-xml-parser-5.10.1: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "dependabot/uv/aiohttp-3.14.3",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:dependabot/uv/aiohttp-3.14.3: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "dependabot/uv/cryptography-50.0.0",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:dependabot/uv/cryptography-50.0.0: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "dependabot/uv/mcp-1.28.1",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:dependabot/uv/mcp-1.28.1: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "dependabot/uv/pyasn1-0.6.4",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:dependabot/uv/pyasn1-0.6.4: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "dependabot/uv/setuptools-83.0.0",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:dependabot/uv/setuptools-83.0.0: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "diagnosis",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "changingGrading",
+                "external": false,
+                "changedLines": 7,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-06-02T01:45:50Z",
+                "unavailable": null
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "docs/kube-agents-decoupling",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:docs/kube-agents-decoupling: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "docs/out-of-tree-tasks",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:docs/out-of-tree-tasks: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "docs/pr-plan-wave-update",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:docs/pr-plan-wave-update: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "docs/task-authoring-best-practices",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:docs/task-authoring-best-practices: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "ehole/team-integration",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:ehole/team-integration: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "experiment/parallel-eval-runs",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:experiment/parallel-eval-runs: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "feat/bastion-matrix",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:feat/bastion-matrix: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "feat/bridge-result-model",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:feat/bridge-result-model: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "feat/cve-remediation-main",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:feat/cve-remediation-main: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "feat/efficiency-turns",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:feat/efficiency-turns: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "feat/eval-bastion",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:feat/eval-bastion: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "feat/greenops-consolidation",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:feat/greenops-consolidation: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "feat/mesh-federation",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:feat/mesh-federation: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "feat/parallel-eval-runs",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:feat/parallel-eval-runs: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "feat/pods-on-node-verifier",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:feat/pods-on-node-verifier: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "feat/run-isolation",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:feat/run-isolation: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "feat/run-isolation-legacy",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:feat/run-isolation-legacy: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "feat/scoring-v1-docs",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:feat/scoring-v1-docs: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "feat/scoring-v1-frontend",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:feat/scoring-v1-frontend: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "feat/scoring-v1-outcome-score",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:feat/scoring-v1-outcome-score: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "feat/scoring-v1-results-wiring",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:feat/scoring-v1-results-wiring: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "feat/scoring-v1-safety-metric",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:feat/scoring-v1-safety-metric: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "feat/scoring-v1-task-retrofit",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:feat/scoring-v1-task-retrofit: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "feat/secret-rotation-task",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:feat/secret-rotation-task: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "feat/site-dark-mode",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:feat/site-dark-mode: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "feat/site-efficiency-metrics",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:feat/site-efficiency-metrics: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "feat/spot-rebalancing",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:feat/spot-rebalancing: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "fix-backsync-load-encode-guardrails",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:fix-backsync-load-encode-guardrails: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "fix/backsync-ci-credentials",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:fix/backsync-ci-credentials: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "fix/bastion-host-skill-gap",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:fix/bastion-host-skill-gap: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "fix/doc-retrieval-rate-url-normalization",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:fix/doc-retrieval-rate-url-normalization: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "fix/oc-trajectory-node-on-path",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:fix/oc-trajectory-node-on-path: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "fix/oc-trajectory-node-path",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:fix/oc-trajectory-node-path: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "fix/site-readme-emulator-project",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:fix/site-readme-emulator-project: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "fix/site-vite8-code-splitting",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:fix/site-vite8-code-splitting: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "fix/suggest-flips-tree-check",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:fix/suggest-flips-tree-check: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "fix/task-review-verifier-robustness",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:fix/task-review-verifier-robustness: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "flip-core-foundation",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:flip-core-foundation: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "flip-suggestions",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:flip-suggestions: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "flip/providers-tf-modules",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:flip/providers-tf-modules: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "flip/wave4-5-parity",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:flip/wave4-5-parity: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "harden-cve-remediation",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:harden-cve-remediation: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "kube",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:kube: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "migration/flip-content-parity",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:migration/flip-content-parity: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "parallel-task-fixes-132",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:parallel-task-fixes-132: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "pr-plan-batch-waves-4-5",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:pr-plan-batch-waves-4-5: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "refactor/comparison",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:refactor/comparison: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "refactor/entrypoint",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:refactor/entrypoint: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "refactor/gemini-capabilities",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:refactor/gemini-capabilities: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "skills/agent-skills",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:skills/agent-skills: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "split/4-eval-skills",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:split/4-eval-skills: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "submit/1-models-loop",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:submit/1-models-loop: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "submit/2-verification",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:submit/2-verification: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "submit/3-agents-capabilities",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:submit/3-agents-capabilities: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "submit/4-agents-base-cli",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:submit/4-agents-base-cli: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "submit/5-agents-api",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:submit/5-agents-api: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "submit/6-chaos",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:submit/6-chaos: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "submit/7-metrics",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:submit/7-metrics: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "submit/8-harness",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:submit/8-harness: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "sync/upstream-scoring-verification",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:sync/upstream-scoring-verification: Not Found (HTTP 404)"
+              }
+            ],
+            "updatedBranches": [
+              {
+                "fork": "eugeneng04/devops-bench",
+                "branch": "main",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 293321,
+                "changedLinesBefore": 204975,
+                "headCommittedAt": "2026-08-20T06:05:47Z",
+                "unavailable": null
+              }
+            ],
+            "goneForks": [],
+            "goneBranches": []
+          },
+          "kubernetes-sigs/devops-bench": {
+            "comparable": true,
+            "newForks": [
+              {
+                "fullName": "ChinemeremChigbo/devops-bench",
+                "owner": "chinemeremchigbo",
+                "external": true
+              }
+            ],
+            "newBranches": [
+              {
+                "fork": "ChinemeremChigbo/devops-bench",
+                "branch": "add-agent-extra-flags",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "agentFramework",
+                "external": true,
+                "changedLines": 188,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-21T22:26:31Z",
+                "unavailable": null
+              },
+              {
+                "fork": "eugeneng04/devops-bench-sigs",
+                "branch": "feat/per-turn-records",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "tests",
+                "external": false,
+                "changedLines": 1188,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-21T19:43:32Z",
+                "unavailable": null
+              },
+              {
+                "fork": "eugeneng04/devops-bench-sigs",
+                "branch": "feat/terminal-reason",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "agentFramework",
+                "external": false,
+                "changedLines": 273,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-21T19:38:42Z",
+                "unavailable": null
+              },
+              {
+                "fork": "eugeneng04/devops-bench-sigs",
+                "branch": "feat/tool-call-counts",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "core",
+                "external": false,
+                "changedLines": 120,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-21T19:40:26Z",
+                "unavailable": null
+              },
+              {
+                "fork": "eugeneng04/devops-bench-sigs",
+                "branch": "fix/api-token-accumulation",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "agentFramework",
+                "external": false,
+                "changedLines": 163,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-21T19:42:20Z",
+                "unavailable": null
+              },
+              {
+                "fork": "eugeneng04/devops-bench-sigs",
+                "branch": "fix/api-token-buckets",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "agentFramework",
+                "external": false,
+                "changedLines": 969,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-21T19:42:33Z",
+                "unavailable": null
+              },
+              {
+                "fork": "eugeneng04/devops-bench-sigs",
+                "branch": "fix/cli-token-aliases",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "core",
+                "external": false,
+                "changedLines": 75,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-21T19:07:30Z",
+                "unavailable": null
+              },
+              {
+                "fork": "eugeneng04/devops-bench-sigs",
+                "branch": "integration/perf-metrics-all",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "tests",
+                "external": false,
+                "changedLines": 1652,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-21T19:45:18Z",
+                "unavailable": null
+              },
+              {
+                "fork": "geojaz/k8s-devops-bench",
+                "branch": "ehole/cloud-resource-property",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingVerifiers",
+                "external": false,
+                "changedLines": 1571,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-20T22:07:20Z",
+                "unavailable": null
+              },
+              {
+                "fork": "geojaz/k8s-devops-bench",
+                "branch": "ehole/sandbox-all-adapters",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "tests",
+                "external": true,
+                "changedLines": 18198,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-20T22:55:00Z",
+                "unavailable": null
+              },
+              {
+                "fork": "geojaz/k8s-devops-bench",
+                "branch": "ehole/task-version-metadata",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "tests",
+                "external": true,
+                "changedLines": 18120,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-20T22:46:20Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "guard-ar-cleanup-on-gcp",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 7,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-21T22:12:07Z",
+                "unavailable": null
+              },
+              {
+                "fork": "pradeepvrd/devops-bench-1",
+                "branch": "chore/coderabbit-review-tuning",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 137,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-22T00:57:38Z",
+                "unavailable": null
+              },
+              {
+                "fork": "pradeepvrd/devops-bench-1",
+                "branch": "docs/docs-index-and-getting-started",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 171,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-22T07:17:39Z",
+                "unavailable": null
+              },
+              {
+                "fork": "pradeepvrd/devops-bench-1",
+                "branch": "docs/operational-skills-and-references",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 984,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-22T06:15:57Z",
+                "unavailable": null
+              },
+              {
+                "fork": "pradeepvrd/devops-bench-1",
+                "branch": "docs/run-evals-and-leaderboard",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 331,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-22T04:58:02Z",
+                "unavailable": null
+              },
+              {
+                "fork": "pradeepvrd/devops-bench-1",
+                "branch": "docs/validate-eval-skill",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 148,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-21T22:47:52Z",
+                "unavailable": null
+              }
+            ],
+            "updatedBranches": [
+              {
+                "fork": "geojaz/k8s-devops-bench",
+                "branch": "ehole/safeguard-hold-monitor",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "core",
+                "external": false,
+                "changedLines": 1575,
+                "changedLinesBefore": 1425,
+                "headCommittedAt": "2026-08-20T18:53:19Z",
+                "unavailable": null
+              },
+              {
+                "fork": "geojaz/k8s-devops-bench",
+                "branch": "ehole/verifier-http-probe",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingVerifiers",
+                "external": false,
+                "changedLines": 814,
+                "changedLinesBefore": 605,
+                "headCommittedAt": "2026-08-21T21:13:09Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "feat/chaos-dynamic-port-and-notes",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "infrastructure",
+                "external": true,
+                "changedLines": 2256,
+                "changedLinesBefore": 1950,
+                "headCommittedAt": "2026-08-21T20:49:50Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "feat/vcluster-factory-and-smoke-test",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "infrastructure",
+                "external": true,
+                "changedLines": 2071,
+                "changedLinesBefore": 1813,
+                "headCommittedAt": "2026-08-21T22:13:56Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "feat/vcluster-provider-integration",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "infrastructure",
+                "external": true,
+                "changedLines": 1832,
+                "changedLinesBefore": 1656,
+                "headCommittedAt": "2026-08-21T22:13:51Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "feat/vcluster-tf-stack",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "infrastructure",
+                "external": true,
+                "changedLines": 761,
+                "changedLinesBefore": 664,
+                "headCommittedAt": "2026-08-21T22:12:56Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "add-bastion-scripts",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 1140,
+                "changedLinesBefore": 1119,
+                "headCommittedAt": "2026-08-20T21:33:15Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "add-cleanup-skill",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 235,
+                "changedLinesBefore": 202,
+                "headCommittedAt": "2026-08-20T20:06:35Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "add-review-skills",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 579,
+                "changedLinesBefore": 544,
+                "headCommittedAt": "2026-08-21T18:59:23Z",
+                "unavailable": null
+              }
+            ],
+            "goneForks": null,
+            "goneBranches": null
+          }
+        }
+      },
+      "changeDetail": true
     }
   ],
   "daily": {

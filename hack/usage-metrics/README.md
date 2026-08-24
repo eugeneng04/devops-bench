@@ -161,6 +161,23 @@ confusing them is how a trend chart lies.
   window it is asked about: fourteen daily uniques here sum to 89 against a
   reported window figure of 37. The window figure is kept whole, and the page
   never sums uniques across days or across repositories.
+- **A run that could not list a repository's forks is compared against nothing.**
+  Every fork would otherwise look new the moment listing recovered, so the run
+  says it cannot be compared instead of publishing a page of arrivals.
+- **A capped fork listing never publishes a deletion.** A cap makes the listing a
+  sample, and a fork missing from a sample was not necessarily deleted, so the
+  gone counts are null rather than zero and the card says which repository they
+  are missing for. A total that spans a capped repository and an uncapped one is
+  a floor, and reads "at least".
+- **A branch with no signature is not called updated.** No signature means the
+  comparison against upstream failed; calling that a change reports the
+  collector's failure as work somebody did.
+- **A fork branch is collected only while it is ahead of upstream**, so a branch
+  arrives when it diverges and leaves when it is merged, deleted or reset. What
+  went away is described from its last sighting, since it has no current state.
+- **Row detail is kept for the last eight runs; older runs keep the counts.** The
+  whole series is inlined into the page, so unbounded lists would grow it
+  without limit. The run picker offers exactly the runs that still have rows.
 - **A record this version cannot read is named on the page**, not dropped. The
   first snapshot ever taken predates the store and has no format version; a walk
   that raised on it could never get past the oldest date there is. A chart
