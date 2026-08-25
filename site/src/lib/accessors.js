@@ -92,6 +92,25 @@ export function formatRunDate(t) {
     return new Date(t).toLocaleDateString("en-CA", { timeZone: "UTC", year: "numeric", month: "2-digit", day: "2-digit" });
 }
 
+// A round tick step for an absolute range: 1, 2, 2.5 or 5 times a power of ten,
+// the smallest that keeps the axis under ~8 gridlines. The percentage branch can
+// hardcode 10 because its range is always 0..100; an absolute range spans
+// seconds to tens of thousands of tokens, so the step has to follow the data.
+function niceStep(range) {
+    const magnitude = 10 ** Math.floor(Math.log10(range / 4));
+    for (const m of [1, 2, 2.5, 5]) {
+        if (range / (magnitude * m) <= 8) return magnitude * m;
+    }
+    return magnitude * 10;
+}
+
+// Round `value` to a multiple of `step` with `round` (Math.floor / Math.ceil).
+// The trailing toFixed(6) drops float dust so a 0.1 step yields 24.3, not
+// 24.299999999999997, which would print as a long decimal on the axis.
+function snap(value, step, round) {
+    return Number((round(value / step) * step).toFixed(6));
+}
+
 // Trend-chart y-axis [min, max] for the given setups + metric. Fits the plotted
 // scores instead of a fixed 60–100 window so low scorers aren't clipped off the
 // bottom: pad by 5, snap to tens (keeps the 10-step ticks clean), clamp to
@@ -114,7 +133,15 @@ export function yAxisBounds(setupsList, metric) {
     // the range instead and let the axis follow the data.
     if (!metricMeta(metric).percentage) {
         const pad = Math.max((hi - lo) * 0.1, hi * 0.05, 1);
-        return { min: Math.max(0, lo - pad), max: hi + pad };
+        // Snap to a round step for the same reason the percentage branch snaps
+        // to tens: Chart.js labels the endpoints as well as the interior ticks,
+        // so a raw padded bound prints a stray "54.8s" hard against the "54.0s"
+        // gridline above it.
+        const step = niceStep(hi + pad - Math.max(0, lo - pad));
+        return {
+            min: Math.max(0, snap(lo - pad, step, Math.floor)),
+            max: snap(hi + pad, step, Math.ceil)
+        };
     }
     const min = Math.max(0, Math.floor((lo - 5) / 10) * 10);
     const max = Math.min(100, Math.ceil((hi + 5) / 10) * 10);
