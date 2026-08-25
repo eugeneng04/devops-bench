@@ -200,8 +200,19 @@ export function Detail() {
                     <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                         <SetupIdentity setup={setup} model={model} harness={harness} variant="hero" />
                     </div>
-                    <div className="flex flex-col items-start lg:items-end gap-2 shrink-0">
-                        <div className="flex items-baseline gap-1.5">
+                    {/* At eight metrics the toggle is two buttons wider than it
+                        was, which is enough to clip the longest model name to
+                        "Gamma Co…" — the one string on the page that must not be
+                        abbreviated. Merely making this column shrinkable isn't
+                        enough: flex splits the shortfall in proportion to content
+                        width, so the identity still gives up pixels it can only
+                        pay for by truncating, while the toggle beside it could
+                        have wrapped for free. The lopsided shrink factor says
+                        which item yields — this one, all the way down to the
+                        headline figure (shrink-0, so it never breaks), and only
+                        then does the name start to shorten. */}
+                    <div className="flex flex-col items-start lg:items-end gap-2 min-w-0 shrink-[100]">
+                        <div className="flex items-baseline gap-1.5 shrink-0 whitespace-nowrap">
                             <span className="text-4xl font-bold text-slate-900 dark:text-slate-100">{formatMetric(metric, score)}</span>
                             <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide">{METRIC_LABELS[metric]}</span>
                         </div>
