@@ -262,10 +262,7 @@ function scoresFor(rows) {
     const n = scored.length;
     // Efficiency is telemetry, not a score: averaged over ALL rows (an unscored
     // iteration still consumed time and tokens) and survives the early return.
-    const efficiency = {
-        latency: rawMean(rows, r => r.latencySec),
-        tokens: rawMean(rows, r => sumTokens(r))
-    };
+    const efficiency = efficiencyFor(rows);
     if (n === 0) {
         return {
             pass1: null, pass5: null, passMax: null,
@@ -297,19 +294,50 @@ function scoresFor(rows) {
     };
 }
 
+// --- efficiency projection ---------------------------------------------------
+//
+// Exported for the same reason PASS_THRESHOLD and passAtK are: ingest/derive.mjs
+// projects efficiency from real rows and must use exactly this definition, not a
+// copy of it. Change a rule here and both mock and real data follow.
+
 // Mean of a raw (already-absolute) per-row value — seconds, token counts. No
 // ×100: these are not fractions, and the UI formats them by unit.
-function rawMean(rows, pick) {
+export function rawMean(rows, pick) {
     const vals = rows.map(pick).filter(v => Number.isFinite(v));
     return vals.length ? round(vals.reduce((a, b) => a + b, 0) / vals.length, 1) : null;
 }
 
-// Total tokens for one row; null when the harness captured no usage at all.
-function sumTokens(row) {
+// Wall-clock seconds for one row, or null when latency was never measured.
+// Unlike every token bucket, `latencySec` is NON-nullable upstream (row.py) and
+// normalize.py writes `float(record.get("latency") or 0.0)`, so an unmeasured
+// run arrives as 0 rather than null. Treat 0 as that sentinel: a real agent run
+// never completes in 0.0s, and averaging it in would rank an unmeasured setup
+// FIRST on a lower-is-better metric with a full bar.
+export function latencyOf(row) {
+    return Number.isFinite(row.latencySec) && row.latencySec > 0 ? row.latencySec : null;
+}
+
+// Total tokens for one row. Prefers the producer's own total when present (it
+// may count buckets the row does not break out); otherwise sums the captured
+// buckets. `reasoningTokens` is a SIBLING of output, not a subset of it (see
+// the canonical buckets in normalize.py), so leaving it out would undercount
+// every reasoning model. Null when no usage was captured at all, so "not
+// measured" stays distinct from a genuine zero.
+export function sumTokens(row) {
     if (Number.isFinite(row.totalTokens)) return row.totalTokens;
-    const parts = [row.inputTokens, row.outputTokens, row.cachedTokens, row.cacheWriteTokens]
-        .filter(v => Number.isFinite(v));
+    const parts = [
+        row.inputTokens,
+        row.outputTokens,
+        row.cachedTokens,
+        row.reasoningTokens,
+        row.cacheWriteTokens
+    ].filter(v => Number.isFinite(v));
     return parts.length ? parts.reduce((a, b) => a + b, 0) : null;
+}
+
+// The {latency, tokens} slice of Scores for one group of iteration rows.
+export function efficiencyFor(rows) {
+    return { latency: rawMean(rows, latencyOf), tokens: rawMean(rows, sumTokens) };
 }
 
 // Mean over a list of score objects, per metric. Skips non-numeric entries so a

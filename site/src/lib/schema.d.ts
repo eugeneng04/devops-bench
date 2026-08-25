@@ -149,11 +149,23 @@ export interface ResultRow {
     scoringVersion?: string;
     /** Tool-use score in [0,1]; null when unscored. */
     toolScore: number | null;
+    /**
+     * Agent wall-clock seconds. Non-nullable upstream, so an unmeasured run
+     * arrives as `0` — derive treats that as missing data, not an instant run.
+     */
     latencySec: number;
     /** Null when token usage was not captured. */
     inputTokens: number | null;
     /** Null when token usage was not captured. */
     outputTokens: number | null;
+    /** Cache-read input tokens; null/absent when not captured. */
+    cachedTokens?: number | null;
+    /** Reasoning tokens — a sibling bucket of `outputTokens`, not a subset. */
+    reasoningTokens?: number | null;
+    /** Cache-creation input tokens; null/absent when not captured. */
+    cacheWriteTokens?: number | null;
+    /** Provider-reported total; preferred over summing the buckets when present. */
+    totalTokens?: number | null;
     /** Whether the task is vetted as correct; only validated tasks promote to the leaderboard. */
     validated: boolean;
 }

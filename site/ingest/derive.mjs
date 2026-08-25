@@ -12,10 +12,11 @@
 //   tasks   <- distinct row.taskFolder at the LATEST run of each setup
 //   history <- one aggregate point per distinct row.t, time-ordered
 //
-// The SCORING FORMULA is NOT duplicated here — PASS_THRESHOLD and the pass@k
-// estimator are imported from seed/mock-data.mjs so test data and real data are
-// scored by exactly one definition. Change the formula there and re-run derive
-// (see the CLI at the bottom) to re-score everything from the same raw rows.
+// The SCORING FORMULA is NOT duplicated here — PASS_THRESHOLD, the pass@k
+// estimator and the efficiency projection are imported from seed/mock-data.mjs
+// so test data and real data are scored by exactly one definition. Change the
+// formula there and re-run derive (see the CLI at the bottom) to re-score
+// everything from the same raw rows.
 //
 // Presentation (order / color) is not derivable from results — it's curation, so
 // it comes from the optional catalog overrides, falling back to discovery order
@@ -23,7 +24,7 @@
 // catalog (see collectMetadata in catalog.mjs); this module only emits setups.
 // =============================================================================
 
-import { PASS_THRESHOLD, passAtK } from "../seed/mock-data.mjs";
+import { PASS_THRESHOLD, efficiencyFor, passAtK } from "../seed/mock-data.mjs";
 import { PALETTE, SETUP_CATALOG } from "./catalog.mjs";
 
 /**
@@ -58,10 +59,7 @@ function scoresFor(rows) {
     // Efficiency is telemetry, not a score: it is recorded even for an iteration
     // that never scored, so it is averaged over ALL rows rather than the scored
     // subset, and it survives the no-scored-rows early return below.
-    const efficiency = {
-        latency: rawMean(rows, r => r.latencySec),
-        tokens: rawMean(rows, r => sumTokens(r))
-    };
+    const efficiency = efficiencyFor(rows);
     if (n === 0) {
         return {
             pass1: null, pass5: null, passMax: null,
@@ -91,25 +89,6 @@ function scoresFor(rows) {
         recoverableSafety: mean("recoverableSafetyScore"),
         ...efficiency
     };
-}
-
-// Mean of a raw (already-absolute) per-row value — seconds, token counts. Unlike
-// the score means above there is no ×100: these are not fractions, and the UI
-// formats them by unit rather than as a percentage.
-function rawMean(rows, pick) {
-    const vals = rows.map(pick).filter(v => Number.isFinite(v));
-    return vals.length ? round(vals.reduce((a, b) => a + b, 0) / vals.length, 1) : null;
-}
-
-// Total tokens for one row. Prefers the producer's own total when present (it
-// may count buckets the row does not break out); otherwise sums what is there.
-// Returns null when the harness captured no usage at all, so "not measured"
-// stays distinct from a genuine zero.
-function sumTokens(row) {
-    if (Number.isFinite(row.totalTokens)) return row.totalTokens;
-    const parts = [row.inputTokens, row.outputTokens, row.cachedTokens, row.cacheWriteTokens]
-        .filter(v => Number.isFinite(v));
-    return parts.length ? parts.reduce((a, b) => a + b, 0) : null;
 }
 
 // Mean over a list of per-task Scores, per metric, skipping nulls. A metric with
