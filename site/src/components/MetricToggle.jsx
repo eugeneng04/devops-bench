@@ -1,8 +1,9 @@
 // Metric segmented control, shared by the leaderboard header and the detail
 // hero. `available` (optional) marks which metrics have data — the others render
-// DISABLED rather than hidden, so the UI advertises that pass5/passMax will
-// return once the harness produces multi-iteration runs. When omitted (or
-// empty), every metric is enabled (back-compat).
+// DISABLED rather than hidden, so the UI advertises the axis exists and says why
+// it's empty. The reason is per-metric (see metricUnavailableReason): pass@k is
+// waiting on multi-iteration runs, latency/tokens on harness telemetry. When
+// `available` is omitted (or empty), every metric is enabled (back-compat).
 //
 // The metrics are split into two pills, quality and efficiency, rather than one
 // long strip: eight buttons overflow the leaderboard's score column, and the
@@ -16,7 +17,7 @@
 // again. Letting buttons wrap inside a pill makes overflow impossible at any
 // width; the group split only decides where the break lands first.
 
-import { METRICS, METRIC_LABELS, metricDescription, metricMeta, metricShortLabel } from "../lib/vocab.js";
+import { METRICS, METRIC_LABELS, metricDescription, metricMeta, metricShortLabel, metricUnavailableReason } from "../lib/vocab.js";
 
 // Quality metrics first, then efficiency, each preserving METRICS order. Empty
 // groups are dropped so a vocab with only one family renders a single pill.
@@ -54,7 +55,7 @@ export function MetricToggle({ value, onChange, available }) {
                                 // The visible text may be abbreviated to fit; the
                                 // accessible name stays the full metric label.
                                 aria-label={METRIC_LABELS[m]}
-                                title={enabled ? metricDescription(m) : "Available once multi-iteration runs land"}
+                                title={enabled ? metricDescription(m) : metricUnavailableReason(m)}
                                 className={`px-2 py-1 font-medium rounded-md whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900 disabled:cursor-not-allowed ${cls}`}
                             >
                                 {metricShortLabel(m)}

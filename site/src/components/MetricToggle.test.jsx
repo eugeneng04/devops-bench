@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
 import { MetricToggle } from "./MetricToggle.jsx";
-import { METRICS, METRIC_LABELS, metricMeta, metricShortLabel } from "../lib/vocab.js";
+import { METRICS, METRIC_LABELS, metricDescription, metricMeta, metricShortLabel } from "../lib/vocab.js";
 
 const buttonFor = metric => screen.getByRole("button", { name: METRIC_LABELS[metric] });
 
@@ -73,5 +73,20 @@ describe("MetricToggle", () => {
     it("enables every metric when `available` is omitted or empty", () => {
         render(<MetricToggle value="composite" onChange={() => {}} available={[]} />);
         for (const m of METRICS) expect(buttonFor(m)).toBeEnabled();
+    });
+
+    it("explains a disabled metric by the reason it is actually missing", () => {
+        // One hardcoded sentence used to cover every disabled button, so a
+        // harness that reports no timings put "Available once multi-iteration
+        // runs land" under Latency, which has nothing to do with iterations.
+        render(<MetricToggle value="composite" onChange={() => {}} available={["composite"]} />);
+        expect(buttonFor("pass5")).toHaveAttribute("title", "Available once multi-iteration runs land");
+        expect(buttonFor("latency")).toHaveAttribute("title", "Not reported by these runs");
+        expect(buttonFor("tokens")).toHaveAttribute("title", "Not reported by these runs");
+    });
+
+    it("describes an enabled metric instead of explaining its absence", () => {
+        render(<MetricToggle value="composite" onChange={() => {}} available={["composite", "latency"]} />);
+        expect(buttonFor("latency")).toHaveAttribute("title", metricDescription("latency"));
     });
 });

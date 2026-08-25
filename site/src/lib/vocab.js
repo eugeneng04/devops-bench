@@ -153,6 +153,23 @@ export function metricDescription(metric) {
     return METRIC_DESCRIPTIONS[metric] ?? METRIC_LABELS[metric] ?? metric;
 }
 
+// Why a metric has no data, shown on its disabled toggle button. A metric can
+// go missing for unrelated reasons — pass@k needs the same task run repeatedly,
+// while an efficiency axis just needs the harness to report telemetry — so one
+// hardcoded sentence can't cover both. It used to, which put "Available once
+// multi-iteration runs land" under a greyed-out Latency button.
+const METRIC_UNAVAILABLE_REASONS = {
+    pass5: "Available once multi-iteration runs land",
+    passMax: "Available once multi-iteration runs land",
+    latency: "Not reported by these runs",
+    tokens: "Not reported by these runs"
+};
+
+/** Tooltip for a metric with no data in the current dataset. */
+export function metricUnavailableReason(metric) {
+    return METRIC_UNAVAILABLE_REASONS[metric] ?? "Not reported by these runs";
+}
+
 // Which metrics actually have any non-null value across the given setups. Used
 // by the metric toggle so pass@k buttons stay hidden until the harness
 // produces the multi-iteration runs that populate them.
