@@ -306,8 +306,17 @@ npm run dev          # http://localhost:5173
 > `devops-bench-shared`, the same project named at the top of this section). The
 > emulator keeps each project id in a **separate namespace**, so seeding one id
 > while the app reads another leaves the dashboard **silently empty** — no error,
-> just no rows. If that happens, check the id in all three places above, or query
-> the emulator directly to see which namespace the data landed in:
+> just no rows. Four places name the project and all four have to agree:
+>
+> - the `--project` flag in step 1
+> - `GCLOUD_PROJECT` in step 2
+> - `VITE_FIREBASE_PROJECT_ID` in `.env`, which is what the browser reads
+> - `"default"` in `.firebaserc`, which is where the emulator falls back if you
+>   drop `--project` — get this one wrong and the emulator UI on :4000 shows no
+>   docs even though the seed reported success
+>
+> If that happens, query the emulator directly to see which namespace the data
+> actually landed in:
 >
 > ```bash
 > curl -s "http://127.0.0.1:8080/v1/projects/devops-bench-shared/databases/leaderboard-test/documents/setups" | head
