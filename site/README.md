@@ -344,6 +344,7 @@ npm test             # Vitest — fast, DB-free unit + component tests
 | `src/pages/Detail.test.jsx` | stat-card math (incl. null-safe / empty), task-table sorting, `?metric=` param, not-found/loading/error |
 | `src/hooks/useBenchmarkData.test.js` | load-once lifecycle, error capture, terminate-on-PROD |
 | `src/components/TrendChart.test.jsx` | sr-only a11y table: date-union columns, `—` for missing runs and null values |
+| `src/components/MetricToggle.test.jsx` | a button per vocab metric, the quality/efficiency group split, `available` disabling |
 
 ---
 

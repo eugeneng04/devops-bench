@@ -38,6 +38,20 @@ export const METRIC_LABELS = {
     tokens: "Tokens"
 };
 
+// Abbreviated labels for the metric toggle only, where eight buttons compete for
+// the width of one table column. "Recoverable Safety" is ~2.5x the width of any
+// other button, so it alone decides whether the group fits on one line. Headings,
+// tooltips and the accessible name of the button all keep the full METRIC_LABELS
+// text — this shortens the visible glyphs, not the vocabulary.
+const METRIC_SHORT_LABELS = {
+    recoverableSafety: "Rec. Safety"
+};
+
+/** Toggle-button text for a metric, falling back to the full label. */
+export function metricShortLabel(metric) {
+    return METRIC_SHORT_LABELS[metric] ?? METRIC_LABELS[metric] ?? metric;
+}
+
 // The metric keys in display order — used by the metric toggles. Composite leads
 // as the default headline; pass@k follow, then the efficiency axes.
 export const METRICS = [
@@ -130,7 +144,7 @@ export const METRIC_DESCRIPTIONS = {
         "Pass@1: share of task attempts whose correctness clears the pass threshold (0.7).",
     pass5: "Pass@5: needs multi-iteration runs (not produced yet).",
     passMax: "Pass^5: needs multi-iteration runs (not produced yet).",
-    latency: "Latency: mean agent wall-clock seconds per task. Lower is better, so the bar is scaled against the slowest setup on screen.",
+    latency: "Latency: mean agent wall-clock seconds per task. Lower is better, so the bar is scaled against the fastest setup on screen — a full bar is the fastest, half a bar is twice as slow.",
     tokens: "Tokens: mean total tokens per task (the provider total when reported, else the sum of the captured buckets). Lower is better."
 };
 
