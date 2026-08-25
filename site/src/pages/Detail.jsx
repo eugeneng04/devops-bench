@@ -31,20 +31,32 @@ function StatCard({ label, value, sub }) {
 function TaskTable({ setup, metric }) {
     const [sort, setSort] = useState({ key: "score", dir: "desc" });
 
+    // Mirrors the leaderboard's ordering (Leaderboard.jsx): "desc" means BEST
+    // first, which for latency/tokens is the smallest value, and a task with no
+    // value for this metric sorts last in either direction rather than being
+    // read as a 0 — otherwise an unmeasured task would head the ascending list
+    // as if it were the fastest.
     const tasks = useMemo(() => {
         const dir = sort.dir === "asc" ? 1 : -1;
-        return [...setup.tasks].sort((a, b) =>
-            sort.key === "name"
-                ? dir * a.name.localeCompare(b.name)
-                : dir * ((a.scores[metric] ?? 0) - (b.scores[metric] ?? 0))
-        );
+        const lower = isLowerBetter(metric);
+        return [...setup.tasks].sort((a, b) => {
+            if (sort.key === "name") return dir * a.name.localeCompare(b.name);
+            const av = a.scores[metric];
+            const bv = b.scores[metric];
+            if (av == null && bv == null) return 0;
+            if (av == null) return 1;
+            if (bv == null) return -1;
+            return dir * (lower ? bv - av : av - bv);
+        });
     }, [setup, metric, sort]);
 
-    // Largest value across this setup's tasks, so an absolute metric's bar has a
-    // scale (percentage metrics ignore it).
-    const taskMax = useMemo(() => {
+    // Best value across this setup's tasks — the smallest for a lower-is-better
+    // metric — so an absolute metric's bar has a scale (percentage metrics
+    // ignore it).
+    const taskBest = useMemo(() => {
         const vals = setup.tasks.map(t => t.scores[metric]).filter(v => v != null);
-        return vals.length ? Math.max(...vals) : null;
+        if (!vals.length) return null;
+        return isLowerBetter(metric) ? Math.min(...vals) : Math.max(...vals);
     }, [setup, metric]);
 
     function sortBy(key) {
@@ -71,7 +83,7 @@ function TaskTable({ setup, metric }) {
                     {tasks.map(task => {
                         // Null-safe: an unscored task shows an empty bar and "—".
                         const s = task.scores[metric];
-                        const barPct = metricBarFraction(metric, s, taskMax) * 100;
+                        const barPct = metricBarFraction(metric, s, taskBest) * 100;
                         return (
                             <tr key={task.folder} className="border-t border-slate-100 dark:border-slate-800">
                                 <td className="py-3 pr-4">
@@ -152,6 +164,11 @@ export function Detail() {
     const med = vals.length ? median(vals) : null;
     const pct = v => formatMetric(metric, v);
 
+    // Speed is reported independently of the selected metric, so this card stays
+    // meaningful (and doesn't duplicate "Average") while the toggle moves.
+    const speeds = setup.tasks.map(t => t.scores.latency).filter(v => v != null);
+    const avgSpeed = speeds.length ? speeds.reduce((a, b) => a + b, 0) / speeds.length : null;
+
     return (
         <main className="w-full max-w-5xl flex flex-col items-center gap-6">
             {backLink}
@@ -190,7 +207,11 @@ export function Detail() {
                                   : "none"
                         }
                     />
-                    <StatCard label="Avg Speed" value="N/A" sub="not captured yet" />
+                    <StatCard
+                        label="Avg Speed"
+                        value={formatMetric("latency", avgSpeed)}
+                        sub={avgSpeed == null ? "not captured" : `over ${speeds.length} tasks`}
+                    />
                 </div>
 
                 {/* Task breakdown */}
@@ -204,9 +225,9 @@ export function Detail() {
                         <svg className="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 12l3-3 3 3 4-4M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                         </svg>
-                        Score Trend Over Time
+                        {METRIC_LABELS[metric]} Trend Over Time
                     </h2>
-                    <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">This setup's success rate across historical run iterations.</p>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">This setup&apos;s {METRIC_LABELS[metric].toLowerCase()} across historical run iterations.</p>
                 </div>
                 <TrendChart
                     setups={[setup]}
@@ -215,7 +236,7 @@ export function Detail() {
                     harnesses={harnesses}
                     showLegend={false}
                     fill
-                    ariaLabel="Score trend over time for this setup"
+                    ariaLabel={`${METRIC_LABELS[metric]} trend over time for this setup`}
                     caption={`Score trend for ${setupLabel(setup, models, harnesses)} (metric: ${metric})`}
                 />
             </section>

@@ -46,14 +46,32 @@ describe("metricBarFraction", () => {
         expect(metricBarFraction("composite", 75, null)).toBeCloseTo(0.75);
     });
 
-    it("inverts an absolute metric so the fastest setup gets the fullest bar", () => {
-        // Scaled against the slowest (100s): 10s is nearly full, 100s is minimal.
-        expect(metricBarFraction("latency", 10, 100)).toBeCloseTo(0.9);
-        expect(metricBarFraction("latency", 100, 100)).toBeCloseTo(0.02);
+    it("scales an absolute metric as a ratio to the best value on screen", () => {
+        // Best (fastest) is 10s: it earns a full bar, and twice as slow is half.
+        expect(metricBarFraction("latency", 10, 10)).toBeCloseTo(1);
+        expect(metricBarFraction("latency", 20, 10)).toBeCloseTo(0.5);
+        expect(metricBarFraction("latency", 100, 10)).toBeCloseTo(0.1);
+    });
+
+    it("gives the only visible setup a full bar, not a sliver", () => {
+        // Regression: filtering down to one row made value === the scale, which
+        // previously floored the bar at 2% for the fastest setup on screen.
+        expect(metricBarFraction("latency", 42, 42)).toBeCloseTo(1);
+        expect(metricBarFraction("tokens", 38412, 38412)).toBeCloseTo(1);
+    });
+
+    it("keeps near-equal values near-equal instead of full vs empty", () => {
+        // Regression: min..max normalization would render these 1.0 and 0.0,
+        // turning a 1% gap into the whole bar width.
+        expect(metricBarFraction("latency", 99, 99)).toBeCloseTo(1);
+        expect(metricBarFraction("latency", 100, 99)).toBeCloseTo(0.99, 2);
     });
 
     it("is empty for a missing value or an unusable scale", () => {
         expect(metricBarFraction("latency", null, 100)).toBe(0);
         expect(metricBarFraction("latency", 10, null)).toBe(0);
+        // 0 is the unmeasured sentinel, not an instant run — no bar for it.
+        expect(metricBarFraction("latency", 0, 10)).toBe(0);
+        expect(metricBarFraction("latency", 10, 0)).toBe(0);
     });
 });

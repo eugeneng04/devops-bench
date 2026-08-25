@@ -6,7 +6,7 @@ import { useMemo, useState } from "react";
 import { useBenchmark } from "../context/BenchmarkContext.jsx";
 import { buildFilterGroups, getFilteredSetups, emptyFilterState } from "../lib/filters.js";
 import { setupScore } from "../lib/accessors.js";
-import { availableMetrics, metricDescription, isLowerBetter } from "../lib/vocab.js";
+import { METRIC_LABELS, availableMetrics, metricDescription, isLowerBetter } from "../lib/vocab.js";
 import { FilterBar } from "../components/FilterBar.jsx";
 import { LeaderboardRow } from "../components/LeaderboardRow.jsx";
 import { MetricToggle } from "../components/MetricToggle.jsx";
@@ -42,11 +42,12 @@ export function Leaderboard() {
         });
     }, [filtered, metric]);
 
-    // Largest value on screen, so an absolute metric's bar has a scale. Null for
-    // percentage metrics, which need none.
-    const metricMax = useMemo(() => {
+    // Best value on screen — the smallest, for the lower-is-better absolute
+    // metrics — so their bars have a scale. Null for percentage metrics, which
+    // need none.
+    const metricBest = useMemo(() => {
         const vals = sorted.map(s => setupScore(s, metric)).filter(v => v != null);
-        return vals.length ? Math.max(...vals) : null;
+        return vals.length ? Math.min(...vals) : null;
     }, [sorted, metric]);
 
     function toggleFilter(groupKey, value) {
@@ -121,7 +122,7 @@ export function Leaderboard() {
                         : error ? <LoadError />
                         : sorted.length === 0 ? <EmptyState onClear={clearFilters} />
                         : sorted.map(setup => (
-                            <LeaderboardRow key={setup.id} setup={setup} models={models} harnesses={harnesses} metric={metric} metricMax={metricMax} />
+                            <LeaderboardRow key={setup.id} setup={setup} models={models} harnesses={harnesses} metric={metric} metricBest={metricBest} />
                         ))}
                 </div>
             </div>
@@ -144,7 +145,7 @@ export function Leaderboard() {
                         models={models}
                         harnesses={harnesses}
                         showLegend
-                        ariaLabel="Accuracy Performance Trend Over Time Chart comparing different setups across historical runs"
+                        ariaLabel={`${METRIC_LABELS[metric]} trend over time, comparing setups across historical runs`}
                         caption={`Score trend over time data summary (selected metric: ${metric})`}
                     />
                 </section>

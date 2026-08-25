@@ -100,16 +100,21 @@ export function formatMetric(metric, value) {
  * Fraction (0..1) of the bar to fill for `value`.
  *
  * A percentage metric maps directly. An absolute metric has no natural ceiling,
- * so it is scaled against `max` (the largest value currently on screen) and
- * INVERTED — the fastest/cheapest setup earns the fullest bar, matching the
- * "longer bar is better" reading every other metric already has.
+ * so it is expressed as a RATIO TO THE BEST value currently on screen (`best` =
+ * the smallest, since lower is better): the fastest/cheapest setup earns a full
+ * bar, and something twice as slow earns half of one. That keeps the "longer bar
+ * is better" reading every other metric has, while staying proportional —
+ * normalizing across `min..max` instead would render a 99s setup full and a 100s
+ * setup empty, exaggerating a 1% gap into the whole width.
  */
-export function metricBarFraction(metric, value, max) {
+export function metricBarFraction(metric, value, best) {
     if (value == null || !Number.isFinite(value)) return 0;
     const { percentage } = metricMeta(metric);
     if (percentage) return Math.max(0, Math.min(1, value / 100));
-    if (!Number.isFinite(max) || max <= 0) return 0;
-    return Math.max(0.02, Math.min(1, 1 - value / max));
+    // `value <= 0` can't be a real reading (0 latency is the unmeasured sentinel,
+    // 0 tokens means nothing was captured), and a non-positive best gives no scale.
+    if (!Number.isFinite(best) || best <= 0 || value <= 0) return 0;
+    return Math.max(0, Math.min(1, best / value));
 }
 
 // One-line explanation per metric — the single source of truth for the score
