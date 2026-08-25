@@ -102,8 +102,12 @@ export function Leaderboard() {
                     </div>
                     <div className="col-span-5 sm:col-span-5 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 sm:gap-x-4 sm:gap-y-2 pr-2">
                         <div className="flex items-center gap-1 min-w-[70px]">
-                            <span>SCORE</span>
-                            <div tabIndex={0} aria-label="Score Explanation" className="group relative cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 rounded-full">
+                            {/* "METRIC", not "SCORE": the toggle below can select
+                                latency or tokens, and neither is a score. Naming the
+                                selected metric here instead would just echo the
+                                highlighted button an inch beneath it. */}
+                            <span>METRIC</span>
+                            <div tabIndex={0} aria-label={`${METRIC_LABELS[metric]} explanation`} className="group relative cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 rounded-full">
                                 <svg aria-hidden="true" className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>

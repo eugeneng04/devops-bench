@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams, useSearchParams, Link } from "react-router-dom";
 import { useBenchmark } from "../context/BenchmarkContext.jsx";
 import { setupScore, setupLabel } from "../lib/accessors.js";
-import { METRIC_LABELS, availableMetrics, formatMetric, metricBarFraction, isLowerBetter } from "../lib/vocab.js";
+import { METRICS, METRIC_LABELS, availableMetrics, formatMetric, metricBarFraction, isLowerBetter, metricMeta } from "../lib/vocab.js";
 import { SetupIdentity } from "../components/SetupIdentity.jsx";
 import { MetricToggle } from "../components/MetricToggle.jsx";
 import { TrendChart } from "../components/TrendChart.jsx";
@@ -65,9 +65,17 @@ function TaskTable({ setup, metric }) {
             : { key, dir: key === "name" ? "asc" : "desc" });
     }
 
-    const Arrow = ({ k }) => sort.key === k
-        ? <span className="text-indigo-500 dark:text-indigo-400">{sort.dir === "asc" ? "▲" : "▼"}</span>
-        : <span className="text-slate-300 dark:text-slate-600">↕</span>;
+    // The arrow reports which way the VALUES run, not the internal sort flag.
+    // "desc" means best-first, and best-first under latency/tokens is ascending
+    // numbers — so the glyph has to invert or the column reads 22.3k → 28.0k
+    // under a ▼.
+    const Arrow = ({ k }) => {
+        if (sort.key !== k) return <span className="text-slate-300 dark:text-slate-600">↕</span>;
+        const ascending = k === "name"
+            ? sort.dir === "asc"
+            : (sort.dir === "asc") !== isLowerBetter(metric);
+        return <span className="text-indigo-500 dark:text-indigo-400">{ascending ? "▲" : "▼"}</span>;
+    };
 
     return (
         <div className="w-full bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xl shadow-slate-100 dark:shadow-none p-6">
@@ -76,7 +84,10 @@ function TaskTable({ setup, metric }) {
                 <thead>
                     <tr className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 select-none">
                         <th className="pb-2 pr-4 cursor-pointer" onClick={() => sortBy("name")}>Task <Arrow k="name" /></th>
-                        <th className="pb-2 pr-4 cursor-pointer" onClick={() => sortBy("score")}>Score ({METRIC_LABELS[metric]}) <Arrow k="score" /></th>
+                        {/* The metric names the column on its own: "Score (Tokens)"
+                            calls a token count a score, and the parenthetical was
+                            only ever there because "Score" couldn't carry which one. */}
+                        <th className="pb-2 pr-4 cursor-pointer" onClick={() => sortBy("score")}>{METRIC_LABELS[metric]} <Arrow k="score" /></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -164,10 +175,20 @@ export function Detail() {
     const med = vals.length ? median(vals) : null;
     const pct = v => formatMetric(metric, v);
 
-    // Speed is reported independently of the selected metric, so this card stays
-    // meaningful (and doesn't duplicate "Average") while the toggle moves.
-    const speeds = setup.tasks.map(t => t.scores.latency).filter(v => v != null);
-    const avgSpeed = speeds.length ? speeds.reduce((a, b) => a + b, 0) / speeds.length : null;
+    // The fifth card reports an efficiency axis the toggle is NOT showing, so it
+    // adds a number instead of repeating one. This card used to be a hardcoded
+    // "Avg Speed", which was independent of the metric back when latency wasn't
+    // selectable; now that it is, selecting Latency makes "Average" the mean
+    // latency and the two cards print the same figure side by side. Taking the
+    // first efficiency metric other than the selected one gives Tokens under
+    // Latency and Latency everywhere else, without naming either key here.
+    const companion = METRICS.find(m => !metricMeta(m).percentage && m !== metric);
+    const companionVals = companion
+        ? setup.tasks.map(t => t.scores[companion]).filter(v => v != null)
+        : [];
+    const companionAvg = companionVals.length
+        ? companionVals.reduce((a, b) => a + b, 0) / companionVals.length
+        : null;
 
     return (
         <main className="w-full max-w-5xl flex flex-col items-center gap-6">
@@ -207,11 +228,13 @@ export function Detail() {
                                   : "none"
                         }
                     />
-                    <StatCard
-                        label="Avg Speed"
-                        value={formatMetric("latency", avgSpeed)}
-                        sub={avgSpeed == null ? "not captured" : `over ${speeds.length} tasks`}
-                    />
+                    {companion ? (
+                        <StatCard
+                            label={`Avg ${METRIC_LABELS[companion]}`}
+                            value={formatMetric(companion, companionAvg)}
+                            sub={companionAvg == null ? "not captured" : `over ${companionVals.length} tasks`}
+                        />
+                    ) : null}
                 </div>
 
                 {/* Task breakdown */}
