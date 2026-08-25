@@ -67,4 +67,16 @@ describe("Leaderboard", () => {
         fireEvent.click(pass5);
         expect(pass5).toHaveAttribute("aria-pressed", "true");
     });
+
+    it("names the selected metric in the trend heading and caption", () => {
+        // The heading used to be hardcoded "Accuracy Performance Trend Over
+        // Time", which reads as a falsehood under an efficiency metric where
+        // the series is seconds or tokens rather than a success rate.
+        renderPage();
+        expect(screen.getByRole("heading", { name: /Outcome Trend Over Time/i })).toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole("button", { name: "Pass@5" }));
+        expect(screen.getByRole("heading", { name: /Pass@5 Trend Over Time/i })).toBeInTheDocument();
+        expect(screen.queryByText(/success rates/i)).not.toBeInTheDocument();
+    });
 });

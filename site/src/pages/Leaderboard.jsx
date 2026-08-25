@@ -135,9 +135,9 @@ export function Leaderboard() {
                             <svg className="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 12l3-3 3 3 4-4M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                             </svg>
-                            Accuracy Performance Trend Over Time
+                            {METRIC_LABELS[metric]} Trend Over Time
                         </h2>
-                        <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Comparing agent configuration success rates across historical run iterations.</p>
+                        <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Comparing agent configuration {METRIC_LABELS[metric].toLowerCase()} across historical run iterations.</p>
                     </div>
                     <TrendChart
                         setups={filtered}
@@ -146,7 +146,7 @@ export function Leaderboard() {
                         harnesses={harnesses}
                         showLegend
                         ariaLabel={`${METRIC_LABELS[metric]} trend over time, comparing setups across historical runs`}
-                        caption={`Score trend over time data summary (selected metric: ${metric})`}
+                        caption={`${METRIC_LABELS[metric]} trend over time data summary`}
                     />
                 </section>
             )}

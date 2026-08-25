@@ -237,7 +237,7 @@ export function Detail() {
                     showLegend={false}
                     fill
                     ariaLabel={`${METRIC_LABELS[metric]} trend over time for this setup`}
-                    caption={`Score trend for ${setupLabel(setup, models, harnesses)} (metric: ${metric})`}
+                    caption={`${METRIC_LABELS[metric]} trend for ${setupLabel(setup, models, harnesses)}`}
                 />
             </section>
         </main>
