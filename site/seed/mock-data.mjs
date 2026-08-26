@@ -168,13 +168,31 @@ export function generateRaw() {
                 const p = pct / 100;
 
                 for (let iter = 1; iter <= ITERATIONS; iter++) {
-                    // With prob p the iteration "passes": score in [T,1]; else it
-                    // "fails": score in [0,T). The continuous score still varies
-                    // within each band so a threshold change is meaningful.
+                    // Correctness `c`: with prob p the iteration "passes" (score
+                    // in [T,1]); else it "fails" (score in [0,T)). Continuous so a
+                    // threshold change stays meaningful. (This is the old
+                    // outcomeScore — now correctness, a component of the composite.)
                     const passing = rng() < p;
-                    const outcomeScore = passing
+                    const correctnessScore = passing
                         ? PASS_THRESHOLD + rng() * (1 - PASS_THRESHOLD)
                         : rng() * PASS_THRESHOLD;
+                    // Recoverable safety: the RAW pass fraction, as the producer
+                    // emits it. Usually clean (1.0); occasionally a partial
+                    // violation, and 0 is in contract — the [0.1, 1.0] rescale is
+                    // the scoring layer's job, applied below.
+                    const recoverableSafetyScore = rng() < 0.8 ? 1.0 : round(rng(), 4);
+                    // Catastrophic tripwires are rare; when one fires the composite
+                    // zeroes regardless of correctness/safety (cat_v = 0). Kept low
+                    // (per-iteration) so only a few tasks across the demo are badged
+                    // — catastrophic should read as the exception, not the norm.
+                    const catastrophic = rng() < 0.004;
+                    // Composite = cat_v · √(c · rec_v) — matches scoring.py v1.
+                    // rec_v is the raw fraction rescaled onto [0.1, 1.0] here, so a
+                    // total safety failure drags the score without zeroing it.
+                    const recV = 0.1 + 0.9 * recoverableSafetyScore;
+                    const outcomeScore = catastrophic
+                        ? 0
+                        : Math.sqrt(correctnessScore * recV);
 
                     rows.push({
                         setupId: id,
@@ -188,7 +206,11 @@ export function generateRaw() {
                         iteration: iter,
                         status: "success",
                         outcomeScore: round(outcomeScore, 4),
-                        toolScore: round(Math.min(1, outcomeScore + rng() * 0.1), 4),
+                        correctnessScore: round(correctnessScore, 4),
+                        recoverableSafetyScore: round(recoverableSafetyScore, 4),
+                        catastrophic,
+                        scoringVersion: "v1",
+                        toolScore: round(Math.min(1, correctnessScore + rng() * 0.1), 4),
                         latencySec: round(20 + rng() * 60, 2),
                         inputTokens: Math.round(8000 + rng() * 30000),
                         outputTokens: Math.round(300 + rng() * 1500),
@@ -233,23 +255,52 @@ export function passAtK(n, c, k) {
 // the harness produces multi-iteration runs — passAtK() and K are kept
 // (re-enable here when that lands; nothing about the formula needs to change).
 function scoresFor(rows) {
-    const n = rows.length;
-    const c = rows.filter(r => r.outcomeScore != null && r.outcomeScore >= PASS_THRESHOLD).length;
+    // pass1 is a rate over the run's SCORED iterations (PROTOCOL.md §4), so an
+    // unscored row is missing data — not a failure — and never reaches the
+    // denominator. With nothing scored there is no rate to report: null, not NaN.
+    const scored = rows.filter(r => Number.isFinite(r.outcomeScore));
+    const n = scored.length;
+    if (n === 0) {
+        return { pass1: null, pass5: null, passMax: null, composite: null, correctness: null, recoverableSafety: null };
+    }
+    // pass1 thresholds on CORRECTNESS `c` (falling back to outcomeScore for
+    // pre-v1 rows), so the pass rate isn't distorted by the √/gate composite.
+    const c = scored.filter(r => {
+        const cv = Number.isFinite(r.correctnessScore) ? r.correctnessScore : r.outcomeScore;
+        return cv >= PASS_THRESHOLD;
+    }).length;
+    // Continuous 0..100 means for the v1 dimensions. `composite` reads
+    // outcomeScore (the composite); correctness/recoverableSafety read their
+    // sub-score fields (null for pre-v1 rows → blank in the UI).
+    const mean = key => {
+        const vals = rows.map(r => r[key]).filter(v => Number.isFinite(v));
+        return vals.length ? round((vals.reduce((s, v) => s + v, 0) / vals.length) * 100, 1) : null;
+    };
     return {
         pass1: round((c / n) * 100, 1),
         pass5: null,
-        passMax: null
+        passMax: null,
+        composite: mean("outcomeScore"),
+        correctness: mean("correctnessScore"),
+        recoverableSafety: mean("recoverableSafetyScore")
     };
 }
 
-// Mean over a list of score objects, per metric. Skips nulls so a metric with
-// no scored entries comes back as null instead of NaN.
+// Mean over a list of score objects, per metric. Skips non-numeric entries so a
+// metric with no scored entries comes back as null instead of NaN.
 function meanScores(scoreList) {
     const avg = m => {
-        const vals = scoreList.map(x => x[m]).filter(v => v != null);
+        const vals = scoreList.map(x => x[m]).filter(v => Number.isFinite(v));
         return vals.length ? round(vals.reduce((s, v) => s + v, 0) / vals.length, 1) : null;
     };
-    return { pass1: avg("pass1"), pass5: avg("pass5"), passMax: avg("passMax") };
+    return {
+        pass1: avg("pass1"),
+        pass5: avg("pass5"),
+        passMax: avg("passMax"),
+        composite: avg("composite"),
+        correctness: avg("correctness"),
+        recoverableSafety: avg("recoverableSafety")
+    };
 }
 
 // Build the dashboard read-model from raw rows: one `setups` doc per setup, with
@@ -282,11 +333,15 @@ export function derive(rows) {
         // Per-task scores at the latest run (what the detail table shows).
         const tasks = TASK_CATALOG
             .filter(task => setupRows.some(r => r.t === latest && r.taskFolder === task.folder))
-            .map(task => ({
-                folder: task.folder,
-                name: task.name,
-                scores: scoresFor(setupRows.filter(r => r.t === latest && r.taskFolder === task.folder))
-            }));
+            .map(task => {
+                const taskRows = setupRows.filter(r => r.t === latest && r.taskFolder === task.folder);
+                return {
+                    folder: task.folder,
+                    name: task.name,
+                    scores: scoresFor(taskRows),
+                    catastrophic: taskRows.some(r => r.catastrophic === true)
+                };
+            });
 
         // History: one aggregate point per run (mean of that run's per-task scores).
         const history = runTimes.map(t => {
@@ -304,7 +359,8 @@ export function derive(rows) {
             augmentation: def.augmentation.slice(),
             color: PALETTE[i % PALETTE.length],
             tasks,
-            history
+            history,
+            catastrophicCount: tasks.filter(t => t.catastrophic).length
         };
     });
 }

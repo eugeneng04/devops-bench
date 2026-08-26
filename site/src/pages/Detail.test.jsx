@@ -27,13 +27,13 @@ function makeBenchmark(overrides = {}) {
                 id: SETUP_ID, order: 0, model: "alpha-pro", harness: "gemini-cli",
                 augmentation: [], color: "#3b82f6",
                 tasks: [
-                    { folder: "a", name: "Apple", scores: { pass1: 60, pass5: 65, passMax: 70 } },
-                    { folder: "b", name: "Banana", scores: { pass1: 90, pass5: 95, passMax: 100 } },
-                    { folder: "c", name: "Cherry", scores: { pass1: 80, pass5: 85, passMax: 90 } }
+                    { folder: "a", name: "Apple", scores: { composite: 60, pass1: 60, pass5: 65, passMax: 70 } },
+                    { folder: "b", name: "Banana", scores: { composite: 90, pass1: 90, pass5: 95, passMax: 100 } },
+                    { folder: "c", name: "Cherry", scores: { composite: 80, pass1: 80, pass5: 85, passMax: 90 } }
                 ],
                 history: [
-                    { t: "2026-01-15T00:00:00Z", scores: { pass1: 70, pass5: 75, passMax: 80 } },
-                    { t: "2026-02-15T00:00:00Z", scores: { pass1: 80, pass5: 85, passMax: 90 } }
+                    { t: "2026-01-15T00:00:00Z", scores: { composite: 70, pass1: 70, pass5: 75, passMax: 80 } },
+                    { t: "2026-02-15T00:00:00Z", scores: { composite: 80, pass1: 80, pass5: 85, passMax: 90 } }
                 ]
             }
         ],
@@ -86,11 +86,11 @@ describe("Detail", () => {
                 id: SETUP_ID, order: 0, model: "alpha-pro", harness: "gemini-cli",
                 augmentation: [], color: "#3b82f6",
                 tasks: [
-                    { folder: "a", name: "Apple", scores: { pass1: 80, pass5: 1, passMax: 1 } },
-                    { folder: "b", name: "Banana", scores: { pass1: 60, pass5: 1, passMax: 1 } },
-                    { folder: "c", name: "Cherry", scores: { pass1: null, pass5: 1, passMax: 1 } }
+                    { folder: "a", name: "Apple", scores: { composite: 80, pass1: 80, pass5: 1, passMax: 1 } },
+                    { folder: "b", name: "Banana", scores: { composite: 60, pass1: 60, pass5: 1, passMax: 1 } },
+                    { folder: "c", name: "Cherry", scores: { composite: null, pass1: null, pass5: 1, passMax: 1 } }
                 ],
-                history: [{ t: "2026-01-15T00:00:00Z", scores: { pass1: 70, pass5: 1, passMax: 1 } }]
+                history: [{ t: "2026-01-15T00:00:00Z", scores: { composite: 70, pass1: 70, pass5: 1, passMax: 1 } }]
             }]
         });
         renderAt(`/setup/${SETUP_ID}`);
@@ -121,15 +121,49 @@ describe("Detail", () => {
         expect(within(card("Average")).getByText("over 0 tasks")).toBeInTheDocument();
     });
 
+    it("shows no catastrophic tasks when the field is absent", () => {
+        // The common case: the ingest omits catastrophicCount entirely rather
+        // than writing a 0, and that has to read the same as an explicit 0.
+        renderAt(`/setup/${SETUP_ID}`);
+        const card = label => screen.getByText(label).closest("div");
+        expect(within(card("Catastrophic")).getByText("0")).toBeInTheDocument();
+        expect(within(card("Catastrophic")).getByText("none")).toBeInTheDocument();
+    });
+
+    it("shows no catastrophic tasks for an explicit zero", () => {
+        benchmark.setups[0].catastrophicCount = 0;
+        renderAt(`/setup/${SETUP_ID}`);
+        const card = label => screen.getByText(label).closest("div");
+        expect(within(card("Catastrophic")).getByText("0")).toBeInTheDocument();
+        expect(within(card("Catastrophic")).getByText("none")).toBeInTheDocument();
+    });
+
+    it("uses the singular subtitle for one catastrophic task", () => {
+        benchmark.setups[0].catastrophicCount = 1;
+        renderAt(`/setup/${SETUP_ID}`);
+        const card = label => screen.getByText(label).closest("div");
+        expect(within(card("Catastrophic")).getByText("1")).toBeInTheDocument();
+        // "outcome", not "task": the run happened, only its score was zeroed.
+        expect(within(card("Catastrophic")).getByText("outcome zeroed")).toBeInTheDocument();
+    });
+
+    it("uses the plural subtitle for several catastrophic tasks", () => {
+        benchmark.setups[0].catastrophicCount = 3;
+        renderAt(`/setup/${SETUP_ID}`);
+        const card = label => screen.getByText(label).closest("div");
+        expect(within(card("Catastrophic")).getByText("3")).toBeInTheDocument();
+        expect(within(card("Catastrophic")).getByText("outcomes zeroed")).toBeInTheDocument();
+    });
+
     it("honors the ?metric= query param", () => {
         renderAt(`/setup/${SETUP_ID}?metric=pass5`);
         expect(screen.getByRole("button", { name: "Pass@5" })).toHaveAttribute("aria-pressed", "true");
         expect(screen.getByRole("button", { name: "Pass@1" })).toHaveAttribute("aria-pressed", "false");
     });
 
-    it("falls back to Pass@1 for an unknown metric param", () => {
+    it("falls back to the composite Outcome metric for an unknown metric param", () => {
         renderAt(`/setup/${SETUP_ID}?metric=bogus`);
-        expect(screen.getByRole("button", { name: "Pass@1" })).toHaveAttribute("aria-pressed", "true");
+        expect(screen.getByRole("button", { name: "Outcome" })).toHaveAttribute("aria-pressed", "true");
     });
 
     it("sorts the task table by score desc by default", () => {

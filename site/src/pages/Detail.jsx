@@ -96,7 +96,7 @@ export function Detail() {
 
     const queryMetric = searchParams.get("metric");
     const [metric, setMetric] = useState(
-        queryMetric && METRIC_LABELS[queryMetric] ? queryMetric : "pass1"
+        queryMetric && METRIC_LABELS[queryMetric] ? queryMetric : "composite"
     );
 
     const setup = useMemo(() => setups.find(s => s.id === id) || null, [setups, id]);
@@ -167,7 +167,20 @@ export function Detail() {
                     <StatCard label="Best Task" value={pct(best)} sub={METRIC_LABELS[metric]} />
                     <StatCard label="Average" value={pct(avg)} sub={`over ${vals.length} tasks`} />
                     <StatCard label="Median" value={pct(med)} sub={METRIC_LABELS[metric]} />
-                    <StatCard label="Avg Cost" value="N/A" sub="not captured yet" />
+                    <StatCard
+                        label="Catastrophic"
+                        value={String(setup.catastrophicCount ?? 0)}
+                        // "outcome zeroed", not "task zeroed": the task still ran
+                        // and still has its other measurements; what a
+                        // catastrophic violation zeroes is the Outcome score.
+                        sub={
+                            setup.catastrophicCount === 1
+                                ? "outcome zeroed"
+                                : setup.catastrophicCount
+                                  ? "outcomes zeroed"
+                                  : "none"
+                        }
+                    />
                     <StatCard label="Avg Speed" value="N/A" sub="not captured yet" />
                 </div>
 

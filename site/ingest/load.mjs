@@ -29,7 +29,8 @@ const RUN_ID_RE = /^run_\d{8}_\d{6}(?:_[A-Za-z0-9_-]+)?$/;
 const ROWS_FILE = "rows.json";
 
 // Field validators. Each returns an error string or null.
-const num01 = v => (v >= 0 && v <= 1 ? null : "must be in [0,1]");
+const inRange = (lo, hi) => v => (v >= lo && v <= hi ? null : `must be in [${lo},${hi}]`);
+const num01 = inRange(0, 1);
 const nonNeg = v => (v >= 0 ? null : "must be >= 0");
 
 /**
@@ -85,6 +86,19 @@ export function validateRow(row) {
     float("latencySec", nonNeg);
     intOrNull("inputTokens", nonNeg);
     intOrNull("outputTokens", nonNeg);
+
+    // Scoring-framework v1 fields — OPTIONAL (pre-v1 rows omit them). Validate the
+    // shape only when present so old runs still ingest.
+    if ("correctnessScore" in row) floatOrNull("correctnessScore", num01);
+    // Raw pass fraction: the [0.1, 1.0] rescale is applied by the scoring layer,
+    // not the emitter, so 0 is in contract here (§2).
+    if ("recoverableSafetyScore" in row) floatOrNull("recoverableSafetyScore", num01);
+    if ("catastrophic" in row && typeof row.catastrophic !== "boolean") {
+        errs.push("catastrophic: must be a boolean");
+    }
+    if ("scoringVersion" in row && typeof row.scoringVersion !== "string") {
+        errs.push("scoringVersion: must be a string");
+    }
 
     return errs;
 }
