@@ -2,11 +2,11 @@
   "apiVersion": "usage-metrics/v1",
   "kind": "UsageSeries",
   "formatVersion": 1,
-  "generatedAt": "2026-08-24T16:52:20Z",
+  "generatedAt": "2026-08-27T16:53:04Z",
   "provenance": {
-    "collectorSha": "e116dc0e6af6ee7795f4a97cdb19828994b10b98",
-    "workflowRunUrl": null,
-    "writtenAt": "2026-08-24T16:52:20Z"
+    "collectorSha": "ea766e6af797a9ec76245ef0e738479d23a3e7cd",
+    "workflowRunUrl": "https://github.com/eugeneng04/devops-bench/actions/runs/33094987086",
+    "writtenAt": "2026-08-27T16:53:04Z"
   },
   "unreadable": [
     {
@@ -1829,6 +1829,436 @@
         }
       },
       "changeDetail": true
+    },
+    {
+      "date": "2026-08-27",
+      "collectedAt": "2026-08-27T16:46:51Z",
+      "windowDays": 14,
+      "totals": {
+        "forks": 28,
+        "activeForks": 26,
+        "externalForks": 6,
+        "owners": 19,
+        "activeOwners": 17,
+        "externalOwners": 6,
+        "activeExternalOwners": 4,
+        "divergentBranches": 277,
+        "externalDivergentBranches": 12,
+        "distinctChanges": 249,
+        "externalDistinctChanges": 12,
+        "changedLines": 1471173,
+        "unclassifiedLines": 11438,
+        "trafficRepos": [
+          "gke-labs/devops-bench"
+        ]
+      },
+      "derived": {
+        "externalOwnerRatio": 0.3157894736842105,
+        "activeExternalOwnerRatio": 0.23529411764705882,
+        "externalBranchRatio": 0.04332129963898917,
+        "externalChangeRatio": 0.04819277108433735,
+        "unclassifiedLineRate": 0.007774748449026729
+      },
+      "affiliation": {
+        "inside": 19,
+        "outside": 10,
+        "frozenAt": "2026-08-27"
+      },
+      "references": {
+        "depending": 2,
+        "running": 1,
+        "citing": 13
+      },
+      "referencesUnavailable": null,
+      "traffic": {
+        "gke-labs/devops-bench": {
+          "views": 356,
+          "uniqueVisitors": 33,
+          "clones": 6655,
+          "uniqueCloners": 213
+        },
+        "kubernetes-sigs/devops-bench": null
+      },
+      "coverage": {
+        "partial": false,
+        "skipped": [],
+        "trafficRepos": [
+          "gke-labs/devops-bench"
+        ],
+        "forksUnavailable": []
+      },
+      "provenance": {
+        "collectorSha": "ea766e6af797a9ec76245ef0e738479d23a3e7cd",
+        "workflowRunUrl": "https://github.com/eugeneng04/devops-bench/actions/runs/33094987086",
+        "writtenAt": "2026-08-27T16:46:51Z"
+      },
+      "changes": {
+        "since": "2026-08-24",
+        "repos": {
+          "gke-labs/devops-bench": {
+            "comparable": true,
+            "newForks": [],
+            "newBranches": [
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "ehole/http-probe-classify-sync",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:ehole/http-probe-classify-sync: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "ehole/http-probe-restore-context",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:ehole/http-probe-restore-context: Not Found (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/devops-bench",
+                "branch": "ehole/openclaw-gemini-3-7",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:ehole/openclaw-gemini-3-7: Not Found (HTTP 404)"
+              }
+            ],
+            "updatedBranches": [
+              {
+                "fork": "eugeneng04/devops-bench",
+                "branch": "main",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 388086,
+                "changedLinesBefore": 293321,
+                "headCommittedAt": "2026-08-24T16:54:01Z",
+                "unavailable": null
+              }
+            ],
+            "goneForks": [],
+            "goneBranches": []
+          },
+          "kubernetes-sigs/devops-bench": {
+            "comparable": true,
+            "newForks": [],
+            "newBranches": [
+              {
+                "fork": "eugeneng04/devops-bench-sigs",
+                "branch": "feat/model-turns-on-row",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "agentFramework",
+                "external": false,
+                "changedLines": 1044,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-24T21:00:32Z",
+                "unavailable": null
+              },
+              {
+                "fork": "eugeneng04/devops-bench-sigs",
+                "branch": "feat/openclaw-cache-write",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "agentFramework",
+                "external": false,
+                "changedLines": 660,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-24T20:24:10Z",
+                "unavailable": null
+              },
+              {
+                "fork": "eugeneng04/devops-bench-sigs",
+                "branch": "feat/run-telemetry",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "agentFramework",
+                "external": false,
+                "changedLines": 1924,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-25T22:08:02Z",
+                "unavailable": null
+              },
+              {
+                "fork": "eugeneng04/devops-bench-sigs",
+                "branch": "feat/run-timeout-on-row",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "tests",
+                "external": false,
+                "changedLines": 698,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-24T20:59:04Z",
+                "unavailable": null
+              },
+              {
+                "fork": "eugeneng04/devops-bench-sigs",
+                "branch": "feat/served-model-on-row",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "agentFramework",
+                "external": false,
+                "changedLines": 1603,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-24T21:05:24Z",
+                "unavailable": null
+              },
+              {
+                "fork": "eugeneng04/devops-bench-sigs",
+                "branch": "feat/tool-wait-on-row",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "agentFramework",
+                "external": false,
+                "changedLines": 1460,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-24T21:04:29Z",
+                "unavailable": null
+              },
+              {
+                "fork": "eugeneng04/devops-bench-sigs",
+                "branch": "perf/latency-agent-span-only",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "tests",
+                "external": false,
+                "changedLines": 564,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-24T20:22:42Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "fix/vcluster-local-hostnames",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "tests",
+                "external": true,
+                "changedLines": 62,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-25T17:15:57Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "docs/bastion",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 283,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-25T20:13:29Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "feat/adk-agent-harness",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "agentFramework",
+                "external": false,
+                "changedLines": 1864,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-25T21:18:34Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "fix/mcp-major-version-ceiling",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "unclassified",
+                "external": false,
+                "changedLines": 7,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-25T21:47:51Z",
+                "unavailable": null
+              }
+            ],
+            "updatedBranches": [
+              {
+                "fork": "ChinemeremChigbo/devops-bench",
+                "branch": "add-agent-extra-flags",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "agentFramework",
+                "external": true,
+                "changedLines": 235,
+                "changedLinesBefore": 188,
+                "headCommittedAt": "2026-08-24T19:57:02Z",
+                "unavailable": null
+              },
+              {
+                "fork": "eugeneng04/devops-bench-sigs",
+                "branch": "feat/agents-claude-code-harness",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingHarness",
+                "external": false,
+                "changedLines": 2131,
+                "changedLinesBefore": 2087,
+                "headCommittedAt": "2026-08-26T00:32:29Z",
+                "unavailable": null
+              },
+              {
+                "fork": "eugeneng04/devops-bench-sigs",
+                "branch": "feat/agents-hermes-harness",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingHarness",
+                "external": false,
+                "changedLines": 1593,
+                "changedLinesBefore": 1261,
+                "headCommittedAt": "2026-08-26T16:25:18Z",
+                "unavailable": null
+              },
+              {
+                "fork": "eugeneng04/devops-bench-sigs",
+                "branch": "feat/terminal-reason",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "agentFramework",
+                "external": false,
+                "changedLines": 209,
+                "changedLinesBefore": 273,
+                "headCommittedAt": "2026-08-24T16:34:30Z",
+                "unavailable": null
+              },
+              {
+                "fork": "eugeneng04/devops-bench-sigs",
+                "branch": "feat/tool-call-counts",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "agentFramework",
+                "external": false,
+                "changedLines": 329,
+                "changedLinesBefore": 120,
+                "headCommittedAt": "2026-08-24T16:41:05Z",
+                "unavailable": null
+              },
+              {
+                "fork": "eugeneng04/devops-bench-sigs",
+                "branch": "fix/cli-token-aliases",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "tests",
+                "external": false,
+                "changedLines": 404,
+                "changedLinesBefore": 75,
+                "headCommittedAt": "2026-08-24T16:41:09Z",
+                "unavailable": null
+              },
+              {
+                "fork": "eugeneng04/devops-bench-sigs",
+                "branch": "integration/perf-metrics-all",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "tests",
+                "external": false,
+                "changedLines": 404,
+                "changedLinesBefore": 1652,
+                "headCommittedAt": "2026-08-24T16:41:09Z",
+                "unavailable": null
+              },
+              {
+                "fork": "eugeneng04/devops-bench-sigs",
+                "branch": "multi-server-mcp-and-skills",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "agentFramework",
+                "external": false,
+                "changedLines": 2570,
+                "changedLinesBefore": 1737,
+                "headCommittedAt": "2026-08-26T17:52:21Z",
+                "unavailable": null
+              },
+              {
+                "fork": "geojaz/k8s-devops-bench",
+                "branch": "ehole/verifier-http-probe",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingVerifiers",
+                "external": false,
+                "changedLines": 917,
+                "changedLinesBefore": 814,
+                "headCommittedAt": "2026-08-27T05:41:30Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "add-task-cve-remediation",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 788,
+                "changedLinesBefore": 724,
+                "headCommittedAt": "2026-08-26T17:21:50Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "add-task-migration-and-upgrade",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 522,
+                "changedLinesBefore": 474,
+                "headCommittedAt": "2026-08-26T18:52:12Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "add-task-spot-rebalancing",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 730,
+                "changedLinesBefore": 649,
+                "headCommittedAt": "2026-08-26T18:47:34Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "fair-verification-budget",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "core",
+                "external": false,
+                "changedLines": 253,
+                "changedLinesBefore": 149,
+                "headCommittedAt": "2026-08-25T20:13:31Z",
+                "unavailable": null
+              },
+              {
+                "fork": "pradeepvrd/devops-bench-1",
+                "branch": "docs/docs-index-and-getting-started",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 257,
+                "changedLinesBefore": 171,
+                "headCommittedAt": "2026-08-24T21:11:00Z",
+                "unavailable": null
+              },
+              {
+                "fork": "pradeepvrd/devops-bench-1",
+                "branch": "docs/operational-skills-and-references",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 972,
+                "changedLinesBefore": 984,
+                "headCommittedAt": "2026-08-26T04:31:18Z",
+                "unavailable": null
+              },
+              {
+                "fork": "pradeepvrd/devops-bench-1",
+                "branch": "docs/validate-eval-skill",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 160,
+                "changedLinesBefore": 148,
+                "headCommittedAt": "2026-08-26T23:45:01Z",
+                "unavailable": null
+              }
+            ],
+            "goneForks": null,
+            "goneBranches": null
+          }
+        }
+      },
+      "changeDetail": true
     }
   ],
   "daily": {
@@ -1836,7 +2266,7 @@
       "covered": [
         [
           "2026-07-29",
-          "2026-08-23"
+          "2026-08-26"
         ]
       ],
       "gaps": [],
@@ -2018,10 +2448,31 @@
         },
         {
           "date": "2026-08-23",
-          "views": 0,
-          "uniqueVisitors": 0,
-          "clones": 0,
-          "uniqueCloners": 0
+          "views": 4,
+          "uniqueVisitors": 3,
+          "clones": 464,
+          "uniqueCloners": 28
+        },
+        {
+          "date": "2026-08-24",
+          "views": 44,
+          "uniqueVisitors": 9,
+          "clones": 977,
+          "uniqueCloners": 13
+        },
+        {
+          "date": "2026-08-25",
+          "views": 72,
+          "uniqueVisitors": 11,
+          "clones": 1174,
+          "uniqueCloners": 33
+        },
+        {
+          "date": "2026-08-26",
+          "views": 41,
+          "uniqueVisitors": 10,
+          "clones": 1276,
+          "uniqueCloners": 35
         }
       ]
     }
