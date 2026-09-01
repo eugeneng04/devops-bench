@@ -2,7 +2,9 @@
 // Model logos are filled squares with a letter; harness icons are line glyphs
 // tinted with the harness accent so the runner reads as its own entity class.
 
-const BRANDS = {
+// Exported as data, not just as components: the charts redraw the same marks
+// with the canvas 2D API, and a second copy of the glyphs would drift.
+export const BRANDS = {
     alpha: { fill: "#6366f1", letter: "A" },
     beta: { fill: "#0ea5e9", letter: "B" },
     gamma: { fill: "#f97316", letter: "C" },
@@ -23,21 +25,19 @@ export function BrandLogo({ logo }) {
     );
 }
 
-const HARNESS_GLYPHS = {
-    terminal: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 8l3 3-3 3m5 1h4" />,
-    claw: (
-        <>
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 7l8-4 8 4-8 4-8-4z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 12l8 4 8-4M4 17l8 4 8-4" />
-        </>
-    ),
-    braces: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 5c-2 0-2 2-2 3.5S6 12 4 12c2 0 2 2.5 2 4s0 3 2 3m8-14c2 0 2 2 2 3.5S18 12 20 12c-2 0-2 2.5-2 4s0 3-2 3" />
+// Path data against a 24x24 viewBox, shared with the canvas drawer.
+export const HARNESS_PATHS = {
+    terminal: ["M7 8l3 3-3 3m5 1h4"],
+    claw: ["M4 7l8-4 8 4-8 4-8-4z", "M4 12l8 4 8-4M4 17l8 4 8-4"],
+    braces: ["M8 5c-2 0-2 2-2 3.5S6 12 4 12c2 0 2 2.5 2 4s0 3 2 3m8-14c2 0 2 2 2 3.5S18 12 20 12c-2 0-2 2.5-2 4s0 3-2 3"]
 };
 
 export function HarnessIcon({ harness }) {
     return (
         <svg aria-hidden="true" focusable="false" className="w-4 h-4 min-w-[16px]" fill="none" stroke={harness.accent} viewBox="0 0 24 24">
-            {HARNESS_GLYPHS[harness.logo] || null}
+            {(HARNESS_PATHS[harness.logo] ?? []).map((d, i) => (
+                <path key={i} strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={d} />
+            ))}
         </svg>
     );
 }

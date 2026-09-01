@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
     setupScore,
+    setupTotal,
     setupHistory,
     allRunDates,
     formatRunDate,
@@ -49,6 +50,29 @@ describe("setupScore", () => {
     it("returns null when no task has a score", () => {
         const s = makeSetup({ tasks: [{ folder: "a", name: "A", scores: {} }] });
         expect(setupScore(s, "pass1")).toBeNull();
+    });
+});
+
+describe("setupTotal", () => {
+    it("is the sum over tasks for the metric", () => {
+        expect(setupTotal(makeSetup(), "pass1")).toBe(170); // 90+80
+    });
+
+    it("sums only the tasks that reported, so coverage moves the total", () => {
+        // The mean of these is 90 either way; the total is not.
+        const s = makeSetup({
+            tasks: [
+                { folder: "a", name: "A", scores: { pass1: 90 } },
+                { folder: "b", name: "B", scores: { pass1: null } }
+            ]
+        });
+        expect(setupTotal(s, "pass1")).toBe(90);
+        expect(setupScore(s, "pass1")).toBe(90);
+    });
+
+    it("returns null when no task has a score, rather than a zero total", () => {
+        const s = makeSetup({ tasks: [{ folder: "a", name: "A", scores: {} }] });
+        expect(setupTotal(s, "pass1")).toBeNull();
     });
 });
 

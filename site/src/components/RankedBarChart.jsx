@@ -4,6 +4,10 @@
 // reads as a number and bars read as a ratio. "$0.10 versus $0.40" takes a
 // division; a bar a quarter the length of its neighbour does not. Direction
 // comes from the metric, so the top bar is always the best one.
+//
+// `task` / `aggregate` are the same task view the token breakdown takes: the
+// per-task mean, the suite total, or one task on its own. They go through the
+// shared resolver, so a setup ranks the same way here as it does there.
 
 import { useMemo } from "react";
 import { Bar } from "react-chartjs-2";
@@ -15,6 +19,7 @@ import {
     Tooltip
 } from "chart.js";
 import { rankedBars } from "../lib/charts.js";
+import { setupIconsPlugin, iconGutter } from "../lib/chartIcons.js";
 import { METRIC_LABELS, formatMetric } from "../lib/vocab.js";
 import { useIsDark } from "../hooks/useIsDark.js";
 
@@ -50,14 +55,14 @@ export const barValuePlugin = {
     }
 };
 
-export function RankedBarChart({ setups, metric, models, harnesses, ariaLabel, caption }) {
+export function RankedBarChart({ setups, metric, models, harnesses, task = null, aggregate = "mean", ariaLabel, caption }) {
     const isDark = useIsDark();
     const textColor = isDark ? "#94a3b8" : "#64748b";
     const gridColor = isDark ? "#1e293b" : "#f1f5f9";
 
     const bars = useMemo(
-        () => rankedBars(setups, metric, models, harnesses),
-        [setups, metric, models, harnesses]
+        () => rankedBars(setups, metric, models, harnesses, { task, aggregate }),
+        [setups, metric, models, harnesses, task, aggregate]
     );
 
     const data = useMemo(() => ({
@@ -84,9 +89,10 @@ export function RankedBarChart({ setups, metric, models, harnesses, ariaLabel, c
         indexAxis: "y",
         responsive: true,
         maintainAspectRatio: false,
-        layout: { padding: { right: valuePad } },
+        layout: { padding: { left: iconGutter(2), right: valuePad } },
         plugins: {
             barValues: { color: textColor, format: v => formatMetric(metric, v) },
+            setupIcons: { slots: 2, rowAt: (_tick, i) => bars[i] && { model: models[bars[i].setup.model], harness: harnesses[bars[i].setup.harness] } },
             legend: { display: false },
             tooltip: {
                 callbacks: { label: ctx => ` ${METRIC_LABELS[metric]}: ${formatMetric(metric, ctx.parsed.x)}` }
@@ -104,19 +110,19 @@ export function RankedBarChart({ setups, metric, models, harnesses, ariaLabel, c
                 ticks: { color: textColor, font: { size: 10 }, autoSkip: false, crossAlign: "far" }
             }
         }
-    }), [metric, textColor, gridColor, valuePad]);
+    }), [metric, textColor, gridColor, valuePad, bars, models, harnesses]);
 
     if (!bars.length) {
         return (
             <p className="text-xs text-slate-500 dark:text-slate-400 py-10 text-center">
-                No setup reports {METRIC_LABELS[metric]} in the current selection.
+                No setup reports {METRIC_LABELS[metric]} {task ? "for this task" : "in the current selection"}.
             </p>
         );
     }
 
     return (
         <div style={{ height: bars.length * ROW_PX + CHROME_PX }}>
-            <Bar data={data} options={options} plugins={[barValuePlugin]} role="img" aria-label={ariaLabel} />
+            <Bar data={data} options={options} plugins={[barValuePlugin, setupIconsPlugin]} role="img" aria-label={ariaLabel} />
             <table className="sr-only">
                 {caption ? <caption>{caption}</caption> : null}
                 <thead>

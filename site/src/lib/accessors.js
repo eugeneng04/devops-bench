@@ -67,6 +67,43 @@ export function setupScore(setup, metric) {
     return vals.length ? vals.reduce((sum, v) => sum + v, 0) / vals.length : null;
 }
 
+// Sum across tasks for the metric — what the whole suite cost, rather than what
+// the average task cost. Only meaningful for additive metrics (tokens, cost,
+// latency); totalling a percentage is nonsense, so callers pick the metric.
+//
+// Sums the tasks that reported, like setupScore averages them. That makes the
+// total sensitive to COVERAGE in a way the mean is not: a setup that reported
+// three of twelve tasks totals three tasks' worth and looks cheap. Null-safe;
+// null when nothing was measured.
+/**
+ * @param {Setup} setup
+ * @param {MetricKey} metric
+ * @returns {number | null}
+ */
+export function setupTotal(setup, metric) {
+    const vals = setup.tasks.map(t => t.scores[metric]).filter(v => v != null);
+    return vals.length ? vals.reduce((sum, v) => sum + v, 0) : null;
+}
+
+// One setup's value for a metric under a chart's task view: a single task's own
+// number, or the mean / total across the tasks it reported. The charts that
+// offer the view picker all resolve through here, so "mean", "total" and "one
+// task" mean the same thing on every one of them.
+/**
+ * @typedef {{ task?: string | null, aggregate?: "mean" | "total" }} TaskView
+ * @param {Setup} setup
+ * @param {MetricKey} metric
+ * @param {TaskView} [view]
+ * @returns {number | null}
+ */
+export function setupValue(setup, metric, view = {}) {
+    const { task = null, aggregate = "mean" } = view;
+    // A single task has one value, so mean and total coincide and `aggregate`
+    // does not apply.
+    if (task) return setup.tasks.find(t => t.folder === task)?.scores[metric] ?? null;
+    return aggregate === "total" ? setupTotal(setup, metric) : setupScore(setup, metric);
+}
+
 // Trend points for the metric as { x: <epoch ms>, y: <score> }, in time order.
 // Sparse by construction — a setup only yields points for runs it actually has.
 /**

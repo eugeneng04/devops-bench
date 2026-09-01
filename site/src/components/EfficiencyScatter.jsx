@@ -22,6 +22,7 @@ import {
 import { setupLabel } from "../lib/accessors.js";
 import { scatterPoints, paretoFrontier, colorSeries, canUseLogScale, placeLabels } from "../lib/charts.js";
 import { METRIC_LABELS, formatMetric, isLowerBetter, metricMeta } from "../lib/vocab.js";
+import { drawMarks, marksWidth, legendMarksPlugin, markedLegendLabels, LEGEND_BOX_PX } from "../lib/chartIcons.js";
 import { useIsDark } from "../hooks/useIsDark.js";
 
 Chart.register(LineElement, PointElement, LinearScale, LogarithmicScale, Tooltip, Legend);
@@ -32,11 +33,14 @@ const FRONTIER_COLOR = "#94a3b8";
 
 const LABEL_FONT_PX = 10;
 const LABEL_FONT = `500 ${LABEL_FONT_PX}px system-ui, sans-serif`;
+// Marks sized to the label text, so a label reads as one object rather than a
+// glyph with a caption.
+const LABEL_MARK_PX = 11;
 
-// Names every dot on the canvas. The legend groups dots by color, which cannot
-// tell apart three dots that share one — and on a chart of model × harness
-// pairings, most colors are shared. Geometry lives in placeLabels; this only
-// measures the text and draws it.
+// Names every dot on the canvas, model and harness mark first. The legend groups
+// dots by color, which cannot tell apart three dots that share one — and on a
+// chart of model × harness pairings, most colors are shared. Geometry lives in
+// placeLabels; this only measures the label and draws it.
 const pointLabelPlugin = {
     id: "pointLabels",
     afterDatasetsDraw(chart, _args, opts) {
@@ -51,19 +55,26 @@ const pointLabelPlugin = {
                 const element = meta.data[pi];
                 // The frontier dataset is a line with unlabeled points.
                 if (!element || !point.label) return;
+                // The marks are part of the label's footprint, or placeLabels
+                // packs them over the neighbouring dots.
+                const markW = marksWidth(point, LABEL_MARK_PX);
                 dots.push({
                     x: element.x,
                     y: element.y,
                     r: dataset.pointRadius ?? 4,
-                    w: ctx.measureText(point.label).width,
-                    h: LABEL_FONT_PX + 2,
+                    w: ctx.measureText(point.label).width + markW,
+                    h: Math.max(LABEL_FONT_PX + 2, LABEL_MARK_PX),
                     text: point.label,
+                    mark: point,
+                    markW,
                     color: dataset.borderColor
                 });
             });
         });
 
-        ctx.textAlign = "center";
+        // Left-aligned now that a label is marks plus text: placeLabels returns
+        // the centre, and the pair is laid out from there.
+        ctx.textAlign = "left";
         ctx.textBaseline = "middle";
         // A halo in the page background: labels cross gridlines and, when the
         // plot is crowded, each other.
@@ -71,9 +82,12 @@ const pointLabelPlugin = {
         ctx.lineWidth = 3;
         ctx.lineJoin = "round";
         placeLabels(dots, chartArea).forEach((spot, i) => {
-            ctx.strokeText(dots[i].text, spot.x, spot.y);
-            ctx.fillStyle = dots[i].color;
-            ctx.fillText(dots[i].text, spot.x, spot.y);
+            const dot = dots[i];
+            const left = spot.x - dot.w / 2;
+            drawMarks(ctx, dot.mark, left, spot.y - LABEL_MARK_PX / 2, LABEL_MARK_PX);
+            ctx.strokeText(dot.text, left + dot.markW, spot.y);
+            ctx.fillStyle = dot.color;
+            ctx.fillText(dot.text, left + dot.markW, spot.y);
         });
         ctx.restore();
     }
@@ -123,7 +137,13 @@ export function EfficiencyScatter({
             label: s.label,
             data: s.setups.map(setup => {
                 const p = byId.get(setup.id);
-                return { x: p.x, y: p.y, label: setupLabel(setup, models, harnesses) };
+                return {
+                    x: p.x,
+                    y: p.y,
+                    label: setupLabel(setup, models, harnesses),
+                    model: models[setup.model],
+                    harness: harnesses[setup.harness]
+                };
             }),
             backgroundColor: s.color,
             borderColor: s.color,
@@ -162,13 +182,26 @@ export function EfficiencyScatter({
         interaction: { mode: "nearest", intersect: true },
         plugins: {
             pointLabels: { haloColor: isDark ? "#0f172a" : "#ffffff" },
+            legendMarks: {
+                // The legend lists colour-by groups, so one series is one model
+                // OR one harness — never both.
+                // Matched on the label rather than the dataset index, which the
+                // frontier dataset offsets by one only when it is drawn.
+                markAt: item => {
+                    const s = series.find(x => x.label === item.text);
+                    if (!s) return null;
+                    return colorBy === "harness"
+                        ? { harness: harnesses[s.key], color: s.color }
+                        : { model: models[s.key], color: s.color };
+                }
+            },
             legend: {
                 display: true,
                 position: "bottom",
                 labels: {
                     color: textColor,
-                    usePointStyle: true,
-                    boxWidth: 8,
+                    boxWidth: LEGEND_BOX_PX,
+                    generateLabels: markedLegendLabels,
                     padding: 16,
                     font: { size: 11, weight: "500" },
                     // The frontier is annotation, not a series you can compare
@@ -213,7 +246,7 @@ export function EfficiencyScatter({
                 }
             }
         }
-    }), [xMetric, yMetric, textColor, gridColor, useLogX, useLogY, isDark]);
+    }), [xMetric, yMetric, textColor, gridColor, useLogX, useLogY, isDark, series, colorBy, models, harnesses]);
 
     if (!points.length) {
         return (
@@ -235,8 +268,10 @@ export function EfficiencyScatter({
     );
 
     return (
-        <div className="chart-container flex-grow">
-            <Scatter data={data} options={options} plugins={[pointLabelPlugin]} role="img" aria-label={ariaLabel} />
+        // Fills whatever box the caller gives it. NOT `.chart-container`, which
+        // pins 320px and would leave the rest of a taller wrapper as dead space.
+        <div className="relative w-full h-full">
+            <Scatter data={data} options={options} plugins={[pointLabelPlugin, legendMarksPlugin]} role="img" aria-label={ariaLabel} />
             <table className="sr-only">
                 {caption ? <caption>{caption}</caption> : null}
                 <thead>
