@@ -48,12 +48,19 @@ const pointLabelPlugin = {
         ctx.save();
         ctx.font = LABEL_FONT;
         const dots = [];
+        // The frontier as drawn, in pixels, so placeLabels can steer labels off
+        // it. Read back from the chart rather than recomputed, so it is the same
+        // line the reader sees whatever the axes are doing.
+        let frontierLine = [];
         chart.data.datasets.forEach((dataset, di) => {
             const meta = chart.getDatasetMeta(di);
             if (meta.hidden) return;
+            if (dataset.showLine) {
+                frontierLine = meta.data.map(element => ({ x: element.x, y: element.y }));
+                return;
+            }
             dataset.data.forEach((point, pi) => {
                 const element = meta.data[pi];
-                // The frontier dataset is a line with unlabeled points.
                 if (!element || !point.label) return;
                 // The marks are part of the label's footprint, or placeLabels
                 // packs them over the neighbouring dots.
@@ -81,7 +88,7 @@ const pointLabelPlugin = {
         ctx.strokeStyle = opts.haloColor;
         ctx.lineWidth = 3;
         ctx.lineJoin = "round";
-        placeLabels(dots, chartArea).forEach((spot, i) => {
+        placeLabels(dots, chartArea, frontierLine).forEach((spot, i) => {
             const dot = dots[i];
             const left = spot.x - dot.w / 2;
             drawMarks(ctx, dot.mark, left, spot.y - LABEL_MARK_PX / 2, LABEL_MARK_PX);

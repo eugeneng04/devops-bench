@@ -421,6 +421,36 @@ describe("placeLabels", () => {
         expect(spot.x - 30).toBeGreaterThan(206);
     });
 
+    it("moves a label off the frontier line running through its dot", () => {
+        // A shallow frontier segment leaves the dot almost horizontally, so the
+        // beside-the-dot spot sits right on it however far out it is pushed.
+        // Only treating the line as an obstacle gets the label off it.
+        const dots = [dot(200, 150)];
+        const shallow = [{ x: 100, y: 148 }, { x: 300, y: 152 }];
+        expect(placeLabels(dots, AREA)[0].y).toBe(150);
+        expect(placeLabels(dots, AREA, shallow)[0].y).not.toBe(150);
+    });
+
+    it("leaves a label alone when the frontier passes nowhere near it", () => {
+        const dots = [dot(200, 150)];
+        const far = [{ x: 0, y: 20 }, { x: 400, y: 30 }];
+        expect(placeLabels(dots, AREA, far)[0]).toEqual(placeLabels(dots, AREA)[0]);
+    });
+
+    it("labels the dot even when every spot crosses the line", () => {
+        // Readability beats tidiness: a name overlapping the frontier is worth
+        // more than no name at all.
+        const dots = [dot(200, 150)];
+        const cage = [{ x: 0, y: 100 }, { x: 400, y: 100 }, { x: 400, y: 200 }, { x: 0, y: 200 }, { x: 0, y: 100 }];
+        expect(placeLabels(dots, AREA, cage)).toHaveLength(1);
+    });
+
+    it("lets the caller tuck labels in closer than the default clearance", () => {
+        const [spot] = placeLabels([dot(200, 150)], AREA);
+        const [tight] = placeLabels([dot(200, 150)], AREA, [], 2);
+        expect(tight.x).toBeLessThan(spot.x);
+    });
+
     it("keeps labels off each other when dots sit on top of one another", () => {
         // Two setups can score near-identically; the whole point of labelling
         // every dot is lost if the names land in the same pixels.
