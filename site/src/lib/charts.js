@@ -354,10 +354,15 @@ export function canUseLogScale(values) {
  * @param {{ x: number, y: number, r: number, w: number, h: number }[]} dots
  *   Pixel center, dot radius, and measured label size for each point.
  * @param {{ left: number, right: number, top: number, bottom: number }} area
+ * @param {{ x: number, y: number }[]} [line] Pixel vertices of a polyline the
+ *   labels must also avoid — the Pareto frontier. It is drawn THROUGH the dots,
+ *   so distance from a dot is not distance from the line: a label beside a
+ *   frontier dot sits on the segment leaving it whenever that segment is
+ *   shallow. Treating it as an obstacle is what pushes the label off it.
  * @param {number} [gap] Clearance between a dot and its own label.
  * @returns {{ x: number, y: number }[]} Label center, parallel to `dots`.
  */
-export function placeLabels(dots, area, gap = 6) {
+export function placeLabels(dots, area, line = [], gap = 12) {
     const placed = [];
     return dots.map(dot => {
         const hw = dot.w / 2;
@@ -380,9 +385,46 @@ export function placeLabels(dots, area, gap = 6) {
         // A dot's own dot never collides: every candidate clears it by `gap`.
         const clearOfDots = c =>
             !dots.some(d => Math.abs(d.x - c.x) < hw + d.r && Math.abs(d.y - c.y) < hh + d.r);
+        const clearOfLine = c => {
+            const box = { left: c.x - hw, right: c.x + hw, top: c.y - hh, bottom: c.y + hh };
+            return !line.some((p, i) => i > 0 && segmentHitsBox(line[i - 1], p, box));
+        };
 
-        const spot = candidates.find(c => inside(c) && clearOfLabels(c) && clearOfDots(c)) ?? candidates[0];
+        // The line is the softest constraint: a label crossing it is untidy,
+        // while a label on another label is unreadable. So try for a spot that
+        // clears everything, and give the line up before giving up a name.
+        const ok = c => inside(c) && clearOfLabels(c) && clearOfDots(c);
+        const spot =
+            candidates.find(c => ok(c) && clearOfLine(c)) ??
+            candidates.find(ok) ??
+            candidates[0];
         placed.push({ ...spot, w: dot.w, h: dot.h });
         return spot;
     });
+}
+
+// Does the segment a→b touch the axis-aligned box? Liang-Barsky: clip the
+// segment's parameter range against each edge in turn, and if anything survives
+// the segment passes through.
+function segmentHitsBox(a, b, { left, right, top, bottom }) {
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    let t0 = 0;
+    let t1 = 1;
+    for (const [p, q] of [[-dx, a.x - left], [dx, right - a.x], [-dy, a.y - top], [dy, bottom - a.y]]) {
+        // Parallel to this edge: either wholly outside it or unconstrained by it.
+        if (p === 0) {
+            if (q < 0) return false;
+            continue;
+        }
+        const r = q / p;
+        if (p < 0) {
+            if (r > t1) return false;
+            if (r > t0) t0 = r;
+        } else {
+            if (r < t0) return false;
+            if (r < t1) t1 = r;
+        }
+    }
+    return true;
 }

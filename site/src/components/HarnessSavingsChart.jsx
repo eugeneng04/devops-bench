@@ -28,6 +28,7 @@ import {
 import { harnessComparisons } from "../lib/charts.js";
 import { METRIC_LABELS, formatMetric, isLowerBetter } from "../lib/vocab.js";
 import { setupIconsPlugin, iconGutter } from "../lib/chartIcons.js";
+import { barValuePlugin, valuePad } from "../lib/barValues.js";
 import { useIsDark } from "../hooks/useIsDark.js";
 import { HarnessIcon } from "./Logo.jsx";
 
@@ -91,15 +92,21 @@ export function HarnessSavingsChart({ setups, metric, models, harnesses, ariaLab
         }))
     }), [groups, series]);
 
+    const pad = useMemo(
+        () => valuePad(groups.flatMap(g => g.entries.map(e => formatMetric(metric, e.value)))),
+        [groups, metric]
+    );
+
     const options = useMemo(() => ({
         indexAxis: "y",
         responsive: true,
         maintainAspectRatio: false,
         // One mark only: each row is a model, and the harnesses are the bars
         // within it rather than a property of the row.
-        layout: { padding: { left: iconGutter(1) } },
+        layout: { padding: { left: iconGutter(1), right: pad } },
         plugins: {
             legend: { display: false },   // rendered as HTML below, with the harness glyphs
+            barValues: { color: textColor, format: v => formatMetric(metric, v) },
             setupIcons: { slots: 1, rowAt: (_tick, i) => groups[i] && { model: models[groups[i].model] } },
             tooltip: {
                 callbacks: {
@@ -123,7 +130,7 @@ export function HarnessSavingsChart({ setups, metric, models, harnesses, ariaLab
                 ticks: { color: textColor, font: { size: 10 }, autoSkip: false, crossAlign: "far" }
             }
         }
-    }), [textColor, gridColor, groups, metric, models]);
+    }), [textColor, gridColor, groups, metric, models, pad]);
 
     if (!groups.length) {
         return (
@@ -139,7 +146,7 @@ export function HarnessSavingsChart({ setups, metric, models, harnesses, ariaLab
     return (
         <div>
             <div style={{ height: barCount * BAR_PX + CHROME_PX }}>
-                <Bar data={data} options={options} plugins={[setupIconsPlugin]} role="img" aria-label={ariaLabel} />
+                <Bar data={data} options={options} plugins={[barValuePlugin, setupIconsPlugin]} role="img" aria-label={ariaLabel} />
             </div>
             {/* aria-hidden: the sr-only table below names the harness on every
                 row, so a screen reader gets the mapping without this key. */}

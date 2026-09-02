@@ -1,14 +1,17 @@
 // =============================================================================
-// Benchmark dimension catalog (Node ESM, ingest-side).
+// devops-bench leaderboard — INGEST CATALOG (the dashboard vocabulary).
 //
-// The single source of truth for translating raw telemetry strings (from eval
-// artifacts / metadata) into the curated `models` and `harnesses` identities
-// written to Firestore.
+// The benchmark output records the RAW agent identity it ran with
+// (`agentModel` / `agentProvider` / `agentType`). The dashboard, however, keys
+// on CURATED ids (e.g. `alpha-pro`, `gemini-cli`) and renders metadata
+// (display name, provider, license, logo / accent) that does not exist in the
+// eval output. This module is the ONE place that bridges the two:
 //
-//   resolveModel(raw)   -> curated model key (or fallback slug) + metadata
-//   resolveHarness(raw) -> curated harness key (or fallback slug) + metadata
+//   - MODEL_ALIASES / HARNESS_ALIASES  : raw identity  -> curated id
+//   - MODELS / HARNESSES               : curated id    -> dashboard metadata
+//   - resolveModel() / resolveHarness(): the lookups, with a safe fallback
 //
-// Fallback policy: an unrecognized model or harness is NOT dropped (that would make a
+// Fallback policy: an unknown model/harness is NOT dropped (that would make a
 // whole run vanish from the leaderboard). Instead it is slugified into a key and
 // given minimal synthesized metadata, and the resolver flags it so the ingest
 // can warn. Add a real alias + metadata entry here to give it a proper home.
@@ -35,7 +38,7 @@ export const MODELS = {
 /** @type {Record<string, {name: string, type: "cli"|"api", accent: string, logo: string}>} */
 export const HARNESSES = {
     "gemini-cli":  { name: "Gemini CLI",  type: "cli", accent: "#0ea5e9", logo: "terminal" },
-    "kubeagents":  { name: "KubeAgents",  type: "cli", accent: "#326ce5", logo: "terminal" },
+    "kubeagents":  { name: "KubeAgents",  type: "cli", accent: "#14b8a6", logo: "cluster" },
     "claude-code": { name: "Claude Code", type: "cli", accent: "#d97757", logo: "terminal" },
     "openclaw":    { name: "OpenClaw",    type: "cli", accent: "#f43f5e", logo: "claw" },
     "api-loop":    { name: "API Runner",  type: "api", accent: "#8b5cf6", logo: "braces" },
@@ -106,156 +109,116 @@ export const HARNESS_ALIASES = {
 
 // --- presentation ------------------------------------------------------------
 
-// A stable palette of line/bar colors for setups. The derive step cycles
-// through this list in order of appearance (so the first setup seen is blue,
-// second is purple, etc.), giving every setup a distinguishable color in charts.
-export const SETUP_PALETTE = [
-    "#3b82f6", // blue
-    "#8b5cf6", // purple
-    "#ec4899", // pink
-    "#f59e0b", // amber
-    "#10b981", // emerald
-    "#06b6d4", // cyan
-    "#6366f1", // indigo
-    "#f97316"  // orange
+// One line/bar color per setup, assigned by discovery order in derive(). Same
+// palette the mock seed uses, so test and real data look consistent.
+export const PALETTE = [
+    "#3b82f6", "#1d4ed8", "#10b981", "#059669",
+    "#f59e0b", "#d97706", "#8b5cf6", "#ec4899"
 ];
 
-// --- helpers -----------------------------------------------------------------
-
-/**
- * Turn an arbitrary raw string into a safe, predictable collection id.
- * Lowercases, replaces non-alphanumerics with hyphens, trims hyphens.
- */
-export function slugify(str) {
-    if (!str) return "unknown";
-    return String(str)
-        .toLowerCase()
-        .trim()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "") || "unknown";
-}
-
-/**
- * Clean a raw model string: strip whitespace, unquote, lowercase for lookup.
- */
-function clean(str) {
-    if (!str) return "";
-    return String(str)
-        .trim()
-        .replace(/^["']|["']$/g, "")
-        .toLowerCase();
-}
-
-/**
- * Title-case a slug for fallback display names: "gemini-2-5-pro" -> "Gemini 2 5 Pro".
- */
-function humanize(slug) {
-    return slug
-        .split("-")
-        .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-        .join(" ");
-}
+// Optional per-setup overrides ({ [setupId]: { order?, color? } }) passed to
+// derive(). Empty by default — discovery order + PALETTE are used. Fill this to
+// pin a stable order/color for specific setups.
+/** @type {Record<string, {order?: number, color?: string}>} */
+export const SETUP_CATALOG = {};
 
 // --- resolvers ---------------------------------------------------------------
 
-/**
- * Resolve a raw `agentModel` string (from metadata or run config) into a curated
- * model key and its metadata record.
- *
- * Matching order:
- *   1. Exact match against MODEL_ALIASES (case-insensitive).
- *   2. Substring match: find the first alias contained in the raw string.
- *      Allows "claude-opus-4-8-20260101" -> "claude-opus-4-8".
- *   3. Fallback: slugify the raw string, synthesize a minimal Model record,
- *      and mark `known: false` so ingest can log a warning.
- *
- * @param {string} raw
- * @returns {{ key: string, model: {name: string, provider: string, license: string, logo: string}, known: boolean }}
- */
-export function resolveModel(raw) {
-    const c = clean(raw);
-    if (!c) {
-        return {
-            key: "unknown-model",
-            model: { name: "Unknown Model", provider: "Unknown", license: "Proprietary", logo: "alpha" },
-            known: false
-        };
-    }
-
-    // 1. Exact alias match
-    if (MODEL_ALIASES[c]) {
-        const key = MODEL_ALIASES[c];
-        return { key, model: { ...MODELS[key] }, known: true };
-    }
-
-    // 2. Substring match (most specific alias wins)
-    for (const [alias, key] of MODEL_ALIASES_BY_SPECIFICITY) {
-        if (c.includes(alias)) {
-            return { key, model: { ...MODELS[key] }, known: true };
-        }
-    }
-
-    // 3. Fallback: synthesize
-    const key = slugify(raw);
-    return {
-        key,
-        model: {
-            name: humanize(key),
-            provider: "Unknown",
-            license: "Proprietary",
-            logo: "alpha"
-        },
-        known: false
-    };
+function slugify(value) {
+    return String(value || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
 }
 
 /**
- * Resolve a raw `agentType` string (from metadata or run config) into a curated
- * harness key and its metadata record.
+ * Resolve a raw model identity to a curated key plus the metadata to upsert.
  *
- * Matching order:
- *   1. Exact alias match against HARNESS_ALIASES (case-insensitive).
- *   2. Substring match: find the first alias contained in the raw string.
- *      Allows "agent-runner-cli" -> "gemini-cli".
- *   3. Fallback: slugify the raw string, synthesize a minimal Harness record,
- *      and mark `known: false`.
- *
- * @param {string} raw
- * @returns {{ key: string, harness: {name: string, type: "cli"|"api", accent: string, logo: string}, known: boolean }}
+ * @param {string|null|undefined} agentModel raw AGENT_MODEL value
+ * @param {string|null|undefined} agentProvider raw AGENT_PROVIDER value
+ * @returns {{ key: string, meta: object, known: boolean }}
  */
-export function resolveHarness(raw) {
-    const c = clean(raw);
-    if (!c) {
-        return {
-            key: "unknown-harness",
-            harness: { name: "Unknown Harness", type: "cli", accent: "#64748b", logo: "terminal" },
-            known: false
-        };
-    }
+export function resolveModel(agentModel, agentProvider) {
+    const raw = String(agentModel || "").trim();
+    const lower = raw.toLowerCase();
 
-    // 1. Exact match
-    if (HARNESS_ALIASES[c]) {
-        const key = HARNESS_ALIASES[c];
-        return { key, harness: { ...HARNESSES[key] }, known: true };
-    }
-
-    // 2. Substring match
-    for (const [alias, key] of Object.entries(HARNESS_ALIASES)) {
-        if (c.includes(alias)) {
-            return { key, harness: { ...HARNESSES[key] }, known: true };
+    // Exact alias, then substring alias.
+    let key = MODEL_ALIASES[lower];
+    if (!key) {
+        for (const [alias, target] of MODEL_ALIASES_BY_SPECIFICITY) {
+            if (lower && lower.includes(alias.toLowerCase())) { key = target; break; }
         }
     }
 
-    // 3. Fallback: synthesize
-    const key = slugify(raw);
-    return {
-        key,
-        harness: {
-            name: humanize(key),
-            type: "cli",
-            accent: "#64748b",
-            logo: "terminal"
-        },
-        known: false
+    if (key && MODELS[key]) return { key, meta: MODELS[key], known: true };
+
+    // Unknown model: keep it visible with a synthesized entry.
+    const fallbackKey = key || slugify(raw) || "unknown-model";
+    const meta = MODELS[fallbackKey] || {
+        name: raw || "Unknown Model",
+        provider: String(agentProvider || "").trim() || "Unknown",
+        license: "Unknown",
+        logo: "alpha"
     };
+    return { key: fallbackKey, meta, known: false };
+}
+
+/**
+ * Resolve a raw harness/agent type to a curated key plus metadata to upsert.
+ *
+ * @param {string|null|undefined} agentType raw BENCH_AGENT_TYPE value
+ * @returns {{ key: string, meta: object, known: boolean }}
+ */
+export function resolveHarness(agentType) {
+    const raw = String(agentType || "").trim();
+    const lower = raw.toLowerCase();
+
+    const key = HARNESS_ALIASES[lower];
+    if (key && HARNESSES[key]) return { key, meta: HARNESSES[key], known: true };
+
+    const fallbackKey = key || slugify(raw) || "unknown-harness";
+    const meta = HARNESSES[fallbackKey] || {
+        name: raw || "Unknown Harness",
+        // API loops set AGENT_TYPE "api"; everything else is treated as a CLI.
+        type: lower === "api" ? "api" : "cli",
+        accent: "#64748b",
+        logo: "terminal"
+    };
+    return { key: fallbackKey, meta, known: false };
+}
+
+// --- metadata collection -----------------------------------------------------
+
+/**
+ * Collect the `models` / `harnesses` metadata docs referenced by a row set.
+ *
+ * Producer rows carry only the curated `model` / `harness` KEYS, never the
+ * display metadata (name/provider/license/logo, type/accent/...). This bridges
+ * each referenced key to the metadata to upsert. A key absent from the catalog
+ * is NOT dropped — it gets synthesized metadata and is reported via `unknown` so
+ * the operator can add a real entry (a missing entry would otherwise make the
+ * frontend's dangling-ref filter silently hide the whole setup).
+ *
+ * @param {{model: string, harness: string}[]} rows
+ * @returns {{ models: Map<string,object>, harnesses: Map<string,object>,
+ *             unknown: { models: Set<string>, harnesses: Set<string> } }}
+ */
+export function collectMetadata(rows) {
+    const models = new Map();
+    const harnesses = new Map();
+    const unknown = { models: new Set(), harnesses: new Set() };
+
+    for (const r of rows) {
+        if (r.model && !models.has(r.model)) {
+            const m = resolveModel(r.model, null);
+            models.set(r.model, m.meta);
+            if (!m.known) unknown.models.add(r.model);
+        }
+        if (r.harness && !harnesses.has(r.harness)) {
+            const h = resolveHarness(r.harness);
+            harnesses.set(r.harness, h.meta);
+            if (!h.known) unknown.harnesses.add(r.harness);
+        }
+    }
+    return { models, harnesses, unknown };
 }

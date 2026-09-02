@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams, useSearchParams, Link } from "react-router-dom";
 import { useBenchmark } from "../context/BenchmarkContext.jsx";
 import { setupScore, setupLabel } from "../lib/accessors.js";
-import { METRICS, METRIC_LABELS, availableMetrics, formatMetric, metricBarFraction, isLowerBetter, metricMeta, bestValue } from "../lib/vocab.js";
+import { METRICS, METRIC_LABELS, availableMetrics, formatMetric, metricBarFraction, isLowerBetter, metricMeta } from "../lib/vocab.js";
 import { SetupIdentity } from "../components/SetupIdentity.jsx";
 import { MetricToggle } from "../components/MetricToggle.jsx";
 import { TrendChart } from "../components/TrendChart.jsx";
@@ -50,13 +50,14 @@ function TaskTable({ setup, metric }) {
         });
     }, [setup, metric, sort]);
 
-    // Best value across this setup's tasks, so an absolute metric's bar has a
-    // scale (percentage metrics ignore it). Same helper the leaderboard uses,
-    // so the two cannot disagree about what "best" means.
-    const taskBest = useMemo(
-        () => bestValue(metric, setup.tasks.map(t => t.scores[metric])),
-        [setup, metric]
-    );
+    // Best value across this setup's tasks — the smallest for a lower-is-better
+    // metric — so an absolute metric's bar has a scale (percentage metrics
+    // ignore it).
+    const taskBest = useMemo(() => {
+        const vals = setup.tasks.map(t => t.scores[metric]).filter(v => v != null);
+        if (!vals.length) return null;
+        return isLowerBetter(metric) ? Math.min(...vals) : Math.max(...vals);
+    }, [setup, metric]);
 
     function sortBy(key) {
         setSort(prev => prev.key === key
@@ -179,8 +180,8 @@ export function Detail() {
     // "Avg Speed", which was independent of the metric back when latency wasn't
     // selectable; now that it is, selecting Latency makes "Average" the mean
     // latency and the two cards print the same figure side by side. Taking the
-    // first efficiency metric other than the selected one gives Input Tokens
-    // under Latency and Latency everywhere else, without naming either key here.
+    // first efficiency metric other than the selected one gives Tokens under
+    // Latency and Latency everywhere else, without naming either key here.
     const companion = METRICS.find(m => !metricMeta(m).percentage && m !== metric);
     const companionVals = companion
         ? setup.tasks.map(t => t.scores[companion]).filter(v => v != null)
@@ -224,28 +225,20 @@ export function Detail() {
                     <StatCard label="Best Task" value={pct(best)} sub={METRIC_LABELS[metric]} />
                     <StatCard label="Average" value={pct(avg)} sub={`over ${vals.length} tasks`} />
                     <StatCard label="Median" value={pct(med)} sub={METRIC_LABELS[metric]} />
-                    {/* Only on the quality metrics. What a catastrophic
-                        violation zeroes is the Outcome score — the seconds and
-                        tokens the run consumed are untouched and still valid, so
-                        in a row of cards that otherwise all describe the selected
-                        metric, this one would read as qualifying a figure it has
-                        no bearing on. Same rule as the leaderboard's ⚠ badge. */}
-                    {metricMeta(metric).percentage && (
-                        <StatCard
-                            label="Catastrophic"
-                            value={String(setup.catastrophicCount ?? 0)}
-                            // "outcome zeroed", not "task zeroed": the task still ran
-                            // and still has its other measurements; what a
-                            // catastrophic violation zeroes is the Outcome score.
-                            sub={
-                                setup.catastrophicCount === 1
-                                    ? "outcome zeroed"
-                                    : setup.catastrophicCount
-                                      ? "outcomes zeroed"
-                                      : "none"
-                            }
-                        />
-                    )}
+                    <StatCard
+                        label="Catastrophic"
+                        value={String(setup.catastrophicCount ?? 0)}
+                        // "outcome zeroed", not "task zeroed": the task still ran
+                        // and still has its other measurements; what a
+                        // catastrophic violation zeroes is the Outcome score.
+                        sub={
+                            setup.catastrophicCount === 1
+                                ? "outcome zeroed"
+                                : setup.catastrophicCount
+                                  ? "outcomes zeroed"
+                                  : "none"
+                        }
+                    />
                     {companion ? (
                         <StatCard
                             label={`Avg ${METRIC_LABELS[companion]}`}

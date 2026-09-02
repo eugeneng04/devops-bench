@@ -26,15 +26,13 @@ function makeBenchmark(overrides = {}) {
             {
                 id: SETUP_ID, order: 0, model: "alpha-pro", harness: "gemini-cli",
                 augmentation: [], color: "#3b82f6",
-                // The efficiency figures are chosen so their means are round
-                // (50.0s, 20.0k input) and their best is the SMALLEST, which is
-                // the opposite end from the percentage metrics above. No
-                // cachedTokens: this harness reports no cache reads, so that
-                // axis stays null the way a real gemini-cli row does.
+                // Latency/tokens are chosen so their means are round (50.0s,
+                // 20.0k) and their best is the SMALLEST, which is the opposite
+                // end from the percentage metrics above.
                 tasks: [
-                    { folder: "a", name: "Apple", scores: { composite: 60, pass1: 60, pass5: 65, passMax: 70, latency: 40, inputTokens: 10000, outputTokens: 400 } },
-                    { folder: "b", name: "Banana", scores: { composite: 90, pass1: 90, pass5: 95, passMax: 100, latency: 50, inputTokens: 20000, outputTokens: 500 } },
-                    { folder: "c", name: "Cherry", scores: { composite: 80, pass1: 80, pass5: 85, passMax: 90, latency: 60, inputTokens: 30000, outputTokens: 600 } }
+                    { folder: "a", name: "Apple", scores: { composite: 60, pass1: 60, pass5: 65, passMax: 70, latency: 40, tokens: 10000 } },
+                    { folder: "b", name: "Banana", scores: { composite: 90, pass1: 90, pass5: 95, passMax: 100, latency: 50, tokens: 20000 } },
+                    { folder: "c", name: "Cherry", scores: { composite: 80, pass1: 80, pass5: 85, passMax: 90, latency: 60, tokens: 30000 } }
                 ],
                 history: [
                     { t: "2026-01-15T00:00:00Z", scores: { composite: 70, pass1: 70, pass5: 75, passMax: 80 } },
@@ -160,21 +158,6 @@ describe("Detail", () => {
         expect(within(card("Catastrophic")).getByText("outcomes zeroed")).toBeInTheDocument();
     });
 
-    it("drops the catastrophic card on the efficiency metrics", () => {
-        // A catastrophic violation zeroes the OUTCOME score. The seconds and
-        // tokens the run consumed are untouched, so beside a latency or token
-        // headline the card qualifies a figure it has no bearing on.
-        benchmark.setups[0].catastrophicCount = 3;
-        for (const m of ["latency", "inputTokens", "outputTokens"]) {
-            renderAt(`/setup/${SETUP_ID}?metric=${m}`);
-            expect(screen.queryByText("Catastrophic")).not.toBeInTheDocument();
-            cleanup();
-        }
-        // ...and is still there on the quality side, where it explains the score.
-        renderAt(`/setup/${SETUP_ID}?metric=composite`);
-        expect(screen.getByText("Catastrophic")).toBeInTheDocument();
-    });
-
     it("reports the efficiency axis the toggle is not showing", () => {
         const card = label => screen.getByText(label).closest("div");
 
@@ -188,9 +171,7 @@ describe("Detail", () => {
         renderAt(`/setup/${SETUP_ID}?metric=latency`);
         expect(within(card("Average")).getByText("50.0s")).toBeInTheDocument();
         expect(screen.queryByText("Avg Latency")).not.toBeInTheDocument();
-        // Falls to the next efficiency axis in METRICS order, which is now the
-        // input-token axis rather than a combined token count.
-        expect(within(card("Avg Input Tokens")).getByText("20.0k")).toBeInTheDocument();
+        expect(within(card("Avg Tokens")).getByText("20.0k")).toBeInTheDocument();
     });
 
     it("orients the stat cards by the metric's direction", () => {
@@ -205,7 +186,7 @@ describe("Detail", () => {
     it("heads the task column with the metric rather than calling it a score", () => {
         // A token count is telemetry, not a score; the old "Score (Tokens)"
         // header said otherwise.
-        renderAt(`/setup/${SETUP_ID}?metric=inputTokens`);
+        renderAt(`/setup/${SETUP_ID}?metric=tokens`);
         expect(screen.getByRole("columnheader", { name: /Tokens/ })).toBeInTheDocument();
         expect(screen.queryByRole("columnheader", { name: /Score/ })).not.toBeInTheDocument();
     });
@@ -250,7 +231,7 @@ describe("Detail", () => {
         expect(header(/Outcome/)).toHaveTextContent("▼"); // 90 → 60, descending
 
         cleanup();
-        renderAt(`/setup/${SETUP_ID}?metric=inputTokens`);
+        renderAt(`/setup/${SETUP_ID}?metric=tokens`);
         expect(header(/Tokens/)).toHaveTextContent("▲"); // 10.0k → 30.0k, ascending
         fireEvent.click(header(/Tokens/));
         expect(header(/Tokens/)).toHaveTextContent("▼");

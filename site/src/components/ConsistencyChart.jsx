@@ -28,16 +28,13 @@ import {
 import { taskSpreads } from "../lib/charts.js";
 import { METRIC_LABELS, formatMetric } from "../lib/vocab.js";
 import { setupIconsPlugin, iconGutter } from "../lib/chartIcons.js";
+import { VALUE_FONT, VALUE_GAP, valuePad } from "../lib/barValues.js";
 import { useIsDark } from "../hooks/useIsDark.js";
 
 Chart.register(BarElement, CategoryScale, LinearScale, Tooltip);
 
 const ROW_PX = 32;
 const CHROME_PX = 64;
-
-const VALUE_FONT_PX = 11;
-const VALUE_GAP = 6;
-const VALUE_CHAR_PX = VALUE_FONT_PX * 0.62;
 
 const WHISKER_PX = 2;
 // End caps at half the box height: tall enough to read as a terminator, short
@@ -86,7 +83,7 @@ export const spreadMarkerPlugin = {
             ctx.lineTo(mid, bar.y + half);
             ctx.stroke();
 
-            ctx.font = `600 ${VALUE_FONT_PX}px system-ui, sans-serif`;
+            ctx.font = VALUE_FONT;
             ctx.fillStyle = opts.textColor;
             ctx.textAlign = "left";
             ctx.textBaseline = "middle";
@@ -122,17 +119,16 @@ export function ConsistencyChart({ setups, metric, models, harnesses, ariaLabel,
         }]
     }), [rows, metric]);
 
-    const valuePad = useMemo(() => {
-        if (!rows.length) return 0;
-        const widest = Math.max(...rows.map(r => rangeText(metric, r).length));
-        return widest * VALUE_CHAR_PX + VALUE_GAP + 4;
-    }, [rows, metric]);
+    const pad = useMemo(
+        () => valuePad(rows.map(r => rangeText(metric, r))),
+        [rows, metric]
+    );
 
     const options = useMemo(() => ({
         indexAxis: "y",
         responsive: true,
         maintainAspectRatio: false,
-        layout: { padding: { left: iconGutter(2), right: valuePad } },
+        layout: { padding: { left: iconGutter(2), right: pad } },
         plugins: {
             legend: { display: false },
             spreadMarkers: { rows, metric, textColor, markerColor: isDark ? "#e2e8f0" : "#334155" },
@@ -173,7 +169,7 @@ export function ConsistencyChart({ setups, metric, models, harnesses, ariaLabel,
                 ticks: { color: textColor, font: { size: 10 }, autoSkip: false, crossAlign: "far" }
             }
         }
-    }), [rows, metric, textColor, gridColor, isDark, valuePad, models, harnesses]);
+    }), [rows, metric, textColor, gridColor, isDark, pad, models, harnesses]);
 
     if (!rows.length) {
         return (
