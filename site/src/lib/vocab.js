@@ -35,26 +35,31 @@ export const METRIC_LABELS = {
     pass5: "Pass@5",
     passMax: "Pass^5",
     latency: "Latency",
-    inputTokens: "Input Tokens",
-    outputTokens: "Output Tokens",
-    cachedTokens: "Cached Tokens"
+    tokens: "Tokens",
+    cost: "Cost",
+    turns: "Turns",
+    toolCalls: "Tool Calls",
+    cacheHitRate: "Cache Hit Rate",
+    tokensInput: "Input Tokens",
+    tokensCached: "Cached Tokens",
+    tokensCacheWrite: "Cache Write Tokens",
+    tokensReasoning: "Reasoning Tokens",
+    tokensOutput: "Output Tokens"
 };
 
-// Abbreviated labels for the metric toggle only, where ten buttons compete for
+// Abbreviated labels for the metric toggle only, where eight buttons compete for
 // the width of one table column. "Recoverable Safety" is ~2.5x the width of any
 // other button, so it alone decides whether the group fits on one line. Headings,
 // tooltips and the accessible name of the button all keep the full METRIC_LABELS
 // text — this shortens the visible glyphs, not the vocabulary.
-//
-// The token axes drop the shared "Tokens" noun because the efficiency pill
-// already groups them next to each other: three buttons reading "Input Tokens /
-// Output Tokens / Cached Tokens" repeat the word twice for no discrimination,
-// and the full name survives in the tooltip and the accessible name.
 const METRIC_SHORT_LABELS = {
     recoverableSafety: "Rec. Safety",
-    inputTokens: "Input",
-    outputTokens: "Output",
-    cachedTokens: "Cached"
+    cacheHitRate: "Cache Hits",
+    tokensInput: "Input",
+    tokensCached: "Cached",
+    tokensCacheWrite: "Cache Write",
+    tokensReasoning: "Reasoning",
+    tokensOutput: "Output"
 };
 
 /** Toggle-button text for a metric, falling back to the full label. */
@@ -72,10 +77,43 @@ export const METRICS = [
     "pass5",
     "passMax",
     "latency",
-    "inputTokens",
-    "outputTokens",
-    "cachedTokens"
+    "tokens",
+    "cost"
 ];
+
+// Metrics offered as a chart axis, grouped for the axis pickers. This is a
+// superset of METRICS: the token buckets and the agentic-work counts are worth
+// plotting but would make the leaderboard table unreadable as columns, so they
+// live here and not in METRICS.
+export const METRIC_GROUPS = [
+    { key: "quality", label: "Quality", metrics: ["composite", "correctness", "recoverableSafety", "pass1", "pass5", "passMax"] },
+    { key: "efficiency", label: "Efficiency", metrics: ["latency", "tokens", "cost"] },
+    { key: "buckets", label: "Token Buckets", metrics: ["tokensInput", "tokensCached", "tokensCacheWrite", "tokensReasoning", "tokensOutput", "cacheHitRate"] },
+    { key: "work", label: "Agentic Work", metrics: ["turns", "toolCalls"] }
+];
+
+/** Every plottable metric, in group order. */
+export const CHART_METRICS = METRIC_GROUPS.flatMap(g => g.metrics);
+
+// The billed token buckets, in the order they stack. `tokensOutput` EXCLUDES
+// reasoning: the two are siblings in the stack, not a whole and its part, so
+// summing the buckets gives the total rather than double-counting thinking.
+export const TOKEN_BUCKET_METRICS = [
+    "tokensInput",
+    "tokensCached",
+    "tokensCacheWrite",
+    "tokensReasoning",
+    "tokensOutput"
+];
+
+// One color per bucket, held constant across the stack and its legend.
+export const TOKEN_BUCKET_COLORS = {
+    tokensInput: "#f59e0b",
+    tokensCached: "#10b981",
+    tokensCacheWrite: "#8b5cf6",
+    tokensReasoning: "#ec4899",
+    tokensOutput: "#3b82f6"
+};
 
 // Per-metric presentation rules. Quality metrics are 0..100 percentages where
 // higher is better; efficiency metrics are absolute magnitudes (seconds, token
@@ -83,7 +121,8 @@ export const METRICS = [
 // be scaled against the visible range rather than read as a percentage, and the
 // sort has to invert. Anything not listed defaults to the percentage rules.
 const PERCENT = { unit: "%", lowerIsBetter: false, percentage: true };
-const TOKENS = { unit: "", lowerIsBetter: true, percentage: false };
+// A bare lower-is-better count with no unit — token buckets, turns, tool calls.
+const COUNT = { unit: "", lowerIsBetter: true, percentage: false };
 export const METRIC_META = {
     composite: PERCENT,
     correctness: PERCENT,
@@ -92,9 +131,18 @@ export const METRIC_META = {
     pass5: PERCENT,
     passMax: PERCENT,
     latency: { unit: "s", lowerIsBetter: true, percentage: false },
-    inputTokens: TOKENS,
-    outputTokens: TOKENS,
-    cachedTokens: TOKENS
+    tokens: COUNT,
+    cost: { unit: "$", lowerIsBetter: true, percentage: false },
+    turns: COUNT,
+    toolCalls: COUNT,
+    // Cache hit rate is the one efficiency axis where HIGHER is better — it is a
+    // share of the prompt served cheaply, not an amount spent.
+    cacheHitRate: { unit: "%", lowerIsBetter: false, percentage: true },
+    tokensInput: COUNT,
+    tokensCached: COUNT,
+    tokensCacheWrite: COUNT,
+    tokensReasoning: COUNT,
+    tokensOutput: COUNT
 };
 
 /** Presentation rules for a metric, defaulting to the percentage rules. */
@@ -119,6 +167,9 @@ export function formatMetric(metric, value) {
     // and the column keeps a stable width across rows.
     if (percentage) return `${value.toFixed(1)}%`;
     if (unit === "s") return `${value.toFixed(1)}s`;
+    // Sub-dollar costs need three places: at two, $0.052 and $0.054 both print
+    // "$0.05" and the ranked bars read as a tie they are not.
+    if (unit === "$") return value < 1 ? `$${value.toFixed(3)}` : `$${value.toFixed(2)}`;
     // Bare counts get thousands-compacted; a leaderboard cell has no room for
     // "38412.0" and the exact figure is not what a reader is comparing.
     if (value >= 1000) return `${(value / 1000).toFixed(1)}k`;
@@ -146,26 +197,6 @@ export function metricBarFraction(metric, value, best) {
     return Math.max(0, Math.min(1, best / value));
 }
 
-/**
- * The best value among `values` for `metric`, or null when none qualifies.
- *
- * "Best" follows the metric's direction: the smallest for a lower-is-better
- * absolute metric, the largest otherwise. Non-positive readings are dropped
- * from the lower-is-better case because they are the unmeasured sentinel
- * (see `latencyOf` / `bucketSum` in seed/mock-data.mjs). That matters beyond
- * the offending row: `best` is shared by the whole column, so one 0 would trip
- * the `best <= 0` guard above and flatten EVERY bar, not just its own.
- *
- * Shared by the leaderboard (across visible setups) and the detail task table
- * (across one setup's tasks) so the two cannot drift apart.
- */
-export function bestValue(metric, values) {
-    const vals = values.filter(v => v != null && Number.isFinite(v));
-    if (!isLowerBetter(metric)) return vals.length ? Math.max(...vals) : null;
-    const positive = vals.filter(v => v > 0);
-    return positive.length ? Math.min(...positive) : null;
-}
-
 // One-line explanation per metric — the single source of truth for the score
 // tooltip (contextual to the selected metric) and each toggle button's hover.
 export const METRIC_DESCRIPTIONS = {
@@ -180,12 +211,16 @@ export const METRIC_DESCRIPTIONS = {
     pass5: "Pass@5: needs multi-iteration runs (not produced yet).",
     passMax: "Pass^5: needs multi-iteration runs (not produced yet).",
     latency: "Latency: mean agent wall-clock seconds per task. Lower is better, so the bar is scaled against the fastest setup on screen — a full bar is the fastest, half a bar is twice as slow.",
-    inputTokens:
-        "Input tokens: mean prompt tokens sent per task, including cache writes. Kept separate from output because providers bill it at a fraction of the generated rate. Lower is better.",
-    outputTokens:
-        "Output tokens: mean generated tokens per task, including reasoning tokens (a sibling of output, not a subset). The most expensive axis, and typically a few percent of the volume. Lower is better.",
-    cachedTokens:
-        "Cached tokens: mean cache-read tokens per task — prompt content billed at a steep discount. Reported by some harnesses only, so a blank cell means not reported, not zero. Lower is better."
+    tokens: "Tokens: mean total tokens per task (the provider total when reported, else the sum of the captured buckets). Lower is better.",
+    cost: "Cost: mean USD per task, from the run's own token buckets priced at the provider's published rates — input, cache reads, cache writes, output, and reasoning billed at the output rate. Stamped at ingest, so a past run keeps the rate it was billed at. Blank when the model has no rate on file.",
+    turns: "Turns: mean model round-trips per task. Not tool calls — one turn can issue several, and a text-only turn issues none.",
+    toolCalls: "Tool calls: mean tool invocations per task. The unit of agentic work; two setups with the same score and wall clock can differ several-fold here.",
+    cacheHitRate: "Cache hit rate: share of prompt tokens served from cache (cache reads ÷ fresh input + reads + writes). Higher is better — it is the same context bought at a tenth of the price.",
+    tokensInput: "Input tokens: mean fresh (non-cached) prompt tokens per task.",
+    tokensCached: "Cached tokens: mean cache-read prompt tokens per task, billed at roughly a tenth of the input rate.",
+    tokensCacheWrite: "Cache write tokens: mean cache-creation tokens per task, billed at a premium over input.",
+    tokensReasoning: "Reasoning tokens: mean thinking tokens per task. A sibling of output, not a subset — and billed at the output rate.",
+    tokensOutput: "Output tokens: mean visible completion tokens per task, excluding reasoning where the harness separates it."
 };
 
 // Description for a metric key, falling back to its label.
@@ -202,11 +237,8 @@ const METRIC_UNAVAILABLE_REASONS = {
     pass5: "Available once multi-iteration runs land",
     passMax: "Available once multi-iteration runs land",
     latency: "Not reported by these runs",
-    inputTokens: "Not reported by these runs",
-    outputTokens: "Not reported by these runs",
-    // Cache reads are the one axis a harness can legitimately omit while
-    // reporting everything else, so the reason names the harness, not the run.
-    cachedTokens: "Not reported by these harnesses"
+    tokens: "Not reported by these runs",
+    cost: "No rate on file for these models, or no per-bucket token usage to price"
 };
 
 /** Tooltip for a metric with no data in the current dataset. */
@@ -217,8 +249,8 @@ export function metricUnavailableReason(metric) {
 // Which metrics actually have any non-null value across the given setups. Used
 // by the metric toggle so pass@k buttons stay hidden until the harness
 // produces the multi-iteration runs that populate them.
-export function availableMetrics(setups) {
-    return METRICS.filter(m =>
+export function availableMetrics(setups, metrics = METRICS) {
+    return metrics.filter(m =>
         setups.some(s =>
             (s.tasks || []).some(t => t.scores?.[m] != null) ||
             (s.history || []).some(h => h.scores?.[m] != null)
