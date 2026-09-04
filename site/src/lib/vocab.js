@@ -156,7 +156,7 @@ export function isLowerBetter(metric) {
 }
 
 /**
- * Render a metric value for display: "85.4%", "42.1s", "12.3k".
+ * Render a metric value for display: "85.4%", "42.1s", "12.3k", "1.4M".
  * Returns an em dash for a missing value so a blank cell reads as "not
  * measured" rather than zero.
  */
@@ -170,9 +170,17 @@ export function formatMetric(metric, value) {
     // Sub-dollar costs need three places: at two, $0.052 and $0.054 both print
     // "$0.05" and the ranked bars read as a tie they are not.
     if (unit === "$") return value < 1 ? `$${value.toFixed(3)}` : `$${value.toFixed(2)}`;
-    // Bare counts get thousands-compacted; a leaderboard cell has no room for
-    // "38412.0" and the exact figure is not what a reader is comparing.
-    if (value >= 1000) return `${(value / 1000).toFixed(1)}k`;
+    // Bare counts get compacted; a leaderboard cell has no room for "38412.0"
+    // and the exact figure is not what a reader is comparing. Steps up to M at
+    // a million rather than running on to "1000.0k", which a reader has to
+    // count digits to size — and a suite total crosses that easily.
+    if (value >= 1000) {
+        const k = value / 1000;
+        // The step is on the ROUNDED figure, not the raw one: 999_960 divides to
+        // 999.96k, which toFixed(1) prints as "1000.0k" — the four-digit k this
+        // step exists to avoid.
+        return k >= 999.95 ? `${(k / 1000).toFixed(1)}M` : `${k.toFixed(1)}k`;
+    }
     return String(Math.round(value));
 }
 

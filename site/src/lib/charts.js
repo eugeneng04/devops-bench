@@ -9,7 +9,7 @@
 // components stay presentation.
 // =============================================================================
 
-import { setupLabel, setupScore } from "./accessors.js";
+import { setupLabel, setupScore, setupValue } from "./accessors.js";
 import { augmentationLabel, isLowerBetter } from "./vocab.js";
 
 /**
@@ -74,7 +74,7 @@ export function paretoFrontier(points, xMetric, yMetric) {
 // Assigned over the SORTED key list rather than discovery order so a setup keeps
 // its color when the leaderboard is filtered — a legend whose colors shuffle as
 // you tick a filter box is worse than no legend.
-const SERIES_PALETTE = [
+export const SERIES_PALETTE = [
     "#6366f1", "#f43f5e", "#10b981", "#f59e0b",
     "#0ea5e9", "#a855f7", "#ec4899", "#14b8a6"
 ];
@@ -124,15 +124,17 @@ export function colorSeries(setups, dimension, models, harnesses) {
  * a given chart runs.
  *
  * Setups with no value for the metric are dropped rather than ranked last: an
- * unmeasured setup is not a slow or expensive one.
+ * unmeasured setup is not a slow or expensive one. Under a task view that also
+ * drops the setups which never ran the selected task.
  *
  * @param {Setup[]} setups
  * @param {MetricKey} metric
  * @param {Record<string, {name: string}>} models
  * @param {Record<string, {name: string, accent: string}>} harnesses
+ * @param {import('./accessors.js').TaskView} [view]
  * @returns {{ setup: Setup, label: string, value: number, color: string }[]}
  */
-export function rankedBars(setups, metric, models, harnesses) {
+export function rankedBars(setups, metric, models, harnesses, view) {
     const lower = isLowerBetter(metric);
     // Same model colors the scatters use, so a setup is one color down the page.
     const colors = new Map();
@@ -143,7 +145,7 @@ export function rankedBars(setups, metric, models, harnesses) {
         .map(setup => ({
             setup,
             label: setupLabel(setup, models, harnesses),
-            value: setupScore(setup, metric),
+            value: setupValue(setup, metric, view),
             color: colors.get(setup.id) ?? SERIES_PALETTE[0]
         }))
         .filter(bar => Number.isFinite(bar.value))
@@ -172,7 +174,7 @@ export function rankedBars(setups, metric, models, harnesses) {
  * @param {MetricKey} metric
  * @param {Record<string, {name: string}>} models
  * @param {Record<string, {name: string, accent: string}>} harnesses
- * @returns {{ key: string, label: string, best: number,
+ * @returns {{ key: string, model: string, label: string, best: number,
  *             entries: { setup: Setup, harness: string, label: string, color: string,
  *                        value: number, pctVsBest: number | null }[] }[]}
  */
@@ -203,6 +205,7 @@ export function harnessComparisons(setups, metric, models, harnesses) {
             const modelName = models[g.setup.model]?.name ?? g.setup.model;
             return {
                 key: g.key,
+                model: g.setup.model,
                 label: [modelName, ...(g.augmentation.length ? g.augmentation.map(augmentationLabel) : ["Baseline"])].join(" · "),
                 best,
                 entries: g.entries
@@ -217,9 +220,9 @@ export function harnessComparisons(setups, metric, models, harnesses) {
 }
 
 /**
- * Per-task values for one setup under a metric, at its latest run — the dots in
- * the distribution strip. Tasks with no value are dropped, so the strip shows
- * what was measured rather than implying a zero.
+ * Per-task values for one setup under a metric, at its latest run. Tasks with no
+ * value are dropped, so the result shows what was measured rather than implying
+ * a zero.
  *
  * @param {Setup} setup
  * @param {MetricKey} metric
@@ -229,6 +232,94 @@ export function taskValues(setup, metric) {
     return setup.tasks
         .map(t => ({ value: t.scores[metric], task: t.name || t.folder }))
         .filter(d => Number.isFinite(d.value));
+}
+
+// Interpolating between the two order statistics a quantile falls between,
+// which is what R's type 7 and numpy's default do. A twelve-task suite puts Q1
+// and Q3 between tasks, and snapping to the nearer one would make a box a whole
+// task wider or narrower than it is.
+const quantile = (sorted, p) => {
+    const i = (sorted.length - 1) * p;
+    const lo = Math.floor(i);
+    return sorted[lo].value + (sorted[Math.ceil(i)].value - sorted[lo].value) * (i - lo);
+};
+
+/**
+ * How consistent each setup is across the suite, tightest first.
+ *
+ * Every other view on this page is a mean, and a mean cannot separate a setup
+ * that costs the same on all twelve tasks from one that is nearly free on eleven
+ * and ruinous on the twelfth. Those are the same number and not the same
+ * product, and which one you have decides whether you can budget for it.
+ *
+ * Ranked on the range RELATIVE to the median, not the raw range: a setup whose
+ * numbers are small all round would otherwise take the top of the ranking for
+ * being cheap rather than for being predictable. When the median is zero there
+ * is no ratio to take, so the raw range stands in.
+ *
+ * A setup with fewer than two measured tasks is dropped rather than ranked as
+ * perfectly consistent, which is what a single measurement would score.
+ *
+ * `worst` is the task at the bad end, which is the metric's own direction: the
+ * slowest task on latency, the lowest-scoring one on an outcome metric.
+ *
+ * @param {Setup[]} setups
+ * @param {MetricKey} metric
+ * @param {Record<string, {name: string}>} models
+ * @param {Record<string, {name: string, accent: string}>} harnesses
+ * @returns {{ setup: Setup, label: string, color: string, count: number,
+ *             min: number, q1: number, median: number, q3: number, max: number,
+ *             spread: number, worst: { value: number, task: string } }[]}
+ */
+export function taskSpreads(setups, metric, models, harnesses) {
+    const lower = isLowerBetter(metric);
+    // Same model colors the rest of the page uses, so a setup is one color down it.
+    const colors = new Map();
+    for (const series of colorSeries(setups, "model", models, harnesses)) {
+        for (const setup of series.setups) colors.set(setup.id, series.color);
+    }
+    return setups
+        .map(setup => {
+            const values = taskValues(setup, metric).sort((a, b) => a.value - b.value);
+            if (values.length < 2) return null;
+            const min = values[0];
+            const max = values[values.length - 1];
+            const median = quantile(values, 0.5);
+            return {
+                setup,
+                label: setupLabel(setup, models, harnesses),
+                color: colors.get(setup.id) ?? SERIES_PALETTE[0],
+                count: values.length,
+                min: min.value,
+                q1: quantile(values, 0.25),
+                median,
+                q3: quantile(values, 0.75),
+                max: max.value,
+                spread: median ? (max.value - min.value) / Math.abs(median) : max.value - min.value,
+                worst: lower ? max : min
+            };
+        })
+        .filter(Boolean)
+        .sort((a, b) => a.spread - b.spread);
+}
+
+/**
+ * The tasks the given setups have in common ground, as picker options — the
+ * union across setups, not the intersection, so a task only one setup ran is
+ * still selectable rather than hidden. Ordered by first appearance, which is
+ * the order the suite defines them in.
+ *
+ * @param {Setup[]} setups
+ * @returns {{ folder: string, name: string }[]}
+ */
+export function taskOptions(setups) {
+    const byFolder = new Map();
+    for (const setup of setups) {
+        for (const task of setup.tasks) {
+            if (!byFolder.has(task.folder)) byFolder.set(task.folder, task.name || task.folder);
+        }
+    }
+    return [...byFolder].map(([folder, name]) => ({ folder, name }));
 }
 
 /**

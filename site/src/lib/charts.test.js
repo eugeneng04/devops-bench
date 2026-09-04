@@ -8,6 +8,8 @@ import {
     placeLabels,
     rankedBars,
     scatterPoints,
+    taskOptions,
+    taskSpreads,
     taskValues
 } from "./charts.js";
 
@@ -287,6 +289,110 @@ describe("taskValues", () => {
             { value: 0.2, task: "Task 1" },
             { value: 0.4, task: "t3" }   // falls back to the folder when unnamed
         ]);
+    });
+});
+
+const models = { "alpha-pro": { name: "Alpha Pro" }, "beta-sonic": { name: "Beta Sonic" } };
+const harnesses = { "gemini-cli": { name: "Gemini CLI", accent: "#0ea5e9" } };
+
+// A setup whose per-task values under `cost` are exactly `values`.
+const withTasks = (id, values, over = {}) => setup(id, {}, {
+    tasks: values.map((cost, i) => ({ folder: `t${i}`, name: `Task ${i}`, scores: { cost } })),
+    ...over
+});
+
+describe("taskSpreads", () => {
+    it("ranks on the range relative to the median, not the raw range", () => {
+        // `cheap` swings 4x and `pricey` swings by a fifth. The raw range would
+        // rank cheap as the tighter of the two and call a setup predictable for
+        // being inexpensive.
+        const cheap = withTasks("cheap", [0.05, 0.10, 0.20]);
+        const pricey = withTasks("pricey", [9, 10, 11]);
+        expect(taskSpreads([cheap, pricey], "cost", models, harnesses).map(r => r.setup.id))
+            .toEqual(["pricey", "cheap"]);
+    });
+
+    it("reports the median between the ends, not the mean", () => {
+        // Eleven cheap tasks and one ruinous one: the mean is dragged toward the
+        // outlier and the median is not, which is the whole claim of the row.
+        const row = taskSpreads([withTasks("a", [...Array(11).fill(0.02), 2.2])], "cost", models, harnesses)[0];
+        expect(row.min).toBe(0.02);
+        expect(row.max).toBe(2.2);
+        expect(row.median).toBe(0.02);
+        expect(row.count).toBe(12);
+    });
+
+    it("averages the middle pair on an even task count", () => {
+        const row = taskSpreads([withTasks("a", [1, 2, 4, 5])], "cost", models, harnesses)[0];
+        expect(row.median).toBe(3);
+    });
+
+    it("boxes the middle half, interpolating a quartile that falls between tasks", () => {
+        const row = taskSpreads([withTasks("a", [1, 2, 3, 4, 5])], "cost", models, harnesses)[0];
+        expect(row).toMatchObject({ min: 1, q1: 2, median: 3, q3: 4, max: 5 });
+        // Q1 of six tasks sits a quarter of the way from the 2nd to the 3rd.
+        // Snapping to the nearer task would widen the box by a whole task.
+        const six = taskSpreads([withTasks("b", [0, 4, 8, 12, 16, 20])], "cost", models, harnesses)[0];
+        expect(six.q1).toBe(5);
+        expect(six.q3).toBe(15);
+    });
+
+    it("keeps the box inside the whiskers when one task is an outlier", () => {
+        // The claim the box plot makes over a plain range bar: eleven tasks
+        // agree and the twelfth does not, so the box stays narrow while the
+        // whisker runs out to the outlier.
+        const row = taskSpreads([withTasks("a", [...Array(11).fill(0.02), 2.2])], "cost", models, harnesses)[0];
+        expect(row.q1).toBe(0.02);
+        expect(row.q3).toBe(0.02);
+        expect(row.max).toBe(2.2);
+    });
+
+    it("names the task at the metric's own bad end", () => {
+        const s = withTasks("a", [0.1, 0.9]);
+        // Lower is better on cost, so the worst task is the dearest.
+        expect(taskSpreads([s], "cost", models, harnesses)[0].worst).toEqual({ value: 0.9, task: "Task 1" });
+        // Higher is better on an outcome score, so it flips.
+        const scored = setup("b", {}, { tasks: [
+            { folder: "t0", name: "Task 0", scores: { composite: 90 } },
+            { folder: "t1", name: "Task 1", scores: { composite: 30 } }
+        ] });
+        expect(taskSpreads([scored], "composite", models, harnesses)[0].worst).toEqual({ value: 30, task: "Task 1" });
+    });
+
+    it("drops a setup with one measured task rather than calling it perfectly consistent", () => {
+        // Zero spread off a single measurement would take the top of the ranking
+        // on no evidence at all.
+        const one = withTasks("one", [0.5]);
+        const two = withTasks("two", [0.4, 0.6]);
+        expect(taskSpreads([one, two], "cost", models, harnesses).map(r => r.setup.id)).toEqual(["two"]);
+    });
+
+    it("falls back to the raw range when the median is zero", () => {
+        const row = taskSpreads([withTasks("a", [0, 0, 3])], "cost", models, harnesses)[0];
+        expect(row.median).toBe(0);
+        expect(row.spread).toBe(3);   // a ratio to zero would be Infinity
+    });
+});
+
+describe("taskOptions", () => {
+    it("unions the tasks across setups, so one only a single setup ran is still offered", () => {
+        const a = setup("a", {}, { tasks: [
+            { folder: "t1", name: "Task 1", scores: {} },
+            { folder: "t2", name: "Task 2", scores: {} }
+        ] });
+        const b = setup("b", {}, { tasks: [
+            { folder: "t2", name: "Task 2", scores: {} },
+            { folder: "t3", name: "", scores: {} }
+        ] });
+        expect(taskOptions([a, b])).toEqual([
+            { folder: "t1", name: "Task 1" },
+            { folder: "t2", name: "Task 2" },
+            { folder: "t3", name: "t3" }   // falls back to the folder when unnamed
+        ]);
+    });
+
+    it("is empty for no setups, so the picker can hide itself", () => {
+        expect(taskOptions([])).toEqual([]);
     });
 });
 

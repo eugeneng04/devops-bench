@@ -3,6 +3,7 @@
 // renderFilterGroup in app.js.
 
 import { anyFilterActive } from "../lib/filters.js";
+import { BrandLogo, HarnessIcon } from "./Logo.jsx";
 
 function FilterGroup({ group, filterState, onToggle }) {
     if (group.options.length === 0) return null;
@@ -28,8 +29,13 @@ function FilterGroup({ group, filterState, onToggle }) {
                         type="button"
                         onClick={() => onToggle(group.key, opt.value)}
                         aria-pressed={active}
-                        className={`${sizeCls} rounded-full border font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1 dark:focus-visible:ring-offset-slate-900 ${cls}`}
+                        className={`${sizeCls} rounded-full border font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1 dark:focus-visible:ring-offset-slate-900 inline-flex items-center gap-1.5 ${cls}`}
                     >
+                        {/* The mark is the same one the leaderboard row and the
+                            charts draw, so a chip and a bar are recognisably the
+                            same thing. Options without one just show text. */}
+                        {opt.model ? <BrandLogo logo={opt.model.logo} /> : null}
+                        {opt.harness ? <HarnessIcon harness={opt.harness} /> : null}
                         {opt.text}
                     </button>
                 );

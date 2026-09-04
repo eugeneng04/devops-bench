@@ -94,6 +94,15 @@ describe("formatMetric", () => {
         expect(formatMetric("tokens", 850)).toBe("850");
     });
 
+    it("steps up to millions instead of running on to a four-digit k", () => {
+        expect(formatMetric("tokens", 1_400_000)).toBe("1.4M");
+        expect(formatMetric("tokens", 12_345_678)).toBe("12.3M");
+        expect(formatMetric("tokens", 999_000)).toBe("999.0k");   // still k
+        // The step is on the rounded figure: this divides to 999.96k, which
+        // would otherwise print as "1000.0k".
+        expect(formatMetric("tokens", 999_960)).toBe("1.0M");
+    });
+
     it("keeps sub-dollar costs legible instead of rounding them to $0.00", () => {
         // Per-task cost spans a fraction of a cent to several dollars. At two
         // decimals a cached Haiku task and a free one both read "$0.00".

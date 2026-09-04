@@ -8,6 +8,12 @@
 //
 // A model that ran on one harness only is omitted rather than drawn as a lone
 // full bar, which would read as a win over nothing.
+//
+// The legend is HTML rather than Chart.js's own: the y-axis labels name the
+// model, so the legend is the ONLY place a bar's harness is stated, and colour
+// alone is a poor key once two accents are close or the reader cannot tell them
+// apart. Rendering it outside the canvas lets it carry the same glyph the rest
+// of the dashboard uses for that harness.
 
 import { useMemo } from "react";
 import { Bar } from "react-chartjs-2";
@@ -21,12 +27,16 @@ import {
 } from "chart.js";
 import { harnessComparisons } from "../lib/charts.js";
 import { METRIC_LABELS, formatMetric, isLowerBetter } from "../lib/vocab.js";
+import { setupIconsPlugin, iconGutter } from "../lib/chartIcons.js";
 import { useIsDark } from "../hooks/useIsDark.js";
+import { HarnessIcon } from "./Logo.jsx";
 
 Chart.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 const BAR_PX = 26;
-const CHROME_PX = 90;
+// Chart chrome only — the HTML legend sits outside the canvas and takes its own
+// space, so the canvas no longer has to reserve room for one.
+const CHROME_PX = 56;
 
 // "+180%" reads as more of a good thing; on cost it is the opposite. Say which.
 function pctText(metric, pct) {
@@ -53,11 +63,21 @@ export function HarnessSavingsChart({ setups, metric, models, harnesses, ariaLab
         const byHarness = new Map();
         for (const g of groups) {
             for (const e of g.entries) {
-                if (!byHarness.has(e.harness)) byHarness.set(e.harness, { key: e.harness, label: e.label, color: e.color });
+                if (!byHarness.has(e.harness)) {
+                    byHarness.set(e.harness, {
+                        key: e.harness,
+                        label: e.label,
+                        color: e.color,
+                        // The glyph is keyed off the catalog entry, so a harness
+                        // the catalog does not carry falls back to colour alone
+                        // rather than borrowing another runner's mark.
+                        harness: harnesses[e.harness]
+                    });
+                }
             }
         }
         return [...byHarness.values()];
-    }, [groups]);
+    }, [groups, harnesses]);
 
     const data = useMemo(() => ({
         labels: groups.map(g => g.label),
@@ -75,11 +95,12 @@ export function HarnessSavingsChart({ setups, metric, models, harnesses, ariaLab
         indexAxis: "y",
         responsive: true,
         maintainAspectRatio: false,
+        // One mark only: each row is a model, and the harnesses are the bars
+        // within it rather than a property of the row.
+        layout: { padding: { left: iconGutter(1) } },
         plugins: {
-            legend: {
-                position: "bottom",
-                labels: { color: textColor, usePointStyle: true, boxWidth: 8, padding: 16, font: { size: 11, weight: "500" } }
-            },
+            legend: { display: false },   // rendered as HTML below, with the harness glyphs
+            setupIcons: { slots: 1, rowAt: (_tick, i) => groups[i] && { model: models[groups[i].model] } },
             tooltip: {
                 callbacks: {
                     label: ctx => {
@@ -102,7 +123,7 @@ export function HarnessSavingsChart({ setups, metric, models, harnesses, ariaLab
                 ticks: { color: textColor, font: { size: 10 }, autoSkip: false, crossAlign: "far" }
             }
         }
-    }), [textColor, gridColor, groups, metric]);
+    }), [textColor, gridColor, groups, metric, models]);
 
     if (!groups.length) {
         return (
@@ -116,8 +137,21 @@ export function HarnessSavingsChart({ setups, metric, models, harnesses, ariaLab
     const barCount = groups.reduce((n, g) => n + g.entries.length, 0);
 
     return (
-        <div style={{ height: barCount * BAR_PX + CHROME_PX }}>
-            <Bar data={data} options={options} role="img" aria-label={ariaLabel} />
+        <div>
+            <div style={{ height: barCount * BAR_PX + CHROME_PX }}>
+                <Bar data={data} options={options} plugins={[setupIconsPlugin]} role="img" aria-label={ariaLabel} />
+            </div>
+            {/* aria-hidden: the sr-only table below names the harness on every
+                row, so a screen reader gets the mapping without this key. */}
+            <ul aria-hidden="true" className="flex flex-wrap justify-center gap-x-5 gap-y-2 mt-3">
+                {series.map(s => (
+                    <li key={s.key} className="flex items-center gap-1.5 text-[11px] font-medium text-slate-600 dark:text-slate-300">
+                        {s.harness ? <HarnessIcon harness={s.harness} /> : null}
+                        <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: s.color }} />
+                        {s.label}
+                    </li>
+                ))}
+            </ul>
             <table className="sr-only">
                 {caption ? <caption>{caption}</caption> : null}
                 <thead>
