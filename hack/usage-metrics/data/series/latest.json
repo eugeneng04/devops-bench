@@ -2,16 +2,20 @@
   "apiVersion": "usage-metrics/v1",
   "kind": "UsageSeries",
   "formatVersion": 1,
-  "generatedAt": "2026-09-03T10:10:08Z",
+  "generatedAt": "2026-09-07T10:46:27Z",
   "provenance": {
-    "collectorSha": "3327be0c257931b187d0bb67c1de9e70237a54e7",
-    "workflowRunUrl": "https://github.com/eugeneng04/devops-bench/actions/runs/33742250999",
-    "writtenAt": "2026-09-03T10:10:08Z"
+    "collectorSha": "10b897d9d2e1dd469ae9d4432028041133a82312",
+    "workflowRunUrl": "https://github.com/eugeneng04/devops-bench/actions/runs/34112774776",
+    "writtenAt": "2026-09-07T10:46:27Z"
   },
   "unreadable": [
     {
       "date": "2026-08-11",
       "reason": "snapshot: no formatVersion. Snapshots written before the store existed are format 1 and are not readable by this program."
+    },
+    {
+      "date": "2026-09-07",
+      "reason": "classification failed: KeyError('totalCount')"
     }
   ],
   "runs": [
