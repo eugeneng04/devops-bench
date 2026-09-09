@@ -7,6 +7,7 @@ import { useBenchmark } from "../context/BenchmarkContext.jsx";
 import { buildFilterGroups, getFilteredSetups, emptyFilterState } from "../lib/filters.js";
 import { setupScore, compareByName } from "../lib/accessors.js";
 import { METRIC_LABELS, availableMetrics, metricDescription, isLowerBetter, bestValue } from "../lib/vocab.js";
+import { ChartsPanel } from "../components/ChartsPanel.jsx";
 import { FilterBar } from "../components/FilterBar.jsx";
 import { LeaderboardRow } from "../components/LeaderboardRow.jsx";
 import { MetricToggle } from "../components/MetricToggle.jsx";
@@ -211,6 +212,10 @@ export function Leaderboard() {
                         caption={`${METRIC_LABELS[metric]} trend over time data summary`}
                     />
                 </section>
+            )}
+
+            {!loading && !error && filtered.length > 0 && (
+                <ChartsPanel setups={filtered} models={models} harnesses={harnesses} />
             )}
         </main>
     );

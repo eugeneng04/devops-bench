@@ -37,7 +37,11 @@ export const METRIC_LABELS = {
     latency: "Latency",
     inputTokens: "Input Tokens",
     outputTokens: "Output Tokens",
-    cachedTokens: "Cached Tokens"
+    cachedTokens: "Cached Tokens",
+    // Chart-only: the three buckets summed. Never a leaderboard column (see
+    // METRICS) — billed at different rates, so a rank on the sum would treat a
+    // cache-heavy setup as if it cost the same per token as a cache-poor one.
+    tokens: "Total Tokens"
 };
 
 // Abbreviated labels for the metric toggle only, where ten buttons compete for
@@ -77,6 +81,27 @@ export const METRICS = [
     "cachedTokens"
 ];
 
+// Metrics offered as a chart axis, grouped for the axis pickers on the charts
+// panel below the leaderboard. `tokens` (the summed buckets) lives only here,
+// not in METRICS: it is a chart aggregate, not a leaderboard column.
+export const METRIC_GROUPS = [
+    { key: "quality", label: "Quality", metrics: ["composite", "correctness", "recoverableSafety", "pass1", "pass5", "passMax"] },
+    { key: "efficiency", label: "Efficiency", metrics: ["latency", "tokens", "inputTokens", "outputTokens", "cachedTokens"] }
+];
+
+/** Every plottable metric, in group order. */
+export const CHART_METRICS = METRIC_GROUPS.flatMap(g => g.metrics);
+
+// The billed token buckets, in the order they stack.
+export const TOKEN_BUCKET_METRICS = ["inputTokens", "outputTokens", "cachedTokens"];
+
+// One color per bucket, held constant across the stack and its legend.
+export const TOKEN_BUCKET_COLORS = {
+    inputTokens: "#f59e0b",
+    outputTokens: "#3b82f6",
+    cachedTokens: "#10b981"
+};
+
 // Per-metric presentation rules. Quality metrics are 0..100 percentages where
 // higher is better; efficiency metrics are absolute magnitudes (seconds, token
 // counts) where LOWER is better and the value can exceed 100 — so the bar has to
@@ -94,7 +119,8 @@ export const METRIC_META = {
     latency: { unit: "s", lowerIsBetter: true, percentage: false },
     inputTokens: TOKENS,
     outputTokens: TOKENS,
-    cachedTokens: TOKENS
+    cachedTokens: TOKENS,
+    tokens: TOKENS
 };
 
 /** Presentation rules for a metric, defaulting to the percentage rules. */
@@ -185,7 +211,9 @@ export const METRIC_DESCRIPTIONS = {
     outputTokens:
         "Output tokens: mean generated tokens per task, including reasoning tokens (a sibling of output, not a subset). The most expensive axis, and typically a few percent of the volume. Lower is better.",
     cachedTokens:
-        "Cached tokens: mean cache-read tokens per task — prompt content billed at a steep discount. Reported by some harnesses only, so a blank cell means not reported, not zero. Lower is better."
+        "Cached tokens: mean cache-read tokens per task — prompt content billed at a steep discount. Reported by some harnesses only, so a blank cell means not reported, not zero. Lower is better.",
+    tokens:
+        "Total tokens: mean input, output and cached tokens per task, summed. A chart-only aggregate — never a leaderboard column, since the three buckets are billed at different rates and a rank on the sum would treat them as interchangeable."
 };
 
 // Description for a metric key, falling back to its label.

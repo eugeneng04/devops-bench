@@ -74,6 +74,25 @@ export function setupTags(setup) {
     }));
 }
 
+// The three billed buckets a task's total is summed from. Kept local rather
+// than imported from vocab.js's TOKEN_BUCKET_METRICS, so this file has no
+// import cycle with the chart libs that also read that list.
+const TOTAL_TOKEN_BUCKETS = ["inputTokens", "outputTokens", "cachedTokens"];
+
+// Sum of the three token buckets per task (a task missing all three is
+// dropped, not treated as zero), then meaned across tasks — the same
+// null-handling setupScore gives every other metric. `tokens` is a CHART-only
+// aggregate (see vocab.js METRIC_GROUPS): it is never a leaderboard column,
+// because ranking on a summed count would treat a cache-heavy run as if it
+// cost the same per token as a cache-poor one.
+function totalTokensScore(setup) {
+    const perTask = setup.tasks
+        .map(t => TOTAL_TOKEN_BUCKETS.map(k => t.scores[k]).filter(v => v != null))
+        .filter(parts => parts.length)
+        .map(parts => parts.reduce((a, b) => a + b, 0));
+    return perTask.length ? perTask.reduce((a, b) => a + b, 0) / perTask.length : null;
+}
+
 // Aggregated headline score for a setup under the selected metric. Mean over
 // tasks; null-safe (ignores tasks with no score); null if no scored tasks.
 /**
@@ -82,6 +101,7 @@ export function setupTags(setup) {
  * @returns {number | null}
  */
 export function setupScore(setup, metric) {
+    if (metric === "tokens") return totalTokensScore(setup);
     const vals = setup.tasks.map(t => t.scores[metric]).filter(v => v != null);
     return vals.length ? vals.reduce((sum, v) => sum + v, 0) / vals.length : null;
 }
