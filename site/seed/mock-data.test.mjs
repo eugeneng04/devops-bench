@@ -1,5 +1,22 @@
 import { describe, it, expect } from "vitest";
-import { generateRaw, derive, passAtK, PASS_THRESHOLD } from "./mock-data.mjs";
+import { generateRaw, derive, passAtK, PASS_THRESHOLD, inputTokensOf } from "./mock-data.mjs";
+
+describe("inputTokensOf", () => {
+    it("adds input tokens and cache write tokens", () => {
+        expect(inputTokensOf({ inputTokens: 58, cacheWriteTokens: 225457 })).toBe(225515);
+    });
+
+    it("falls back to input tokens alone when cache write is absent", () => {
+        expect(inputTokensOf({ inputTokens: 356438 })).toBe(356438);
+        expect(inputTokensOf({ inputTokens: 356438, cacheWriteTokens: null })).toBe(356438);
+    });
+
+    it("treats zero or unmeasured as null", () => {
+        expect(inputTokensOf({ inputTokens: 0, cacheWriteTokens: 0 })).toBeNull();
+        expect(inputTokensOf({ inputTokens: null, cacheWriteTokens: null })).toBeNull();
+        expect(inputTokensOf({})).toBeNull();
+    });
+});
 
 describe("passAtK", () => {
     it("is 0 when there are no passes", () => {

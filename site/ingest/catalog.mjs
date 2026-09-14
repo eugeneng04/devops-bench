@@ -24,25 +24,29 @@ export const MODELS = {
     "alpha-pro":        { name: "Alpha Pro",        provider: "Acme",      license: "Proprietary", logo: "alpha" },
     "beta-sonic":       { name: "Beta Sonic",       provider: "Globex",    license: "Proprietary", logo: "beta" },
     "gamma-coder":      { name: "Gamma Coder",      provider: "Initech",   license: "Open Source", logo: "gamma" },
-    "gemini-3.1-pro":   { name: "Gemini 3.1 Pro",   provider: "Google",    license: "Proprietary", logo: "gemini" },
-    "gemini-3.5-flash": { name: "Gemini 3.5 Flash", provider: "Google",    license: "Proprietary", logo: "gemini" },
-    "gemini-3.7-flash": { name: "Gemini 3.7 Flash", provider: "Google",    license: "Proprietary", logo: "gemini" },
-    "claude-opus-5":    { name: "Claude Opus 5",    provider: "Anthropic", license: "Proprietary", logo: "claude" },
-    "claude-opus-4-8":  { name: "Claude Opus 4.8",  provider: "Anthropic", license: "Proprietary", logo: "claude" },
-    "claude-sonnet-5":  { name: "Claude Sonnet 5",  provider: "Anthropic", license: "Proprietary", logo: "claude" },
-    "claude-haiku-4-5": { name: "Claude Haiku 4.5", provider: "Anthropic", license: "Proprietary", logo: "claude" },
-    "claude-fable-5":   { name: "Claude Fable 5",   provider: "Anthropic", license: "Proprietary", logo: "claude" },
-    "gpt-5.6-sol":      { name: "GPT-5.6 Sol",      provider: "OpenAI",    license: "Proprietary", logo: "openai" }
+    "gemini-3.1-pro":   { name: "Gemini 3.1 Pro",   provider: "Google",    license: "Proprietary", logo: "google" },
+    "gemini-3.5-flash": { name: "Gemini 3.5 Flash", provider: "Google",    license: "Proprietary", logo: "google" },
+    "gemini-3.7-flash": { name: "Gemini 3.7 Flash", provider: "Google",    license: "Proprietary", logo: "google" },
+    "gemini-3.8-flash": { name: "Gemini 3.8 Flash", provider: "Google",    license: "Proprietary", logo: "google" },
+    "claude-opus-5":    { name: "Claude Opus 5",    provider: "Anthropic", license: "Proprietary", logo: "anthropic" },
+    "claude-opus-4-8":  { name: "Claude Opus 4.8",  provider: "Anthropic", license: "Proprietary", logo: "anthropic" },
+    "claude-sonnet-5":  { name: "Claude Sonnet 5",  provider: "Anthropic", license: "Proprietary", logo: "anthropic" },
+    "claude-haiku-4-5": { name: "Claude Haiku 4.5", provider: "Anthropic", license: "Proprietary", logo: "anthropic" },
+    "claude-fable-5-1": { name: "Claude Fable 5.1", provider: "Anthropic", license: "Proprietary", logo: "anthropic" },
+    "claude-fable-5":   { name: "Claude Fable 5.1", provider: "Anthropic", license: "Proprietary", logo: "anthropic" },
+    "gpt-5.6-sol":      { name: "GPT-5.6 Sol",      provider: "OpenAI",    license: "Proprietary", logo: "openai" },
+    "qwen3.8-27b-fp8":  { name: "qwen3.8-27b-fp8",  provider: "Alibaba",   license: "Open Source", logo: "qwen" }
 };
 
 /** @type {Record<string, {name: string, type: "cli"|"api", accent: string, logo: string}>} */
 export const HARNESSES = {
     "gemini-cli":  { name: "Gemini CLI",  type: "cli", accent: "#0ea5e9", logo: "terminal" },
     "kubeagents":  { name: "KubeAgents",  type: "cli", accent: "#14b8a6", logo: "cluster" },
-    "claude-code": { name: "Claude Code", type: "cli", accent: "#d97757", logo: "terminal" },
+    "claude-code": { name: "Claude Code", type: "cli", accent: "#d97757", logo: "anthropic" },
+    "claude_code": { name: "Claude Code", type: "cli", accent: "#d97757", logo: "anthropic" },
     "openclaw":    { name: "OpenClaw",    type: "cli", accent: "#f43f5e", logo: "claw" },
     "api-loop":    { name: "API Runner",  type: "api", accent: "#8b5cf6", logo: "braces" },
-    "antigravity": { name: "Antigravity", type: "cli", accent: "#f59e0b", logo: "arrow-up" }
+    "antigravity": { name: "Antigravity", type: "cli", accent: "#f59e0b", logo: "google" }
 };
 
 // --- raw identity -> curated id ----------------------------------------------
@@ -61,6 +65,9 @@ export const MODEL_ALIASES = {
     "gemini-3.1-pro-preview": "gemini-3.1-pro",
     "gemini-3.5-flash": "gemini-3.5-flash",
     "gemini-3.7-flash": "gemini-3.7-flash",
+    "gemini-3.7-flash-high": "gemini-3.7-flash",
+    "gemini-3.8-flash": "gemini-3.8-flash",
+    "gemini-3.8-flash-high": "gemini-3.8-flash",
     // Anthropic. The bare keys cover dated snapshots and the `[1m]` long-context
     // suffix via substring matching; both bill at the same rate, so the suffix
     // needs no entry of its own.
@@ -68,8 +75,22 @@ export const MODEL_ALIASES = {
     "claude-opus-4-8": "claude-opus-4-8",
     "claude-sonnet-5": "claude-sonnet-5",
     "claude-haiku-4-5": "claude-haiku-4-5",
+    "claude-fable-5-1": "claude-fable-5-1",
+    "claude-fable-5.1": "claude-fable-5-1",
     "claude-fable-5": "claude-fable-5",
+    "fable-5.1": "claude-fable-5-1",
+    "fable-5-1": "claude-fable-5-1",
+    "fable51": "claude-fable-5-1",
+    "fable": "claude-fable-5-1",
     "gpt-5.6-sol": "gpt-5.6-sol",
+    "qwen3.8-27b-fp8": "qwen3.8-27b-fp8",
+    "qwen-3.8-27b-fp8": "qwen3.8-27b-fp8",
+    "qwen3.8": "qwen3.8-27b-fp8",
+    "qwen-3.8": "qwen3.8-27b-fp8",
+    "qwen-3.7": "qwen3.8-27b-fp8",
+    "qwen3.7": "qwen3.8-27b-fp8",
+    "qwen-3-7": "qwen3.8-27b-fp8",
+    "qwen": "qwen3.8-27b-fp8",
     // Claude Code's tier shorthands, which is what AGENT_MODEL carries on a
     // subscription CLI run. They name a TIER, not a version — the CLI resolves
     // each to whatever is current — so they point at today's default. A run whose
@@ -98,6 +119,7 @@ export const HARNESS_ALIASES = {
     "binary": "gemini-cli",
     "claude": "claude-code",
     "claude-code": "claude-code",
+    "claude_code": "claude-code",
     "openclaw": "openclaw",
     "claw": "openclaw",
     "kubeagents": "kubeagents",
@@ -154,11 +176,18 @@ export function resolveModel(agentModel, agentProvider) {
 
     // Unknown model: keep it visible with a synthesized entry.
     const fallbackKey = key || slugify(raw) || "unknown-model";
+    const provLower = String(agentProvider || "").toLowerCase();
+    const isQwen = provLower.includes("alibaba") || provLower.includes("qwen") || lower.includes("qwen");
+    const fallbackLogo = provLower.includes("google") ? "google"
+        : provLower.includes("anthropic") ? "anthropic"
+        : provLower.includes("openai") ? "openai"
+        : isQwen ? "qwen"
+        : "alpha";
     const meta = MODELS[fallbackKey] || {
         name: raw || "Unknown Model",
-        provider: String(agentProvider || "").trim() || "Unknown",
-        license: "Unknown",
-        logo: "alpha"
+        provider: String(agentProvider || "").trim() || (isQwen ? "Alibaba" : "Unknown"),
+        license: isQwen ? "Open Source" : "Unknown",
+        logo: fallbackLogo
     };
     return { key: fallbackKey, meta, known: false };
 }

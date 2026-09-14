@@ -56,7 +56,10 @@ export type EfficiencyMetricKey =
     | "tokensCached"
     | "tokensCacheWrite"
     | "tokensReasoning"
-    | "tokensOutput";
+    | "tokensOutput"
+    | "inputTokens"
+    | "outputTokens"
+    | "cachedTokens";
 
 export type MetricKey = QualityMetricKey | EfficiencyMetricKey;
 
@@ -89,6 +92,24 @@ export interface Harness {
     logo: string;
 }
 
+/** One check behind a fired catastrophic gate. */
+export interface CatastrophicDetail {
+    /**
+     * The check's identity as its own layer names it. Present for
+     * verification entries (the task author's safeguard name, e.g.
+     * "container-image-set@checkout.wl"). Absent for integrity entries,
+     * which have no per-check identity.
+     */
+    name?: string;
+    /**
+     * Single-line, <= 240 chars. UNTRUSTED.
+     * "" means no reason was recorded, never "there was no reason".
+     */
+    reason: string;
+    /** 1-based trial number when aggregated across multiple trials. */
+    trial?: number;
+}
+
 /** Per-task scores at the latest run — the detail-page table rows. */
 export interface Task {
     folder: string;
@@ -96,6 +117,10 @@ export interface Task {
     scores: Scores;
     /** True when a catastrophic tripwire fired for this task (cat_v = 0). */
     catastrophic?: boolean;
+    /** Gate names that fired across catastrophic trials for this task. */
+    catastrophicKinds?: string[];
+    /** Per-gate details of fired catastrophic checks for this task. */
+    catastrophicDetails?: Record<string, CatastrophicDetail[]>;
 }
 
 /** One aggregate point per run (mean across tasks), time-ordered. */
@@ -179,6 +204,13 @@ export interface ResultRow {
     recoverableSafetyScore?: number | null;
     /** True when a catastrophic tripwire fired (cat_v = 0), zeroing the outcome. */
     catastrophic?: boolean;
+    /** Gate names that fired on this run (e.g. ["VerificationCatastrophic"]). */
+    catastrophicKinds?: string[];
+    /**
+     * Keyed by gate name. Keys are always a subset of catastrophicKinds.
+     * `{}` when no gate fired, and also `{}` on rows written before this field existed.
+     */
+    catastrophicDetails?: Record<string, CatastrophicDetail[]>;
     /** Scoring-framework version that produced `outcomeScore` (e.g. "v1"). */
     scoringVersion?: string;
     /** Tool-use score in [0,1]; null when unscored. */

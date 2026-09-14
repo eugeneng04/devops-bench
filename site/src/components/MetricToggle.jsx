@@ -17,51 +17,63 @@
 // again. Letting buttons wrap inside a pill makes overflow impossible at any
 // width; the group split only decides where the break lands first.
 
-import { METRICS, METRIC_LABELS, metricDescription, metricMeta, metricShortLabel, metricUnavailableReason } from "../lib/vocab.js";
+import { METRICS, METRIC_LABELS, metricDescription, metricShortLabel, metricUnavailableReason } from "../lib/vocab.js";
 
-// Quality metrics first, then efficiency, each preserving METRICS order. Empty
-// groups are dropped so a vocab with only one family renders a single pill.
-function metricGroups() {
-    const quality = METRICS.filter(m => metricMeta(m).percentage);
-    const efficiency = METRICS.filter(m => !metricMeta(m).percentage);
-    return [quality, efficiency].filter(g => g.length > 0);
-}
+export const METRIC_ROW_GROUPS = [
+    {
+        key: "outcome",
+        label: "Outcome",
+        metrics: ["composite", "correctness", "recoverableSafety"]
+    },
+    {
+        key: "passRates",
+        label: "Pass Rates",
+        metrics: ["pass1", "pass5", "passMax"]
+    },
+    {
+        key: "efficiency",
+        label: "Efficiency",
+        metrics: ["latency", "tokens", "inputTokens", "outputTokens", "cachedTokens", "cost"]
+    }
+];
 
 export function MetricToggle({ value, onChange, available }) {
     const hasFilter = Array.isArray(available) && available.length > 0;
     const isEnabled = m => !hasFilter || available.includes(m);
     return (
-        <div className="flex flex-wrap items-center gap-1.5 min-w-0 max-w-full">
-            {metricGroups().map(group => (
-                <div
-                    key={group[0]}
-                    className="inline-flex flex-wrap p-0.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-[11px]"
-                >
-                    {group.map(m => {
-                        const active = m === value;
-                        const enabled = isEnabled(m);
-                        const cls = active
-                            ? "bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 shadow-sm"
-                            : enabled
-                                ? "text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100"
-                                : "text-slate-300 dark:text-slate-600";
-                        return (
-                            <button
-                                key={m}
-                                type="button"
-                                onClick={() => enabled && onChange(m)}
-                                disabled={!enabled}
-                                aria-pressed={active}
-                                // The visible text may be abbreviated to fit; the
-                                // accessible name stays the full metric label.
-                                aria-label={METRIC_LABELS[m]}
-                                title={enabled ? metricDescription(m) : metricUnavailableReason(m)}
-                                className={`px-2 py-1 font-medium rounded-md whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900 disabled:cursor-not-allowed ${cls}`}
-                            >
-                                {metricShortLabel(m)}
-                            </button>
-                        );
-                    })}
+        <div className="flex flex-col gap-2 min-w-0 max-w-full">
+            {METRIC_ROW_GROUPS.map(group => (
+                <div key={group.key} className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2.5 min-w-0">
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 w-20 shrink-0 select-none">
+                        {group.label}
+                    </span>
+                    <div className="inline-flex flex-wrap p-0.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-[11px]">
+                        {group.metrics.map(m => {
+                            const active = m === value;
+                            const enabled = isEnabled(m);
+                            const cls = active
+                                ? "bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 shadow-sm"
+                                : enabled
+                                    ? "text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100"
+                                    : "text-slate-300 dark:text-slate-600";
+                            return (
+                                <button
+                                    key={m}
+                                    type="button"
+                                    onClick={() => enabled && onChange(m)}
+                                    disabled={!enabled}
+                                    aria-pressed={active}
+                                    // The visible text may be abbreviated to fit; the
+                                    // accessible name stays the full metric label.
+                                    aria-label={METRIC_LABELS[m]}
+                                    title={enabled ? metricDescription(m) : metricUnavailableReason(m)}
+                                    className={`px-2 py-1 font-medium rounded-md whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900 disabled:cursor-not-allowed ${cls}`}
+                                >
+                                    {metricShortLabel(m)}
+                                </button>
+                            );
+                        })}
+                    </div>
                 </div>
             ))}
         </div>

@@ -93,7 +93,7 @@ export function TokenBreakdownChart({ setups, models, harnesses, task, aggregate
         indexAxis: "y",
         responsive: true,
         maintainAspectRatio: false,
-        interaction: { mode: "index", intersect: false },
+        interaction: { mode: "index", axis: "y", intersect: false },
         layout: { padding: { left: iconGutter(2) } },
         plugins: {
             setupIcons: { slots: 2, rowAt: (_tick, i) => plotted[i] && { model: models[plotted[i].setup.model], harness: harnesses[plotted[i].setup.harness] } },

@@ -55,6 +55,43 @@ export function setupTags(setup) {
     }));
 }
 
+// Resolve metric aliases so both inputTokens <-> tokensInput, etc. resolve smoothly.
+export const METRIC_ALIASES = {
+    inputTokens: "tokensInput",
+    tokensInput: "inputTokens",
+    outputTokens: "tokensOutput",
+    tokensOutput: "outputTokens",
+    cachedTokens: "tokensCached",
+    tokensCached: "cachedTokens"
+};
+
+// Canonical token buckets that sum to a task's total tokens.
+// Checks both new prefixed names and standard Firestore bucket names.
+const TOKEN_SUM_BUCKETS = [
+    ["tokensInput", "inputTokens"],
+    ["tokensOutput", "outputTokens"],
+    ["tokensCached", "cachedTokens"],
+    ["tokensReasoning", "reasoningTokens"],
+    ["tokensCacheWrite", "cacheWriteTokens"]
+];
+
+function taskTokensTotal(scores) {
+    const parts = TOKEN_SUM_BUCKETS.map(
+        ([a, b]) => scores[a] ?? scores[b]
+    ).filter(v => typeof v === "number" && Number.isFinite(v));
+    return parts.length ? parts.reduce((sum, v) => sum + v, 0) : null;
+}
+
+export function scoreOf(scores, metric) {
+    if (!scores) return null;
+    if (scores[metric] != null) return scores[metric];
+    if (metric === "cost" && scores.costUsd != null) return scores.costUsd;
+    const alias = METRIC_ALIASES[metric];
+    if (alias && scores[alias] != null) return scores[alias];
+    if (metric === "tokens") return taskTokensTotal(scores);
+    return null;
+}
+
 // Aggregated headline score for a setup under the selected metric. Mean over
 // tasks; null-safe (ignores tasks with no score); null if no scored tasks.
 /**
@@ -63,7 +100,7 @@ export function setupTags(setup) {
  * @returns {number | null}
  */
 export function setupScore(setup, metric) {
-    const vals = setup.tasks.map(t => t.scores[metric]).filter(v => v != null);
+    const vals = setup.tasks.map(t => scoreOf(t.scores, metric)).filter(v => v != null);
     return vals.length ? vals.reduce((sum, v) => sum + v, 0) / vals.length : null;
 }
 
@@ -81,7 +118,7 @@ export function setupScore(setup, metric) {
  * @returns {number | null}
  */
 export function setupTotal(setup, metric) {
-    const vals = setup.tasks.map(t => t.scores[metric]).filter(v => v != null);
+    const vals = setup.tasks.map(t => scoreOf(t.scores, metric)).filter(v => v != null);
     return vals.length ? vals.reduce((sum, v) => sum + v, 0) : null;
 }
 
@@ -100,7 +137,7 @@ export function setupValue(setup, metric, view = {}) {
     const { task = null, aggregate = "mean" } = view;
     // A single task has one value, so mean and total coincide and `aggregate`
     // does not apply.
-    if (task) return setup.tasks.find(t => t.folder === task)?.scores[metric] ?? null;
+    if (task) return scoreOf(setup.tasks.find(t => t.folder === task)?.scores, metric);
     return aggregate === "total" ? setupTotal(setup, metric) : setupScore(setup, metric);
 }
 
@@ -112,7 +149,7 @@ export function setupValue(setup, metric, view = {}) {
  * @returns {{ x: number, y: number | null }[]}
  */
 export function setupHistory(setup, metric) {
-    return setup.history.map(h => ({ x: Date.parse(h.t), y: h.scores[metric] }));
+    return setup.history.map(h => ({ x: Date.parse(h.t), y: scoreOf(h.scores, metric) }));
 }
 
 // Sorted union of run timestamps (ISO) across the given setups. Used to build a

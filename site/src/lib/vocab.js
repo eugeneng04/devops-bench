@@ -44,7 +44,10 @@ export const METRIC_LABELS = {
     tokensCached: "Cached Tokens",
     tokensCacheWrite: "Cache Write Tokens",
     tokensReasoning: "Reasoning Tokens",
-    tokensOutput: "Output Tokens"
+    tokensOutput: "Output Tokens",
+    inputTokens: "Input Tokens",
+    outputTokens: "Output Tokens",
+    cachedTokens: "Cached Tokens"
 };
 
 // Abbreviated labels for the metric toggle only, where eight buttons compete for
@@ -53,13 +56,19 @@ export const METRIC_LABELS = {
 // tooltips and the accessible name of the button all keep the full METRIC_LABELS
 // text — this shortens the visible glyphs, not the vocabulary.
 const METRIC_SHORT_LABELS = {
+    composite: "Overall Score",
     recoverableSafety: "Rec. Safety",
     cacheHitRate: "Cache Hits",
-    tokensInput: "Input",
-    tokensCached: "Cached",
+    tokensInput: "I/P Tokens",
+    tokensCached: "Cached Tokens",
     tokensCacheWrite: "Cache Write",
     tokensReasoning: "Reasoning",
-    tokensOutput: "Output"
+    tokensOutput: "O/P Tokens",
+    inputTokens: "I/P Tokens",
+    outputTokens: "O/P Tokens",
+    cachedTokens: "Cached Tokens",
+    tokens: "Tokens",
+    cost: "Cost"
 };
 
 /** Toggle-button text for a metric, falling back to the full label. */
@@ -78,6 +87,9 @@ export const METRICS = [
     "passMax",
     "latency",
     "tokens",
+    "inputTokens",
+    "outputTokens",
+    "cachedTokens",
     "cost"
 ];
 
@@ -95,9 +107,10 @@ export const METRIC_GROUPS = [
 /** Every plottable metric, in group order. */
 export const CHART_METRICS = METRIC_GROUPS.flatMap(g => g.metrics);
 
-// The billed token buckets, in the order they stack. `tokensOutput` EXCLUDES
-// reasoning: the two are siblings in the stack, not a whole and its part, so
-// summing the buckets gives the total rather than double-counting thinking.
+// The billed token buckets, in the order they stack. `tokensInput` includes
+// cache writes (prompt content sent for this run), and `tokensOutput` excludes
+// reasoning: the buckets are disjoint and sum to the total rather than
+// double-counting cache writes or thinking.
 export const TOKEN_BUCKET_METRICS = [
     "tokensInput",
     "tokensCached",
@@ -142,7 +155,10 @@ export const METRIC_META = {
     tokensCached: COUNT,
     tokensCacheWrite: COUNT,
     tokensReasoning: COUNT,
-    tokensOutput: COUNT
+    tokensOutput: COUNT,
+    inputTokens: COUNT,
+    outputTokens: COUNT,
+    cachedTokens: COUNT
 };
 
 /** Presentation rules for a metric, defaulting to the percentage rules. */
@@ -166,7 +182,17 @@ export function formatMetric(metric, value) {
     // toFixed(1) rather than a bare round, so a whole number still reads "90.0%"
     // and the column keeps a stable width across rows.
     if (percentage) return `${value.toFixed(1)}%`;
-    if (unit === "s") return `${value.toFixed(1)}s`;
+    if (unit === "s") {
+        if (value < 60) return `${value.toFixed(1)}s`;
+        if (value < 3600) {
+            const mins = Math.floor(value / 60);
+            const secs = Math.round(value % 60);
+            return secs === 60 ? `${mins + 1}m` : (secs > 0 ? `${mins}m ${secs}s` : `${mins}m`);
+        }
+        const hrs = Math.floor(value / 3600);
+        const mins = Math.round((value % 3600) / 60);
+        return mins === 60 ? `${hrs + 1}h` : (mins > 0 ? `${hrs}h ${mins}m` : `${hrs}h`);
+    }
     // Sub-dollar costs need three places: at two, $0.052 and $0.054 both print
     // "$0.05" and the ranked bars read as a tie they are not.
     if (unit === "$") return value < 1 ? `$${value.toFixed(3)}` : `$${value.toFixed(2)}`;
@@ -220,15 +246,18 @@ export const METRIC_DESCRIPTIONS = {
     passMax: "Pass^5: needs multi-iteration runs (not produced yet).",
     latency: "Latency: mean agent wall-clock seconds per task. Lower is better, so the bar is scaled against the fastest setup on screen — a full bar is the fastest, half a bar is twice as slow.",
     tokens: "Tokens: mean total tokens per task (the provider total when reported, else the sum of the captured buckets). Lower is better.",
-    cost: "Cost: mean USD per task, from the run's own token buckets priced at the provider's published rates — input, cache reads, cache writes, output, and reasoning billed at the output rate. Stamped at ingest, so a past run keeps the rate it was billed at. Blank when the model has no rate on file.",
+    cost: "Average Cost: mean USD per task, from the run's own token buckets priced at the provider's published rates — input, cache reads, cache writes, output, and reasoning billed at the output rate. Stamped at ingest, so a past run keeps the rate it was billed at. Blank when the model has no rate on file.",
     turns: "Turns: mean model round-trips per task. Not tool calls — one turn can issue several, and a text-only turn issues none.",
     toolCalls: "Tool calls: mean tool invocations per task. The unit of agentic work; two setups with the same score and wall clock can differ several-fold here.",
     cacheHitRate: "Cache hit rate: share of prompt tokens served from cache (cache reads ÷ fresh input + reads + writes). Higher is better — it is the same context bought at a tenth of the price.",
-    tokensInput: "Input tokens: mean fresh (non-cached) prompt tokens per task.",
+    tokensInput: "Input tokens: mean prompt tokens sent per task, including cache writes.",
     tokensCached: "Cached tokens: mean cache-read prompt tokens per task, billed at roughly a tenth of the input rate.",
     tokensCacheWrite: "Cache write tokens: mean cache-creation tokens per task, billed at a premium over input.",
     tokensReasoning: "Reasoning tokens: mean thinking tokens per task. A sibling of output, not a subset — and billed at the output rate.",
-    tokensOutput: "Output tokens: mean visible completion tokens per task, excluding reasoning where the harness separates it."
+    tokensOutput: "Output tokens: mean visible completion tokens per task, excluding reasoning where the harness separates it.",
+    inputTokens: "Input tokens: mean prompt tokens sent per task, including cache writes.",
+    outputTokens: "Output tokens: mean visible completion tokens per task, excluding reasoning where the harness separates it.",
+    cachedTokens: "Cached tokens: mean cache-read prompt tokens per task, billed at roughly a tenth of the input rate."
 };
 
 // Description for a metric key, falling back to its label.
@@ -246,7 +275,10 @@ const METRIC_UNAVAILABLE_REASONS = {
     passMax: "Available once multi-iteration runs land",
     latency: "Not reported by these runs",
     tokens: "Not reported by these runs",
-    cost: "No rate on file for these models, or no per-bucket token usage to price"
+    cost: "No rate on file for these models, or no per-bucket token usage to price",
+    inputTokens: "Not reported by these runs",
+    outputTokens: "Not reported by these runs",
+    cachedTokens: "Not reported by these harnesses"
 };
 
 /** Tooltip for a metric with no data in the current dataset. */
@@ -260,8 +292,8 @@ export function metricUnavailableReason(metric) {
 export function availableMetrics(setups, metrics = METRICS) {
     return metrics.filter(m =>
         setups.some(s =>
-            (s.tasks || []).some(t => t.scores?.[m] != null) ||
-            (s.history || []).some(h => h.scores?.[m] != null)
+            (s.tasks || []).some(t => t.scores?.[m] != null || (m === "cost" && t.scores?.costUsd != null)) ||
+            (s.history || []).some(h => h.scores?.[m] != null || (m === "cost" && h.scores?.costUsd != null))
         )
     );
 }

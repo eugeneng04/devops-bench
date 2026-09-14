@@ -128,6 +128,7 @@ export function ConsistencyChart({ setups, metric, models, harnesses, ariaLabel,
         indexAxis: "y",
         responsive: true,
         maintainAspectRatio: false,
+        interaction: { mode: "index", axis: "y", intersect: false },
         layout: { padding: { left: iconGutter(2), right: pad } },
         plugins: {
             legend: { display: false },
@@ -137,6 +138,7 @@ export function ConsistencyChart({ setups, metric, models, harnesses, ariaLabel,
                 rowAt: (_tick, i) => rows[i] && { model: models[rows[i].setup.model], harness: harnesses[rows[i].setup.harness] }
             },
             tooltip: {
+                animation: false,
                 callbacks: {
                     label: ctx => {
                         const row = rows[ctx.dataIndex];

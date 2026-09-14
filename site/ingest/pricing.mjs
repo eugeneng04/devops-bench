@@ -1,35 +1,11 @@
 // =============================================================================
 // devops-bench leaderboard — MODEL RATE CARD + PER-ROW COST.
 //
-// Cost is the one leaderboard axis that is not measured. Nothing in the eval
-// output says what a run was billed; cost is token usage multiplied by a rate
-// card, and the rate card has to come from somewhere. This module is that rate
-// card, hand-transcribed from the providers' own pricing pages, plus the
-// arithmetic that turns one ResultRow's token buckets into USD.
-//
-// METHODOLOGY (follows Artificial Analysis' coding-agent cost figures):
-//   - every billed bucket is priced separately — non-cached input, cache reads,
-//     cache writes, visible output, reasoning;
-//   - REASONING TOKENS ARE BILLED AT THE OUTPUT RATE. Providers charge thinking
-//     as completion, and the canonical schema breaks it out as a SIBLING of
-//     output rather than a subset (see normalize.py), so it has to be priced
-//     explicitly or every reasoning model comes out free of charge for its
-//     largest bucket;
-//   - the dashboard then shows the per-task mean, not the per-run total, so a
-//     setup that ran more tasks isn't penalised.
-//
-// Rates are HARDCODED on purpose. Ingest is a batch job that has to produce the
-// same number twice; a live price feed would make a re-ingest of the same rows
-// silently disagree with the first one, and the disagreement would look like a
-// model got cheaper. Update the table by hand when a price moves.
-//
-// Cost is stamped onto the row at INGEST (see ingest.mjs), not recomputed at
-// derive time, so a past run keeps the rate it was actually billed at even after
-// the table is updated.
-//
-// Sources (fetched 2026-08-26):
+// Sources (fetched 2026-09-15):
 //   Anthropic — https://platform.claude.com/docs/en/about-claude/pricing
 //   Google    — https://ai.google.dev/gemini-api/docs/pricing
+//   OpenAi    - https://developers.openai.com/api/docs/pricing
+//   Qwen      - https://openrouter.ai/provider/alibaba
 // =============================================================================
 
 import { resolveModel } from "./catalog.mjs";
@@ -37,44 +13,32 @@ import { resolveModel } from "./catalog.mjs";
 const MTOK = 1e6;
 
 /**
- * USD per million tokens, keyed by the CURATED model id (see catalog.mjs), not
- * the raw `agentModel` string — one curated id can be reached from several raw
- * spellings (`opus`, `claude-opus-5`, a dated snapshot) and they all bill the
- * same. `cacheRead` / `cacheWrite` are the provider's own cache rates, not a
- * multiplier applied here, so a provider that prices caching differently needs
- * no special case.
- *
- * A model absent from this table is NOT priced at zero — it gets no cost at all
- * (null), and ingest warns. Zero would rank an unpriced setup best on a
- * lower-is-better axis.
- *
  * @type {Record<string, {input: number, output: number, cacheRead: number, cacheWrite: number}>}
  */
 export const MODEL_PRICES = {
-    // --- Anthropic. 5-minute cache writes (1.25x input); cache hits 0.1x input.
-    // Claude 4.6+ includes the full 1M-token context at STANDARD pricing, so
-    // `claude-opus-4-8[1m]` bills exactly as `claude-opus-4-8` — the `[1m]` in
-    // the run's model id selects a context window, not a rate.
+    // --- Anthropic
     "claude-opus-5":    { input: 5, output: 25, cacheRead: 0.5, cacheWrite: 6.25 },
     "claude-opus-4-8":  { input: 5, output: 25, cacheRead: 0.5, cacheWrite: 6.25 },
     "claude-sonnet-5":  { input: 2, output: 10, cacheRead: 0.2, cacheWrite: 2.5 },
     "claude-haiku-4-5": { input: 1, output: 5,  cacheRead: 0.1, cacheWrite: 1.25 },
+    "claude-fable-5-1": { input: 10, output: 50, cacheRead: 0.25, cacheWrite: 12.5 },
+    "claude-fable-5":   { input: 10, output: 50, cacheRead: 1, cacheWrite: 12.5 },
 
-    // --- Google. The ≤200k-prompt tier; Gemini 3.1 Pro charges a premium above
-    // 200k input tokens ($4 / $18 / $0.40) that a per-row bucket total cannot
-    // detect — the buckets are summed over a whole multi-turn run, so a run of
-    // twenty 30k-token calls is indistinguishable from one 600k-token call.
-    // Pricing every call at the base tier under-reports the rare long-prompt run
-    // rather than over-reporting every short one.
+    // --- Google
     // Gemini publishes no separate cache-WRITE rate: creating a cache bills the
     // tokens at the normal input rate (plus per-hour storage the row cannot see).
-    "gemini-3.1-pro":   { input: 2, output: 12, cacheRead: 0.2, cacheWrite: 2 },
-    // Flash has one tier at any prompt length.
-    "gemini-3.5-flash": { input: 1.5, output: 9, cacheRead: 0.15, cacheWrite: 1.5 },
+    "gemini-3.1-pro": { input: 2, output: 12, cacheRead: 0.2, cacheWrite: 2 },
+    "gemini-3.5-flash": { input: 0.75, output: 3.75, cacheRead: 0.075, cacheWrite: 0.75 },
+    "gemini-3.7-flash": { input: 0.75, output: 3.75, cacheRead: 0.075, cacheWrite: 0.75 },
+    "gemini-3.8-flash": { input: 0.75, output: 3.75, cacheRead: 0.075, cacheWrite: 0.75 },
 
-    // --- Fabricated models used by the mock seed. Not real rates; they exist so
-    // the seeded demo exercises the cost axis at all. Chosen to span a plausible
-    // frontier-to-budget spread.
+    // --- OpenAI, we use short context as no task has gone over 272k tokens yet
+    "gpt-5.6-sol":      { input: 4, output: 20, cacheRead: 0.4, cacheWrite: 5 },
+
+    // --- Alibaba / Qwen
+    "qwen3.8-27b-fp8": { input: 0.425, output: 2.55, cacheRead: 0.085, cacheWrite: 0.5313 },
+
+    // --- Fabricated models used by the mock seed
     "alpha-pro":        { input: 5, output: 25, cacheRead: 0.5, cacheWrite: 6.25 },
     "beta-sonic":       { input: 2, output: 10, cacheRead: 0.2, cacheWrite: 2.5 },
     "gamma-coder":      { input: 1, output: 5,  cacheRead: 0.1, cacheWrite: 1.25 }
@@ -104,18 +68,12 @@ export function priceFor(row) {
  * USD billed for one row's captured token usage, or null when the model has no
  * rate or the run captured no per-bucket usage.
  *
- * Deliberately ignores `totalTokens`: a total cannot be priced, because the
- * buckets it collapses are billed at rates that differ by up to 50x. A row that
- * reports only a total is uncosted, not costed at the input rate.
- *
  * @param {import('../src/lib/schema').ResultRow} row
  * @returns {number | null}
  */
 export function costUsd(row) {
     const price = priceFor(row);
     if (!price) return null;
-    // Reasoning bills at the OUTPUT rate — it is a sibling bucket of output, not
-    // a subset of it, so it is added rather than already counted.
     const billed = [
         [row?.inputTokens, price.input],
         [row?.outputTokens, price.output],

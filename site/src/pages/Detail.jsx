@@ -5,11 +5,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useSearchParams, Link } from "react-router-dom";
 import { useBenchmark } from "../context/BenchmarkContext.jsx";
-import { setupScore, setupLabel } from "../lib/accessors.js";
-import { METRICS, METRIC_LABELS, availableMetrics, formatMetric, metricBarFraction, isLowerBetter, metricMeta } from "../lib/vocab.js";
+import { setupScore, setupLabel, scoreOf } from "../lib/accessors.js";
+import { METRICS, METRIC_LABELS, availableMetrics, formatMetric, metricBarFraction, isLowerBetter, metricMeta, TOKEN_BUCKET_COLORS } from "../lib/vocab.js";
 import { SetupIdentity } from "../components/SetupIdentity.jsx";
 import { MetricToggle } from "../components/MetricToggle.jsx";
-import { TrendChart } from "../components/TrendChart.jsx";
 import { NotFound, Loading, LoadError } from "../components/States.jsx";
 
 function median(nums) {
@@ -28,21 +27,126 @@ function StatCard({ label, value, sub }) {
     );
 }
 
-function TaskTable({ setup, metric }) {
-    const [sort, setSort] = useState({ key: "score", dir: "desc" });
+function CatastrophicDetails({ task }) {
+    const [expanded, setExpanded] = useState(false);
 
-    // Mirrors the leaderboard's ordering (Leaderboard.jsx): "desc" means BEST
-    // first, which for latency/tokens is the smallest value, and a task with no
-    // value for this metric sorts last in either direction rather than being
-    // read as a 0 — otherwise an unmeasured task would head the ascending list
-    // as if it were the fastest.
+    const flatEntries = useMemo(() => {
+        const list = [];
+        if (task.catastrophicDetails && typeof task.catastrophicDetails === "object") {
+            for (const [gate, items] of Object.entries(task.catastrophicDetails)) {
+                if (Array.isArray(items)) {
+                    for (const item of items) {
+                        if (item && typeof item === "object") {
+                            list.push({
+                                gate,
+                                name: item.name,
+                                reason: typeof item.reason === "string" ? item.reason : "",
+                                trial: item.trial
+                            });
+                        }
+                    }
+                }
+            }
+        }
+        return list;
+    }, [task.catastrophicDetails]);
+
+    const kindsLabel = useMemo(() => {
+        const counts = new Map();
+        if (Array.isArray(task.catastrophicKinds)) {
+            for (const k of task.catastrophicKinds) {
+                if (typeof k === "string" && k && !counts.has(k)) counts.set(k, 0);
+            }
+        }
+        for (const item of flatEntries) {
+            if (item.gate) {
+                counts.set(item.gate, (counts.get(item.gate) || 0) + 1);
+            }
+        }
+        const labels = [...counts.entries()].map(([k, count]) => {
+            const label = k.replace(/Catastrophic$/, "");
+            return count > 0 ? `${label} (${count})` : label;
+        }).filter(Boolean);
+        return labels.length > 0 ? `Failure: ${labels.join(", ")}` : "Failure: Catastrophic";
+    }, [task.catastrophicKinds, flatEntries]);
+
+    if (flatEntries.length === 0) {
+        return (
+            <div className="mt-1">
+                <span className="inline-flex max-w-full items-center gap-1.5 rounded-md border border-rose-200/70 dark:border-rose-900/40 bg-rose-50/50 dark:bg-rose-950/25 px-2 py-0.5 text-[11px] font-semibold text-rose-800 dark:text-rose-300 truncate">
+                    {kindsLabel}
+                </span>
+            </div>
+        );
+    }
+
+    if (!expanded) {
+        return (
+            <div className="mt-1">
+                <button
+                    type="button"
+                    onClick={() => setExpanded(true)}
+                    className="inline-flex max-w-full items-center gap-1.5 rounded-md border border-rose-200/70 dark:border-rose-900/40 bg-rose-50/50 dark:bg-rose-950/25 hover:bg-rose-100/60 dark:hover:bg-rose-950/40 px-2 py-0.5 text-[11px] font-semibold text-rose-800 dark:text-rose-300 transition-colors focus:outline-none"
+                >
+                    <span className="truncate">{kindsLabel}</span>
+                    <span className="shrink-0 text-[10px] text-rose-500 dark:text-rose-400">▼</span>
+                </button>
+            </div>
+        );
+    }
+
+    return (
+        <div className="mt-1 w-full rounded-lg border border-rose-200/70 dark:border-rose-900/40 bg-rose-50/40 dark:bg-rose-950/20 px-2.5 py-2 text-xs overflow-hidden">
+            <button
+                type="button"
+                onClick={() => setExpanded(false)}
+                className="w-full flex items-center justify-between gap-1.5 mb-1.5 pb-1 border-b border-rose-200/60 dark:border-rose-900/40 text-[11px] font-semibold text-rose-800 dark:text-rose-300 hover:text-rose-600 dark:hover:text-rose-200 focus:outline-none text-left"
+            >
+                <span className="truncate">{kindsLabel}</span>
+                <span className="shrink-0 text-[10px] text-rose-500 dark:text-rose-400">▲</span>
+            </button>
+            <div className="max-h-48 overflow-y-auto pr-1 space-y-1.5">
+                {flatEntries.map((item, idx) => (
+                    <div key={idx} className={idx > 0 ? "pt-1.5 border-t border-rose-200/50 dark:border-rose-900/30" : ""}>
+                        <div className="flex items-center flex-wrap gap-1.5 mb-0.5">
+                            {item.trial != null && (
+                                <span className="px-1.5 py-0.5 rounded bg-rose-200/60 dark:bg-rose-900/50 text-[10px] font-semibold text-rose-800 dark:text-rose-300">
+                                    trial #{item.trial}
+                                </span>
+                            )}
+                            <span className="text-[10px] font-semibold uppercase tracking-wider text-rose-600 dark:text-rose-400">
+                                {item.gate.replace(/Catastrophic$/, "")}
+                            </span>
+                            {item.name && (
+                                <span className="font-mono font-semibold text-[11px] text-rose-900 dark:text-rose-200 break-all">
+                                    {item.name}
+                                </span>
+                            )}
+                        </div>
+                        <div className="font-mono text-[11px] leading-snug text-slate-700 dark:text-slate-300 break-words">
+                            {item.reason ? item.reason : <span className="italic text-slate-400">(no reason recorded)</span>}
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+function TaskTable({ setup, metric }) {
+    const [sort, setSort] = useState({ key: "score", dir: "asc" });
+
+    // Defaults to ascending so failing / low-scoring tasks surface first.
+    // A task with no value for this metric sorts last in either direction rather
+    // than being read as a 0 — otherwise an unmeasured task would head the
+    // ascending list as if it were the fastest.
     const tasks = useMemo(() => {
         const dir = sort.dir === "asc" ? 1 : -1;
         const lower = isLowerBetter(metric);
         return [...setup.tasks].sort((a, b) => {
             if (sort.key === "name") return dir * a.name.localeCompare(b.name);
-            const av = a.scores[metric];
-            const bv = b.scores[metric];
+            const av = scoreOf(a.scores, metric);
+            const bv = scoreOf(b.scores, metric);
             if (av == null && bv == null) return 0;
             if (av == null) return 1;
             if (bv == null) return -1;
@@ -54,7 +158,7 @@ function TaskTable({ setup, metric }) {
     // metric — so an absolute metric's bar has a scale (percentage metrics
     // ignore it).
     const taskBest = useMemo(() => {
-        const vals = setup.tasks.map(t => t.scores[metric]).filter(v => v != null);
+        const vals = setup.tasks.map(t => scoreOf(t.scores, metric)).filter(v => v != null);
         if (!vals.length) return null;
         return isLowerBetter(metric) ? Math.min(...vals) : Math.max(...vals);
     }, [setup, metric]);
@@ -62,7 +166,7 @@ function TaskTable({ setup, metric }) {
     function sortBy(key) {
         setSort(prev => prev.key === key
             ? { key, dir: prev.dir === "asc" ? "desc" : "asc" }
-            : { key, dir: key === "name" ? "asc" : "desc" });
+            : { key, dir: "asc" });
     }
 
     // Same rule as the leaderboard's ⚠ badge and the Catastrophic stat card:
@@ -92,33 +196,85 @@ function TaskTable({ setup, metric }) {
     return (
         <div className="w-full bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xl shadow-slate-100 dark:shadow-none p-6">
             <div className="mb-3 font-semibold text-slate-500 dark:text-slate-400 tracking-wider uppercase text-xs">Granular Task Breakdown</div>
-            <table className="w-full text-left">
+            <table className="w-full table-fixed text-left">
                 <thead>
                     <tr className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 select-none">
-                        <th className="pb-2 pr-4 cursor-pointer" onClick={() => sortBy("name")}>Task <Arrow k="name" /></th>
+                        <th className="w-1/2 pb-2 pr-4 cursor-pointer" onClick={() => sortBy("name")}>Task <Arrow k="name" /></th>
                         {/* The metric names the column on its own: "Score (Tokens)"
                             calls a token count a score, and the parenthetical was
                             only ever there because "Score" couldn't carry which one. */}
-                        <th className="pb-2 pr-4 cursor-pointer" onClick={() => sortBy("score")}>{METRIC_LABELS[metric]} <Arrow k="score" /></th>
+                        <th className="w-1/2 pb-2 pr-4 cursor-pointer" onClick={() => sortBy("score")}>
+                            <div className="flex items-center justify-between">
+                                <span>{METRIC_LABELS[metric]} <Arrow k="score" /></span>
+                                {metric === "tokens" && (
+                                    <div className="flex items-center gap-2 font-normal normal-case tracking-normal text-slate-400 dark:text-slate-500">
+                                        <span className="inline-flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>In</span>
+                                        <span className="inline-flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Cached</span>
+                                        <span className="inline-flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>Out</span>
+                                    </div>
+                                )}
+                            </div>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
                     {tasks.map(task => {
                         // Null-safe: an unscored task shows an empty bar and "—".
-                        const s = task.scores[metric];
+                        const s = scoreOf(task.scores, metric);
                         const barPct = metricBarFraction(metric, s, taskBest) * 100;
+                        const isTokens = metric === "tokens";
+                        const taskInputTokens = isTokens ? scoreOf(task.scores, "inputTokens") : null;
+                        const taskCachedTokens = isTokens ? scoreOf(task.scores, "cachedTokens") : null;
+                        const taskOutputTokens = isTokens ? scoreOf(task.scores, "outputTokens") : null;
+                        const taskSumBuckets = (taskInputTokens || 0) + (taskCachedTokens || 0) + (taskOutputTokens || 0);
+                        const tokensTooltip = isTokens
+                            ? `Total: ${formatMetric("tokens", s)} (Input: ${formatMetric("inputTokens", taskInputTokens)}, Cached: ${formatMetric("cachedTokens", taskCachedTokens)}, Output: ${formatMetric("outputTokens", taskOutputTokens)})`
+                            : undefined;
+
                         return (
                             <tr key={task.folder} className="border-t border-slate-100 dark:border-slate-800">
-                                <td className="py-3 pr-4">
-                                    <div className="flex flex-col">
-                                        <span className="font-semibold text-slate-700 dark:text-slate-200 text-sm">{task.name}</span>
-                                        <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500 mt-0.5">{task.folder}/</span>
-                                    </div>
+                                <td className="py-3 pr-4 align-top overflow-hidden">
+                                    <span className="font-semibold text-slate-700 dark:text-slate-200 text-sm block truncate">{task.name}</span>
+                                    {badgeable && task.catastrophic && (
+                                        <CatastrophicDetails task={task} />
+                                    )}
                                 </td>
-                                <td className="py-3 pr-4 w-1/2">
+                                <td className="py-3 pr-4 w-1/2 align-top">
                                     <div className="flex items-center gap-3">
-                                        <div className="flex-grow bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
-                                            <div className="progress-bar-fill h-full rounded-full" style={{ width: `${barPct}%`, backgroundColor: setup.color }} />
+                                        <div className="flex-grow bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden" title={tokensTooltip}>
+                                            {isTokens && taskSumBuckets > 0 ? (
+                                                <div className="progress-bar-fill h-full rounded-full flex overflow-hidden" style={{ width: `${barPct}%` }}>
+                                                    {taskInputTokens > 0 && (
+                                                        <div
+                                                            style={{
+                                                                width: `${((taskInputTokens || 0) / taskSumBuckets) * 100}%`,
+                                                                backgroundColor: TOKEN_BUCKET_COLORS.tokensInput
+                                                            }}
+                                                            title={`Input: ${formatMetric("inputTokens", taskInputTokens)}`}
+                                                        />
+                                                    )}
+                                                    {taskCachedTokens > 0 && (
+                                                        <div
+                                                            style={{
+                                                                width: `${((taskCachedTokens || 0) / taskSumBuckets) * 100}%`,
+                                                                backgroundColor: TOKEN_BUCKET_COLORS.tokensCached
+                                                            }}
+                                                            title={`Cached: ${formatMetric("cachedTokens", taskCachedTokens)}`}
+                                                        />
+                                                    )}
+                                                    {taskOutputTokens > 0 && (
+                                                        <div
+                                                            style={{
+                                                                width: `${((taskOutputTokens || 0) / taskSumBuckets) * 100}%`,
+                                                                backgroundColor: TOKEN_BUCKET_COLORS.tokensOutput
+                                                            }}
+                                                            title={`Output: ${formatMetric("outputTokens", taskOutputTokens)}`}
+                                                        />
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <div className="progress-bar-fill h-full rounded-full" style={{ width: `${barPct}%`, backgroundColor: setup.color }} />
+                                            )}
                                         </div>
                                         {/* Sits immediately left of the figure, matching
                                             LeaderboardRow, so it reads as annotating the
@@ -138,8 +294,26 @@ function TaskTable({ setup, metric }) {
                                                 )}
                                             </span>
                                         )}
-                                        <span className="text-sm font-semibold text-slate-700 dark:text-slate-200 w-14 text-right shrink-0">{formatMetric(metric, s)}</span>
+                                        <span className="text-sm font-semibold text-slate-700 dark:text-slate-200 w-14 text-right shrink-0" title={tokensTooltip}>{formatMetric(metric, s)}</span>
                                     </div>
+                                    {isTokens && (
+                                        <div className="flex items-center justify-end gap-1.5 sm:gap-2 text-[10px] text-slate-500 dark:text-slate-400 mt-1 flex-wrap">
+                                            <span className="inline-flex items-center gap-1" title="Input tokens">
+                                                <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: TOKEN_BUCKET_COLORS.tokensInput }} />
+                                                <span>{formatMetric("inputTokens", taskInputTokens)} in</span>
+                                            </span>
+                                            <span>·</span>
+                                            <span className="inline-flex items-center gap-1" title="Cached tokens">
+                                                <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: TOKEN_BUCKET_COLORS.tokensCached }} />
+                                                <span>{formatMetric("cachedTokens", taskCachedTokens)} cached</span>
+                                            </span>
+                                            <span>·</span>
+                                            <span className="inline-flex items-center gap-1" title="Output tokens">
+                                                <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: TOKEN_BUCKET_COLORS.tokensOutput }} />
+                                                <span>{formatMetric("outputTokens", taskOutputTokens)} out</span>
+                                            </span>
+                                        </div>
+                                    )}
                                 </td>
                             </tr>
                         );
@@ -214,7 +388,7 @@ export function Detail() {
     // guard the all-empty case so a sparse setup renders "—" instead of NaN /
     // -Infinity. Mirrors setupScore()'s null handling; `vals.length` is the
     // number of *scored* tasks, which is what "Average over N tasks" should mean.
-    const vals = setup.tasks.map(t => t.scores[metric]).filter(v => v != null);
+    const vals = setup.tasks.map(t => scoreOf(t.scores, metric)).filter(v => v != null);
     // "Best" follows the metric's direction: the fastest task, not the slowest.
     const best = vals.length ? (isLowerBetter(metric) ? Math.min(...vals) : Math.max(...vals)) : null;
     const avg = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
@@ -230,7 +404,7 @@ export function Detail() {
     // Latency and Latency everywhere else, without naming either key here.
     const companion = METRICS.find(m => !metricMeta(m).percentage && m !== metric);
     const companionVals = companion
-        ? setup.tasks.map(t => t.scores[companion]).filter(v => v != null)
+        ? setup.tasks.map(t => scoreOf(t.scores, companion)).filter(v => v != null)
         : [];
     const companionAvg = companionVals.length
         ? companionVals.reduce((a, b) => a + b, 0) / companionVals.length
@@ -260,7 +434,9 @@ export function Detail() {
                     <div className="flex flex-col items-start lg:items-end gap-2 min-w-0 shrink-[100]">
                         <div className="flex items-baseline gap-1.5 shrink-0 whitespace-nowrap">
                             <span className="text-4xl font-bold text-slate-900 dark:text-slate-100">{formatMetric(metric, score)}</span>
-                            <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide">{METRIC_LABELS[metric]}</span>
+                            <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide">
+                                {metric === "cost" ? "Avg Cost / Task" : METRIC_LABELS[metric]}
+                            </span>
                         </div>
                         <MetricToggle value={metric} onChange={setMetric} available={available} />
                     </div>
@@ -271,20 +447,28 @@ export function Detail() {
                     <StatCard label="Best Task" value={pct(best)} sub={METRIC_LABELS[metric]} />
                     <StatCard label="Average" value={pct(avg)} sub={`over ${vals.length} tasks`} />
                     <StatCard label="Median" value={pct(med)} sub={METRIC_LABELS[metric]} />
-                    <StatCard
-                        label="Catastrophic"
-                        value={String(setup.catastrophicCount ?? 0)}
-                        // "outcome zeroed", not "task zeroed": the task still ran
-                        // and still has its other measurements; what a
-                        // catastrophic violation zeroes is the Outcome score.
-                        sub={
-                            setup.catastrophicCount === 1
-                                ? "outcome zeroed"
-                                : setup.catastrophicCount
-                                  ? "outcomes zeroed"
-                                  : "none"
-                        }
-                    />
+                    {/* Only on the quality metrics. What a catastrophic
+                        violation zeroes is the Outcome score — the seconds and
+                        tokens the run consumed are untouched and still valid, so
+                        in a row of cards that otherwise all describe the selected
+                        metric, this one would read as qualifying a figure it has
+                        no bearing on. Same rule as the leaderboard's ⚠ badge. */}
+                    {metricMeta(metric).percentage && (
+                        <StatCard
+                            label="Catastrophic"
+                            value={String(setup.catastrophicCount ?? 0)}
+                            // "outcome zeroed", not "task zeroed": the task still ran
+                            // and still has its other measurements; what a
+                            // catastrophic violation zeroes is the Outcome score.
+                            sub={
+                                setup.catastrophicCount === 1
+                                    ? "outcome zeroed"
+                                    : setup.catastrophicCount
+                                      ? "outcomes zeroed"
+                                      : "none"
+                            }
+                        />
+                    )}
                     {companion ? (
                         <StatCard
                             label={`Avg ${METRIC_LABELS[companion]}`}
@@ -297,29 +481,6 @@ export function Detail() {
                 {/* Task breakdown */}
                 <TaskTable setup={setup} metric={metric} />
             </div>
-
-            {/* Single-setup trend chart */}
-            <section className="w-full bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xl shadow-slate-100 dark:shadow-none p-6 flex flex-col">
-                <div className="mb-4">
-                    <h2 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
-                        <svg className="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 12l3-3 3 3 4-4M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                        </svg>
-                        {METRIC_LABELS[metric]} Trend Over Time
-                    </h2>
-                    <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">This setup&apos;s {METRIC_LABELS[metric].toLowerCase()} across historical run iterations.</p>
-                </div>
-                <TrendChart
-                    setups={[setup]}
-                    metric={metric}
-                    models={models}
-                    harnesses={harnesses}
-                    showLegend={false}
-                    fill
-                    ariaLabel={`${METRIC_LABELS[metric]} trend over time for this setup`}
-                    caption={`${METRIC_LABELS[metric]} trend for ${setupLabel(setup, models, harnesses)}`}
-                />
-            </section>
         </main>
     );
 }

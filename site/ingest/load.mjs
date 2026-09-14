@@ -115,6 +115,50 @@ export function validateRow(row) {
     if ("catastrophic" in row && typeof row.catastrophic !== "boolean") {
         errs.push("catastrophic: must be a boolean");
     }
+    if ("catastrophicKinds" in row) {
+        if (!Array.isArray(row.catastrophicKinds) || row.catastrophicKinds.some(k => typeof k !== "string" || k === "")) {
+            errs.push("catastrophicKinds: must be an array of non-empty strings");
+        }
+    }
+    if ("catastrophicDetails" in row) {
+        const details = row.catastrophicDetails;
+        if (!details || typeof details !== "object" || Array.isArray(details)) {
+            errs.push("catastrophicDetails: must be an object");
+        } else {
+            const entries = Object.entries(details);
+            if (entries.length > 0 && row.catastrophic === false) {
+                errs.push("catastrophicDetails: must be empty when catastrophic is false");
+            }
+            for (const [gate, items] of entries) {
+                if (gate !== "VerificationCatastrophic" && gate !== "IntegrityCatastrophic") {
+                    errs.push(`catastrophicDetails.${gate}: unknown gate (must be VerificationCatastrophic or IntegrityCatastrophic)`);
+                } else if (Array.isArray(row.catastrophicKinds) && !row.catastrophicKinds.includes(gate)) {
+                    errs.push(`catastrophicDetails.${gate}: must be listed in catastrophicKinds`);
+                }
+                if (!Array.isArray(items) || items.length < 1) {
+                    errs.push(`catastrophicDetails.${gate}: must be a non-empty array`);
+                } else {
+                    items.forEach((d, idx) => {
+                        if (!d || typeof d !== "object" || Array.isArray(d)) {
+                            errs.push(`catastrophicDetails.${gate}[${idx}]: must be an object`);
+                            return;
+                        }
+                        if (typeof d.reason !== "string" || d.reason.length > 240) {
+                            errs.push(`catastrophicDetails.${gate}[${idx}].reason: required string <= 240 chars`);
+                        }
+                        if ("name" in d && (typeof d.name !== "string" || d.name.length < 1)) {
+                            errs.push(`catastrophicDetails.${gate}[${idx}].name: must be a non-empty string`);
+                        }
+                        for (const key of Object.keys(d)) {
+                            if (key !== "name" && key !== "reason") {
+                                errs.push(`catastrophicDetails.${gate}[${idx}].${key}: unexpected property`);
+                            }
+                        }
+                    });
+                }
+            }
+        }
+    }
     if ("scoringVersion" in row && typeof row.scoringVersion !== "string") {
         errs.push("scoringVersion: must be a string");
     }

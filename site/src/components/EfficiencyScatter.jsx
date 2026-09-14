@@ -107,7 +107,8 @@ export function EfficiencyScatter({
     models,
     harnesses,
     colorBy = "model",
-    showFrontier = true,
+    xAggregate = "mean",
+    showFrontier = false,
     logX = false,
     logY = false,
     ariaLabel,
@@ -118,8 +119,8 @@ export function EfficiencyScatter({
     const gridColor = isDark ? "#1e293b" : "#f1f5f9";
 
     const points = useMemo(
-        () => scatterPoints(setups, xMetric, yMetric),
-        [setups, xMetric, yMetric]
+        () => scatterPoints(setups, xMetric, yMetric, { aggregate: xAggregate }),
+        [setups, xMetric, yMetric, xAggregate]
     );
 
     const series = useMemo(
@@ -156,6 +157,7 @@ export function EfficiencyScatter({
             borderColor: s.color,
             pointRadius: 6,
             pointHoverRadius: 9,
+            pointHitRadius: 20,
             showLine: false,
             order: 1
         }));
@@ -183,10 +185,14 @@ export function EfficiencyScatter({
         };
     }, [points, series, frontier, models, harnesses]);
 
+    const xLabel = xAggregate === "total"
+        ? (xMetric === "latency" ? "Total Time" : xMetric === "cost" ? "Total Cost (USD)" : `Total ${METRIC_LABELS[xMetric]}`)
+        : (xMetric === "latency" ? "Time per Task (Average)" : xMetric === "cost" ? "Cost per Task (Average)" : `${METRIC_LABELS[xMetric]} per Task (Average)`);
+
     const options = useMemo(() => ({
         responsive: true,
         maintainAspectRatio: false,
-        interaction: { mode: "nearest", intersect: true },
+        interaction: { mode: "nearest", intersect: false },
         plugins: {
             pointLabels: { haloColor: isDark ? "#0f172a" : "#ffffff" },
             legendMarks: {
@@ -218,10 +224,11 @@ export function EfficiencyScatter({
                 }
             },
             tooltip: {
+                animation: false,
                 callbacks: {
                     title: items => items[0]?.raw?.label ?? "",
                     label: ctx => [
-                        ` ${METRIC_LABELS[xMetric]}: ${formatMetric(xMetric, ctx.parsed.x)}`,
+                        ` ${xLabel}: ${formatMetric(xMetric, ctx.parsed.x)}`,
                         ` ${METRIC_LABELS[yMetric]}: ${formatMetric(yMetric, ctx.parsed.y)}`
                     ]
                 }
@@ -230,7 +237,7 @@ export function EfficiencyScatter({
         scales: {
             x: {
                 type: useLogX ? "logarithmic" : "linear",
-                title: { display: true, text: METRIC_LABELS[xMetric], color: textColor, font: { size: 11, weight: "600" } },
+                title: { display: true, text: xLabel, color: textColor, font: { size: 11, weight: "600" } },
                 border: { display: false },
                 grid: { color: gridColor },
                 ticks: {
@@ -253,7 +260,7 @@ export function EfficiencyScatter({
                 }
             }
         }
-    }), [xMetric, yMetric, textColor, gridColor, useLogX, useLogY, isDark, series, colorBy, models, harnesses]);
+    }), [xMetric, yMetric, xLabel, textColor, gridColor, useLogX, useLogY, isDark, series, colorBy, models, harnesses]);
 
     if (!points.length) {
         return (
@@ -284,7 +291,7 @@ export function EfficiencyScatter({
                 <thead>
                     <tr>
                         <th scope="col">Setup</th>
-                        <th scope="col">{METRIC_LABELS[xMetric]}</th>
+                        <th scope="col">{xLabel}</th>
                         <th scope="col">{METRIC_LABELS[yMetric]}</th>
                         {/* Only when a frontier was drawn. Without one, every
                             row would read "no" — an answer to a question this

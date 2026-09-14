@@ -13,7 +13,8 @@ function fakeCtx() {
         calls,
         save() {}, restore() {}, beginPath() {}, fill() {}, translate(x, y) { calls.push(["translate", x, y]); },
         scale() {}, roundRect(x, y) { calls.push(["roundRect", x, y]); }, stroke() {}, arc(x, y) { calls.push(["arc", x, y]); },
-        fillText() {}
+        fillText() {},
+        createLinearGradient() { return { addColorStop() {} }; }
     };
     return ctx;
 }
@@ -46,6 +47,50 @@ describe("marks", () => {
         const solo = fakeCtx();
         drawMarks(solo, { harness }, 100, 20, 10);
         expect(solo.calls).toEqual([["translate", 100, 20]]);
+    });
+
+    it("draws vector logos for google, anthropic, and openai", () => {
+        const googleCtx = fakeCtx();
+        drawMarks(googleCtx, { model: { logo: "google" } }, 50, 10, 14);
+        expect(googleCtx.calls).toEqual([["translate", 50, 10]]);
+
+        const anthropicCtx = fakeCtx();
+        drawMarks(anthropicCtx, { model: { logo: "anthropic" } }, 50, 10, 14);
+        expect(anthropicCtx.calls).toEqual([["translate", 50, 10]]);
+
+        const openaiCtx = fakeCtx();
+        drawMarks(openaiCtx, { model: { logo: "openai" } }, 50, 10, 14);
+        expect(openaiCtx.calls).toEqual([["translate", 50, 10]]);
+    });
+
+    it("draws vector logos for legacy gemini and claude keys", () => {
+        const geminiCtx = fakeCtx();
+        drawMarks(geminiCtx, { model: { logo: "gemini" } }, 50, 10, 14);
+        expect(geminiCtx.calls).toEqual([["translate", 50, 10]]);
+
+        const claudeCtx = fakeCtx();
+        drawMarks(claudeCtx, { model: { logo: "claude" } }, 50, 10, 14);
+        expect(claudeCtx.calls).toEqual([["translate", 50, 10]]);
+    });
+
+    it("draws vector logos for qwen and alibaba", () => {
+        const qwenCtx = fakeCtx();
+        drawMarks(qwenCtx, { model: { logo: "qwen" } }, 50, 10, 14);
+        expect(qwenCtx.calls).toEqual([["translate", 50, 10]]);
+
+        const alibabaCtx = fakeCtx();
+        drawMarks(alibabaCtx, { model: { logo: "alibaba" } }, 50, 10, 14);
+        expect(alibabaCtx.calls).toEqual([["translate", 50, 10]]);
+    });
+
+    it("draws brand vector logos when harness uses google or anthropic", () => {
+        const agyCtx = fakeCtx();
+        drawMarks(agyCtx, { harness: { logo: "google" } }, 50, 10, 14);
+        expect(agyCtx.calls).toEqual([["translate", 50, 10]]);
+
+        const claudeCtx = fakeCtx();
+        drawMarks(claudeCtx, { harness: { logo: "anthropic" } }, 50, 10, 14);
+        expect(claudeCtx.calls).toEqual([["translate", 50, 10]]);
     });
 });
 
