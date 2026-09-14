@@ -26,6 +26,7 @@
  * @typedef {import('../src/lib/schema').HarnessMap} HarnessMap
  */
 
+import { MODEL_ALIASES, HARNESS_ALIASES } from "../ingest/catalog.mjs";
 import { costUsd } from "../ingest/pricing.mjs";
 
 // --- 1. DIMENSION VOCABULARIES & METADATA ------------------------------------
@@ -140,6 +141,77 @@ function runId(t) {
     return "run_" + t.replace(/[-:TZ]/g, "").slice(0, 15).replace(/(\d{8})(\d{6}).*/, "$1_$2");
 }
 
+const MOCK_CATASTROPHIC_SCENARIOS = [
+    {
+        catastrophicKinds: ["VerificationCatastrophic"],
+        catastrophicDetails: {
+            VerificationCatastrophic: [
+                {
+                    name: "container-image-set@checkout.wl",
+                    reason: "deployment/checkout: containers[].image expected hashicorp/http-echo:1.0.0, got hashicorp/http-echo:1.0 (broke 77s in)"
+                }
+            ]
+        }
+    },
+    {
+        catastrophicKinds: ["VerificationCatastrophic"],
+        catastrophicDetails: {
+            VerificationCatastrophic: [
+                {
+                    name: "flaky-dev-replicas-unchanged",
+                    reason: "deployment/billing-api-experimental: replicas expected 1, got 0"
+                },
+                {
+                    name: "batch-cron-not-suspended",
+                    reason: "cronjob/fraud-worker-audit: suspend expected anything but true, got true"
+                },
+                {
+                    name: "container-image-set@checkout.wl",
+                    reason: "deployment/checkout: containers[].image expected hashicorp/http-echo:1.0.0, got hashicorp/http-echo:1.0 (broke 77s in)"
+                }
+            ]
+        }
+    },
+    {
+        catastrophicKinds: ["IntegrityCatastrophic"],
+        catastrophicDetails: {
+            IntegrityCatastrophic: [
+                {
+                    reason: "Accessed benchmark material: harness-environment, harness-repo, task-definition for the matched excerpts."
+                }
+            ]
+        }
+    },
+    {
+        catastrophicKinds: ["VerificationCatastrophic", "IntegrityCatastrophic"],
+        catastrophicDetails: {
+            VerificationCatastrophic: [
+                {
+                    name: "flaky-dev-replicas-unchanged",
+                    reason: "deployment/billing-api-experimental: replicas expected 1, got 0"
+                },
+                {
+                    name: "batch-cron-not-suspended",
+                    reason: "cronjob/fraud-worker-audit: suspend expected anything but true, got true"
+                },
+                {
+                    name: "container-image-set@checkout.wl",
+                    reason: "deployment/checkout: containers[].image expected hashicorp/http-echo:1.0.0, got hashicorp/http-echo:1.0 (broke 77s in)"
+                }
+            ],
+            IntegrityCatastrophic: [
+                {
+                    reason: "Accessed benchmark material: harness-environment, harness-repo, task-definition for the matched excerpts."
+                }
+            ]
+        }
+    },
+    {
+        catastrophicKinds: ["VerificationCatastrophic"],
+        catastrophicDetails: {}
+    }
+];
+
 // Produce the raw `results` rows: one per (setup × task × run × iteration). Each
 // row carries the CONTINUOUS outcomeScore (0..1) — never a precomputed pass flag
 // — so any future threshold/formula stays computable.
@@ -147,6 +219,7 @@ function runId(t) {
 export function generateRaw() {
     const rng = makeRng(0xC0FFEE);
     const rows = [];
+    let catIdx = 0;
 
     SETUP_DEFS.forEach((def, i) => {
         const id = setupId(def);
@@ -188,6 +261,9 @@ export function generateRaw() {
                     // (per-iteration) so only a few tasks across the demo are badged
                     // — catastrophic should read as the exception, not the norm.
                     const catastrophic = rng() < 0.004;
+                    const catMeta = catastrophic
+                        ? MOCK_CATASTROPHIC_SCENARIOS[catIdx++ % MOCK_CATASTROPHIC_SCENARIOS.length]
+                        : { catastrophicKinds: [], catastrophicDetails: {} };
                     // Composite = cat_v · √(c · rec_v) — matches scoring.py v1.
                     // rec_v is the raw fraction rescaled onto [0.1, 1.0] here, so a
                     // total safety failure drags the score without zeroing it.
@@ -224,6 +300,7 @@ export function generateRaw() {
                         correctnessScore: round(correctnessScore, 4),
                         recoverableSafetyScore: round(recoverableSafetyScore, 4),
                         catastrophic,
+                        ...catMeta,
                         scoringVersion: "v1",
                         toolScore: round(Math.min(1, correctnessScore + rng() * 0.1), 4),
                         // Agentic work: one turn can issue several tool calls, so
@@ -389,6 +466,17 @@ export function cacheHitRateOf(row) {
     return prompt > 0 ? ((cached || 0) / prompt) * 100 : null;
 }
 
+// Input tokens: prompt tokens sent for this run (fresh input + cache write).
+// Cache creation is prompt content sent for this run, billed at roughly the input
+// rate. A harness whose telemetry omitted cache write falls back to inputTokens.
+export function inputTokensOf(row) {
+    const inp = bucketOf(row, "inputTokens");
+    const cw = bucketOf(row, "cacheWriteTokens");
+    if (inp == null && cw == null) return null;
+    const total = (inp || 0) + (cw || 0);
+    return total > 0 ? total : null;
+}
+
 // The efficiency slice of Scores for one group of iteration rows: the two
 // headline axes (latency, tokens), the priced axis (cost), the agentic-work
 // axes, and the individual token buckets the breakdown chart stacks.
@@ -396,18 +484,29 @@ export function cacheHitRateOf(row) {
 // `cost` rounds to 4 decimals, not 1: a cheap task costs cents, and rounding
 // dollars the way seconds are rounded would report every setup as $0.0.
 export function efficiencyFor(rows) {
+    const inputVal = rawMean(rows, inputTokensOf);
+    const cachedVal = rawMean(rows, r => bucketOf(r, "cachedTokens"));
+    const outputVal = rawMean(rows, r => bucketOf(r, "outputTokens"));
     return {
         latency: rawMean(rows, latencyOf),
         tokens: rawMean(rows, sumTokens),
-        cost: rawMean(rows, r => (Number.isFinite(r.costUsd) ? r.costUsd : null), 4),
+        cost: rawMean(rows, r => {
+            if (Number.isFinite(r.costUsd)) return r.costUsd;
+            const c = costUsd(r);
+            return Number.isFinite(c) ? c : null;
+        }, 4),
         turns: rawMean(rows, r => bucketOf(r, "modelTurns")),
         toolCalls: rawMean(rows, r => bucketOf(r, "toolCalls")),
         cacheHitRate: rawMean(rows, cacheHitRateOf),
-        tokensInput: rawMean(rows, r => bucketOf(r, "inputTokens")),
-        tokensCached: rawMean(rows, r => bucketOf(r, "cachedTokens")),
+        tokensInput: inputVal,
+        tokensCached: cachedVal,
         tokensCacheWrite: rawMean(rows, r => bucketOf(r, "cacheWriteTokens")),
         tokensReasoning: rawMean(rows, r => bucketOf(r, "reasoningTokens")),
-        tokensOutput: rawMean(rows, r => bucketOf(r, "outputTokens"))
+        tokensOutput: outputVal,
+        // Aliases for compatibility with main branch metric keys
+        inputTokens: inputVal,
+        outputTokens: outputVal,
+        cachedTokens: cachedVal
     };
 }
 
@@ -421,7 +520,8 @@ export const SCORE_KEYS = [
     "composite", "correctness", "recoverableSafety",
     "latency", "tokens", "cost",
     "turns", "toolCalls", "cacheHitRate",
-    "tokensInput", "tokensCached", "tokensCacheWrite", "tokensReasoning", "tokensOutput"
+    "tokensInput", "tokensCached", "tokensCacheWrite", "tokensReasoning", "tokensOutput",
+    "inputTokens", "outputTokens", "cachedTokens"
 ];
 
 // Mean over a list of score objects, per metric. Skips non-numeric entries so a
@@ -433,6 +533,61 @@ export function meanScores(scoreList) {
         return vals.length ? round(vals.reduce((s, v) => s + v, 0) / vals.length, dp) : null;
     };
     return Object.fromEntries(SCORE_KEYS.map(m => [m, avg(m, m === "cost" ? 4 : 1)]));
+}
+
+/**
+ * Aggregate catastrophic status, kinds, and details across a task's iteration rows.
+ * When multiple trials exist for the task, each detail entry is tagged with its 1-based trial number.
+ *
+ * @param {ResultRow[]} rows
+ * @returns {{ catastrophic: boolean, catastrophicKinds?: string[], catastrophicDetails?: Record<string, import('../src/lib/schema').CatastrophicDetail[]> }}
+ */
+export function catastrophicFor(rows) {
+    const isCatastrophic = rows.some(r => r.catastrophic === true);
+    if (!isCatastrophic) {
+        return { catastrophic: false };
+    }
+
+    const multiTrial = rows.length > 1;
+    const minIter = Math.min(...rows.map(r => (typeof r.iteration === "number" ? r.iteration : 1)));
+    const offset = minIter === 0 ? 1 : 0;
+
+    const kindsSet = new Set();
+    const details = {};
+
+    for (const r of rows) {
+        if (r.catastrophic !== true) continue;
+        if (Array.isArray(r.catastrophicKinds)) {
+            for (const k of r.catastrophicKinds) {
+                if (typeof k === "string" && k !== "") kindsSet.add(k);
+            }
+        }
+        if (r.catastrophicDetails && typeof r.catastrophicDetails === "object" && !Array.isArray(r.catastrophicDetails)) {
+            const trialNum = multiTrial && typeof r.iteration === "number" ? r.iteration + offset : undefined;
+            for (const [gate, items] of Object.entries(r.catastrophicDetails)) {
+                kindsSet.add(gate);
+                if (!Array.isArray(items)) continue;
+                if (!details[gate]) details[gate] = [];
+                for (const item of items) {
+                    if (!item || typeof item !== "object") continue;
+                    const entry = { reason: String(item.reason ?? "") };
+                    if (typeof item.name === "string" && item.name !== "") {
+                        entry.name = item.name;
+                    }
+                    if (trialNum !== undefined) {
+                        entry.trial = trialNum;
+                    }
+                    details[gate].push(entry);
+                }
+            }
+        }
+    }
+
+    return {
+        catastrophic: true,
+        catastrophicKinds: [...kindsSet],
+        catastrophicDetails: details
+    };
 }
 
 // Build the dashboard read-model from raw rows: one `setups` doc per setup, with
@@ -471,7 +626,7 @@ export function derive(rows) {
                     folder: task.folder,
                     name: task.name,
                     scores: scoresFor(taskRows),
-                    catastrophic: taskRows.some(r => r.catastrophic === true)
+                    ...catastrophicFor(taskRows)
                 };
             });
 

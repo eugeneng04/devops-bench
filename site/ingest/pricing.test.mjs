@@ -15,6 +15,14 @@ describe("priceFor — which rate card applies", () => {
     it("resolves a raw model id through the catalog aliases", () => {
         expect(priceFor(row({ model: "claude-sonnet-5" }))).toEqual(MODEL_PRICES["claude-sonnet-5"]);
         expect(priceFor(row({ model: "sonnet" }))).toEqual(MODEL_PRICES["claude-sonnet-5"]);
+        expect(priceFor(row({ model: "gpt-5.6-sol" }))).toEqual(MODEL_PRICES["gpt-5.6-sol"]);
+        expect(priceFor(row({ model: "claude-fable-5-1" }))).toEqual(MODEL_PRICES["claude-fable-5-1"]);
+        expect(priceFor(row({ model: "claude-fable-5" }))).toEqual(MODEL_PRICES["claude-fable-5"]);
+        expect(priceFor(row({ model: "qwen-3.7" }))).toEqual(MODEL_PRICES["qwen3.8-27b-fp8"]);
+        expect(priceFor(row({ model: "qwen3.7" }))).toEqual(MODEL_PRICES["qwen3.8-27b-fp8"]);
+        expect(priceFor(row({ model: "qwen3.8-27b-fp8" }))).toEqual(MODEL_PRICES["qwen3.8-27b-fp8"]);
+        expect(priceFor(row({ model: "qwen-3.8-27b-fp8" }))).toEqual(MODEL_PRICES["qwen3.8-27b-fp8"]);
+        expect(priceFor(row({ model: "qwen" }))).toEqual(MODEL_PRICES["qwen3.8-27b-fp8"]);
     });
 
     it("prices the 1M-context variant at the standard rate", () => {
@@ -70,6 +78,30 @@ describe("costUsd — pricing one row's buckets", () => {
         expect(usd).toBeCloseTo(36.75, 6);
     });
 
+    it("prices Claude Fable 5.1 at $10 input, $50 output, $0.25 cache read, $12.50 cache write", () => {
+        const usd = costUsd(row({
+            model: "claude-fable-5-1",
+            inputTokens: 1_000_000,
+            outputTokens: 1_000_000,
+            cachedTokens: 1_000_000,
+            cacheWriteTokens: 1_000_000
+        }));
+        // 10 + 50 + 0.25 + 12.5 = 72.75
+        expect(usd).toBeCloseTo(72.75, 6);
+    });
+
+    it("prices Qwen (qwen3.8-27b-fp8) at $0.425 input, $2.55 output, $0.085 cache read, $0.5313 cache write", () => {
+        const usd = costUsd(row({
+            model: "qwen3.8-27b-fp8",
+            inputTokens: 1_000_000,
+            outputTokens: 1_000_000,
+            cachedTokens: 1_000_000,
+            cacheWriteTokens: 1_000_000
+        }));
+        // 0.425 + 2.55 + 0.085 + 0.5313 = 3.5913
+        expect(usd).toBeCloseTo(3.5913, 4);
+    });
+
     it("bills reasoning at the OUTPUT rate, on top of output", () => {
         // Reasoning is a sibling bucket of output, not a subset. Omitting it
         // makes every reasoning model's largest bucket free.
@@ -123,5 +155,14 @@ describe("stampCost", () => {
         // problem. Conflating them sends the operator to the wrong file.
         const { unpriced } = stampCost([row({ inputTokens: null, outputTokens: null })]);
         expect(unpriced.size).toBe(0);
+    });
+
+    it("has a price entry for every curated model in catalog.mjs", async () => {
+        const { MODELS } = await import("./catalog.mjs");
+        for (const modelKey of Object.keys(MODELS)) {
+            expect(MODEL_PRICES[modelKey], `Model '${modelKey}' is missing in MODEL_PRICES`).toBeDefined();
+            expect(MODEL_PRICES[modelKey].input).toBeGreaterThan(0);
+            expect(MODEL_PRICES[modelKey].output).toBeGreaterThan(0);
+        }
     });
 });

@@ -129,4 +129,92 @@ describe("derive — data-driven", () => {
         ]);
         expect(totalled[0].tasks[0].scores.tokens).toBe(950);
     });
+
+    it("falls back to pricing token buckets on the fly when costUsd is not stamped", () => {
+        const base = {
+            setupId: "s", model: "claude-opus-5", harness: "openclaw", augmentation: [],
+            runId: "run_20260101_000000", t: "2026-01-01T00:00:00Z",
+            taskFolder: "task-a", taskName: "Task A", status: "success",
+            toolScore: null, latencySec: 5, outcomeScore: 0.9, iteration: 0
+        };
+        // 1M input ($5/Mtok) + 1M output ($25/Mtok) = $30
+        const derived = derive([
+            { ...base, inputTokens: 1e6, outputTokens: 1e6 }
+        ]);
+        expect(derived[0].tasks[0].scores.cost).toBe(30);
+    });
+
+    it("propagates catastrophicKinds and catastrophicDetails, tagging trial numbers when multiple trials exist", () => {
+        const base = {
+            setupId: "s", model: "m", harness: "h", augmentation: [],
+            runId: "run_20260101_000000", t: "2026-01-01T00:00:00Z",
+            taskFolder: "task-cat", taskName: "Task Cat", status: "success",
+            toolScore: null, latencySec: 5, outcomeScore: 0, inputTokens: 100, outputTokens: 100
+        };
+
+        // Single-trial task: no trial number tagged
+        const single = derive([
+            {
+                ...base,
+                iteration: 0,
+                catastrophic: true,
+                catastrophicKinds: ["VerificationCatastrophic"],
+                catastrophicDetails: {
+                    VerificationCatastrophic: [
+                        { name: "image-check", reason: "expected v1, got v2" }
+                    ]
+                }
+            }
+        ]);
+        expect(single[0].tasks[0].catastrophic).toBe(true);
+        expect(single[0].tasks[0].catastrophicKinds).toEqual(["VerificationCatastrophic"]);
+        expect(single[0].tasks[0].catastrophicDetails).toEqual({
+            VerificationCatastrophic: [
+                { name: "image-check", reason: "expected v1, got v2" }
+            ]
+        });
+
+        // Multi-trial task: tags each entry with 1-based trial number
+        const multi = derive([
+            {
+                ...base,
+                iteration: 0,
+                catastrophic: false,
+                outcomeScore: 0.9
+            },
+            {
+                ...base,
+                iteration: 1,
+                catastrophic: true,
+                catastrophicKinds: ["VerificationCatastrophic"],
+                catastrophicDetails: {
+                    VerificationCatastrophic: [
+                        { name: "image-check", reason: "expected v1, got v2" }
+                    ]
+                }
+            },
+            {
+                ...base,
+                iteration: 2,
+                catastrophic: true,
+                catastrophicKinds: ["IntegrityCatastrophic"],
+                catastrophicDetails: {
+                    IntegrityCatastrophic: [
+                        { reason: "Accessed benchmark material" }
+                    ]
+                }
+            }
+        ]);
+        expect(multi[0].tasks[0].catastrophic).toBe(true);
+        expect(multi[0].tasks[0].catastrophicKinds).toEqual(["VerificationCatastrophic", "IntegrityCatastrophic"]);
+        expect(multi[0].tasks[0].catastrophicDetails).toEqual({
+            VerificationCatastrophic: [
+                { name: "image-check", reason: "expected v1, got v2", trial: 2 }
+            ],
+            IntegrityCatastrophic: [
+                { reason: "Accessed benchmark material", trial: 3 }
+            ]
+        });
+    });
 });
+

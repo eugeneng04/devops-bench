@@ -30,9 +30,9 @@ function makeBenchmark(overrides = {}) {
                 // 20.0k) and their best is the SMALLEST, which is the opposite
                 // end from the percentage metrics above.
                 tasks: [
-                    { folder: "a", name: "Apple", scores: { composite: 60, pass1: 60, pass5: 65, passMax: 70, latency: 40, tokens: 10000 } },
-                    { folder: "b", name: "Banana", scores: { composite: 90, pass1: 90, pass5: 95, passMax: 100, latency: 50, tokens: 20000 } },
-                    { folder: "c", name: "Cherry", scores: { composite: 80, pass1: 80, pass5: 85, passMax: 90, latency: 60, tokens: 30000 } }
+                    { folder: "a", name: "Apple", scores: { composite: 60, pass1: 60, pass5: 65, passMax: 70, latency: 40, tokens: 10000, inputTokens: 5000 } },
+                    { folder: "b", name: "Banana", scores: { composite: 90, pass1: 90, pass5: 95, passMax: 100, latency: 50, tokens: 20000, inputTokens: 10000 } },
+                    { folder: "c", name: "Cherry", scores: { composite: 80, pass1: 80, pass5: 85, passMax: 90, latency: 60, tokens: 30000, inputTokens: 15000 } }
                 ],
                 history: [
                     { t: "2026-01-15T00:00:00Z", scores: { composite: 70, pass1: 70, pass5: 75, passMax: 80 } },
@@ -163,7 +163,7 @@ describe("Detail", () => {
         // tokens the run consumed are untouched, so beside a latency or token
         // headline the card qualifies a figure it has no bearing on.
         benchmark.setups[0].catastrophicCount = 3;
-        for (const m of ["latency", "inputTokens", "outputTokens"]) {
+        for (const m of ["latency", "tokensInput", "tokensOutput"]) {
             renderAt(`/setup/${SETUP_ID}?metric=${m}`);
             expect(screen.queryByText("Catastrophic")).not.toBeInTheDocument();
             cleanup();
@@ -193,7 +193,7 @@ describe("Detail", () => {
         // the outcome, not the seconds or the tokens.
         benchmark.setups[0].tasks[0].catastrophic = true;
         const marker = /catastrophic safety violation/i;
-        for (const m of ["latency", "inputTokens", "outputTokens"]) {
+        for (const m of ["latency", "tokensInput", "tokensOutput"]) {
             renderAt(`/setup/${SETUP_ID}?metric=${m}`);
             expect(screen.queryByLabelText(marker)).not.toBeInTheDocument();
             cleanup();
@@ -231,7 +231,7 @@ describe("Detail", () => {
 
     it("omits the legend on the efficiency metrics, with the markers", () => {
         benchmark.setups[0].tasks[0].catastrophic = true;
-        for (const m of ["latency", "inputTokens", "outputTokens"]) {
+        for (const m of ["latency", "tokensInput", "tokensOutput"]) {
             renderAt(`/setup/${SETUP_ID}?metric=${m}`);
             expect(screen.queryByText(/catastrophic safety violation/i, { selector: "p" }))
                 .not.toBeInTheDocument();
@@ -282,9 +282,9 @@ describe("Detail", () => {
         expect(screen.getByRole("button", { name: "Outcome" })).toHaveAttribute("aria-pressed", "true");
     });
 
-    it("sorts the task table by score desc by default", () => {
+    it("sorts the task table by score asc by default", () => {
         renderAt(`/setup/${SETUP_ID}`);
-        expect(taskOrder()).toEqual(["Banana", "Cherry", "Apple"]); // 90, 80, 60
+        expect(taskOrder()).toEqual(["Apple", "Cherry", "Banana"]); // 60, 80, 90
     });
 
     it("re-sorts by task name (asc then desc) when the Task header is clicked", () => {
@@ -298,23 +298,20 @@ describe("Detail", () => {
     it("toggles score sort direction on repeated header clicks", () => {
         renderAt(`/setup/${SETUP_ID}`);
         fireEvent.click(screen.getByRole("columnheader", { name: /Outcome/ }));
-        expect(taskOrder()).toEqual(["Apple", "Cherry", "Banana"]); // now ascending
+        expect(taskOrder()).toEqual(["Banana", "Cherry", "Apple"]); // now descending
     });
 
     it("points the sort arrow the way the values actually run", () => {
-        // Both default to best-first, but "best" is the largest percentage and
-        // the smallest token count, so the same sort state has to draw opposite
-        // arrows — otherwise a column ascending 10.0k → 30.0k sits under a ▼.
         const header = name => screen.getByRole("columnheader", { name });
 
         renderAt(`/setup/${SETUP_ID}`);
-        expect(header(/Outcome/)).toHaveTextContent("▼"); // 90 → 60, descending
+        expect(header(/Outcome/)).toHaveTextContent("▲"); // 60 → 90, ascending
 
         cleanup();
         renderAt(`/setup/${SETUP_ID}?metric=tokens`);
-        expect(header(/Tokens/)).toHaveTextContent("▲"); // 10.0k → 30.0k, ascending
+        expect(header(/Tokens/)).toHaveTextContent("▼"); // 30.0k → 10.0k, descending
         fireEvent.click(header(/Tokens/));
-        expect(header(/Tokens/)).toHaveTextContent("▼");
+        expect(header(/Tokens/)).toHaveTextContent("▲");
     });
 
     it("shows a NotFound state for an unknown setup id", () => {
@@ -333,5 +330,78 @@ describe("Detail", () => {
         benchmark = makeBenchmark({ error: new Error("boom") });
         renderAt(`/setup/${SETUP_ID}`);
         expect(screen.getByText(/Couldn't load benchmark data/i)).toBeInTheDocument();
+    });
+
+    it("renders catastrophic failure details under task name on quality metrics, expanding when >3 items", () => {
+        benchmark = makeBenchmark({
+            setups: [
+                {
+                    id: SETUP_ID,
+                    order: 0,
+                    model: "alpha-pro",
+                    harness: "gemini-cli",
+                    augmentation: [],
+                    color: "#3b82f6",
+                    catastrophicCount: 2,
+                    tasks: [
+                        {
+                            folder: "cat-task",
+                            name: "Catastrophic Task",
+                            scores: { composite: 0, pass1: 0, latency: 45 },
+                            catastrophic: true,
+                            catastrophicKinds: ["VerificationCatastrophic", "IntegrityCatastrophic"],
+                            catastrophicDetails: {
+                                VerificationCatastrophic: [
+                                    { name: "chk-1", reason: "deployment/a: replicas expected 1, got 0", trial: 1 },
+                                    { name: "chk-2", reason: "deployment/b: image mismatch", trial: 2 },
+                                    { name: "chk-3", reason: "cronjob/c: suspend expected false, got true", trial: 2 }
+                                ],
+                                IntegrityCatastrophic: [
+                                    { reason: "Accessed benchmark material", trial: 3 }
+                                ]
+                            }
+                        },
+                        {
+                            folder: "legacy-task",
+                            name: "Legacy Task",
+                            scores: { composite: 0, pass1: 0, latency: 30 },
+                            catastrophic: true,
+                            catastrophicKinds: ["VerificationCatastrophic"],
+                            catastrophicDetails: {}
+                        }
+                    ],
+                    history: []
+                }
+            ]
+        });
+
+        renderAt(`/setup/${SETUP_ID}`);
+
+        // Collapsed 1-line box shows first entry and "+3 more ▼"
+        expect(screen.getByText("chk-1:")).toBeInTheDocument();
+        expect(screen.getByText("deployment/a: replicas expected 1, got 0")).toBeInTheDocument();
+        expect(screen.getByText("trial #1")).toBeInTheDocument();
+
+        // Remaining lines hidden until expanded
+        expect(screen.queryByText("chk-2")).not.toBeInTheDocument();
+        expect(screen.queryByText("Accessed benchmark material")).not.toBeInTheDocument();
+        const toggleBtn = screen.getByRole("button", { name: /\+3 more/i });
+        expect(toggleBtn).toBeInTheDocument();
+
+        // Click collapsed box to expand all entries
+        fireEvent.click(toggleBtn);
+        expect(screen.getByText("chk-2")).toBeInTheDocument();
+        expect(screen.getByText("chk-3")).toBeInTheDocument();
+        expect(screen.getByText("Accessed benchmark material")).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: /Show less/i })).toBeInTheDocument();
+
+        // Legacy fallback rendered for task with empty catastrophicDetails
+        expect(screen.getByText("Gate triggered: VerificationCatastrophic")).toBeInTheDocument();
+
+        // When switched to an efficiency metric, failure details are hidden
+        cleanup();
+        renderAt(`/setup/${SETUP_ID}?metric=latency`);
+        expect(screen.queryByText("chk-1:")).not.toBeInTheDocument();
+        expect(screen.queryByText("Gate triggered: VerificationCatastrophic")).not.toBeInTheDocument();
     });
 });

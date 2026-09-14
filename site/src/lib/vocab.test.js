@@ -58,7 +58,13 @@ describe("metric vocabulary coverage", () => {
     });
 
     it("puts every leaderboard column in a chart group, and lists no metric twice", () => {
-        for (const m of METRICS) expect(CHART_METRICS, `${m} missing from METRIC_GROUPS`).toContain(m);
+        const canonical = m =>
+            m === "inputTokens" ? "tokensInput" :
+            m === "outputTokens" ? "tokensOutput" :
+            m === "cachedTokens" ? "tokensCached" : m;
+        for (const m of METRICS) {
+            expect(CHART_METRICS, `${m} missing from METRIC_GROUPS`).toContain(canonical(m));
+        }
         expect(new Set(CHART_METRICS).size).toBe(CHART_METRICS.length);
         expect(new Set(METRIC_GROUPS.map(g => g.key)).size).toBe(METRIC_GROUPS.length);
     });
@@ -87,9 +93,16 @@ describe("formatMetric", () => {
         expect(formatMetric("composite", 85.44)).toBe("85.4%");
     });
 
-    it("renders latency in seconds and compacts large token counts", () => {
+    it("renders latency in seconds, minutes, or hours depending on magnitude", () => {
         expect(formatMetric("latency", 42.66)).toBe("42.7s");
         expect(formatMetric("latency", 8)).toBe("8.0s");
+        expect(formatMetric("latency", 120)).toBe("2m");
+        expect(formatMetric("latency", 195)).toBe("3m 15s");
+        expect(formatMetric("latency", 3600)).toBe("1h");
+        expect(formatMetric("latency", 4500)).toBe("1h 15m");
+    });
+
+    it("compacts large token counts", () => {
         expect(formatMetric("tokens", 38412)).toBe("38.4k");
         expect(formatMetric("tokens", 850)).toBe("850");
     });

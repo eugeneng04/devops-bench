@@ -1,110 +1,40 @@
-// The charts below the leaderboard table.
-//
-// Laid out the way Artificial Analysis lays out its models page: one scrolling
-// column, banded into groups by what is being measured — Harness, Token Usage,
-// Cost, Speed, Consistency — with each chart carrying a one-line italic
-// subtitle. No tabs. A tab hides the comparison a reader did not know to look
-// for — the cost story only lands next to the token story, and both only land
-// next to the score. Groups are waypoints in that scroll, not walls.
-//
-// Subtitles follow Artificial Analysis's house style: a noun phrase naming what
-// is measured and in what unit, then " · " separated qualifiers, ending in the
-// direction. Not sentences, and not an argument for why the chart exists — that
-// reasoning belongs in the header comment of the component that draws it.
-//
-// A spend metric gets a ranked bar for "how much" and a scatter against the
-// outcome score for "did the spend buy anything". Sections whose metric is
-// unmeasured are omitted rather than drawn empty.
-//
-// Every chart reads the FILTERED setups, so the filter bar at the top of the
-// page drives the plots as well as the table.
+// Performance and efficiency charts:
+// 1. Outcome vs Efficiency comparison plot (Score vs Time, Score vs Cost, Score vs Tokens),
+//    with subtabs for Average (mean per task) vs Total (suite total).
+// 2. Task Spread & Consistency box plot (adjustable over metrics, collapsed by default).
 
 import { useMemo, useState } from "react";
 import { EfficiencyScatter } from "./EfficiencyScatter.jsx";
-import { RankedBarChart } from "./RankedBarChart.jsx";
-import { TokenBreakdownChart } from "./TokenBreakdownChart.jsx";
 import { ConsistencyChart } from "./ConsistencyChart.jsx";
-import { HarnessSavingsChart } from "./HarnessSavingsChart.jsx";
-import { scatterPoints, canUseLogScale, taskOptions } from "../lib/charts.js";
 import {
     CHART_METRICS,
-    METRIC_GROUPS,
     METRIC_LABELS,
     availableMetrics,
     isLowerBetter,
-    metricDescription
+    metricShortLabel
 } from "../lib/vocab.js";
 
-// The spend axes paired with the outcome score, in the order a reader meets
-// them: what it cost in money, then in wall clock. Tokens come first and are
-// handled on their own, because their "how much" view is the bucket breakdown
-// rather than a single ranked total.
-// A bar section earns its place over the table's own column only because of the
-// view picker: the table ranks the per-task mean and nothing else, so the total
-// and the single-task views are rankings a reader cannot get upstairs.
-const SPEND_SECTIONS = [
-    {
-        metric: "cost",
-        group: "Cost",
-        barTitle: "Cost per Task",
-        totalTitle: "Total Cost",
-        subject: "API cost (USD)",
-        qualifier: "Priced from each run's own token buckets at published rates",
-        scatterTitle: "Outcome Index vs. Cost per Task"
-    },
-    {
-        metric: "latency",
-        group: "Speed",
-        barTitle: "Time per Task",
-        totalTitle: "Total Time",
-        subject: "agent wall-clock time (seconds)",
-        qualifier: "Excluding scoring and harness startup",
-        scatterTitle: "Outcome Index vs. Execution Time"
-    }
-];
-
-// Taller than the bar charts on purpose. A scatter's dots carry a name label
-// each, and the placement algorithm can only push a label so far before it runs
-// out of plot; the extra height is what stops the labels stacking up in the
-// crowded low-cost corner. One constant so the two scatters keep the same shape.
-//
-// This is the real height of the plot, not of a box the plot sits in — the
-// scatter has to fill it. See the note on EfficiencyScatter's root element.
 const SCATTER_H = "h-[30rem]";
 
-const TOKEN_SECTION = {
-    metric: "tokens",
-    group: "Token Usage",
-    barTitle: "Token Usage per Task",
-    totalTitle: "Total Token Usage",
-    subject: "tokens",
-    qualifier: "Stacked by billed bucket: input, cache read, cache write, reasoning, output"
-};
+const VS_TABS = [
+    { key: "latency", label: "Score vs Time", subject: "execution time" },
+    { key: "cost", label: "Score vs Cost", subject: "cost" },
+    { key: "tokens", label: "Score vs Tokens", subject: "tokens" }
+];
 
-const SCATTER_SUBTITLE =
-    "One dot per model × harness pairing · Dashed line is the Pareto frontier · Up and to the left is better";
+const AGG_OPTIONS = [
+    { key: "mean", label: "Average" },
+    { key: "total", label: "Total" }
+];
 
-const taskName = (tasks, folder) => tasks.find(t => t.folder === folder)?.name ?? folder;
-const cap = text => text.charAt(0).toUpperCase() + text.slice(1);
-
-// What a section is currently showing, phrased so the subtitle and the
-// screen-reader label say it rather than leaving the reader to infer it from a
-// control they may not have touched.
-function viewSubject(view, subject, tasks) {
-    if (view === "total") return `Total ${subject} across all tasks`;
-    if (view === "mean") return `Mean ${subject} per task`;
-    return `${cap(subject)} on ${taskName(tasks, view)}`;
-}
-
-// The section heading follows the view: "per Task" would misread a sum.
-const viewTitle = (view, section) => (view === "total" ? section.totalTitle : section.barTitle);
-
-/** "· Higher is better" / "· Lower is better", from the metric vocabulary. */
-function withDirection(text, metric) {
-    return `${text} · ${isLowerBetter(metric) ? "Lower" : "Higher"} is better`;
-}
-
-// --- small shared controls ---------------------------------------------------
+const BOX_METRIC_CANDIDATES = [
+    "composite",
+    "correctness",
+    "recoverableSafety",
+    "latency",
+    "cost",
+    "tokens"
+];
 
 function Segmented({ value, onChange, options, ariaLabel }) {
     return (
@@ -135,377 +65,207 @@ function Segmented({ value, onChange, options, ariaLabel }) {
     );
 }
 
-// Grouped metric dropdown. A <select> rather than more pill buttons: the custom
-// section offers every metric in the vocabulary, and seventeen pills is a wall.
-function MetricSelect({ id, label, value, onChange, available }) {
-    return (
-        <label htmlFor={id} className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-slate-400">
-            {label}
-            <select
-                id={id}
-                value={value}
-                onChange={e => onChange(e.target.value)}
-                title={metricDescription(value)}
-                className="px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-[11px] font-medium border-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
-            >
-                {METRIC_GROUPS.map(group => {
-                    const options = group.metrics.filter(m => available.includes(m));
-                    if (!options.length) return null;
-                    return (
-                        <optgroup key={group.key} label={group.label}>
-                            {options.map(m => <option key={m} value={m}>{METRIC_LABELS[m]}</option>)}
-                        </optgroup>
-                    );
-                })}
-            </select>
-        </label>
-    );
-}
-
-// Task picker. One control, three kinds of answer: the per-task mean (the
-// default, so the chart reads as it always did), the suite total, or a single
-// task. Mean and total are grouped apart from the task list because they are a
-// different question, not a different task.
-//
-// The caller hides this entirely when there is only one task, where all three
-// answers are the same number.
-function TaskSelect({ id, value, onChange, tasks }) {
-    return (
-        <label htmlFor={id} className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-slate-400">
-            Show
-            <select
-                id={id}
-                value={value}
-                onChange={e => onChange(e.target.value)}
-                className="px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-[11px] font-medium border-0 max-w-[16rem] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
-            >
-                <optgroup label="All tasks">
-                    <option value="mean">Mean per task</option>
-                    <option value="total">Total across tasks</option>
-                </optgroup>
-                {tasks.length ? (
-                    <optgroup label="Single task">
-                        {tasks.map(t => <option key={t.folder} value={t.folder}>{t.name}</option>)}
-                    </optgroup>
-                ) : null}
-            </select>
-        </label>
-    );
-}
-
-function Checkbox({ id, label, checked, onChange, disabled, title }) {
-    return (
-        <label
-            htmlFor={id}
-            title={title}
-            className={`flex items-center gap-1.5 text-[11px] font-medium ${disabled ? "text-slate-300 dark:text-slate-600 cursor-not-allowed" : "text-slate-500 dark:text-slate-400"}`}
-        >
-            <input
-                id={id}
-                type="checkbox"
-                checked={checked}
-                disabled={disabled}
-                onChange={e => onChange(e.target.checked)}
-                className="rounded border-slate-300 dark:border-slate-600 text-indigo-500 focus-visible:ring-indigo-500 disabled:cursor-not-allowed"
-            />
-            {label}
-        </label>
-    );
-}
-
-// One titled chart. The subtitle is not decoration: without it a reader has to
-// infer from the axis whether a long bar is good news.
-function Section({ title, subtitle, controls, children }) {
-    return (
-        <section className="mt-10 first:mt-0 pt-10 first:pt-0 border-t first:border-t-0 border-slate-100 dark:border-slate-800">
-            <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
-                <div className="min-w-0">
-                    <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">{title}</h3>
-                    <p className="text-[11px] italic text-slate-500 dark:text-slate-400 mt-0.5 max-w-3xl">{subtitle}</p>
-                </div>
-                {controls}
-            </div>
-            {children}
-        </section>
-    );
-}
-
-// One icon and accent per group, so the headers are distinguishable at a glance
-// while scrolling and not just five identical grey lines.
-const GROUPS = {
-    "Cost": {
-        accent: "text-emerald-500 dark:text-emerald-400",
-        d: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 9v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-    },
-    "Speed": {
-        accent: "text-amber-500 dark:text-amber-400",
-        d: "M13 10V3L4 14h7v7l9-11h-7z"
-    },
-    "Token Usage": {
-        accent: "text-violet-500 dark:text-violet-400",
-        d: "M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
-    },
-    "Consistency": {
-        accent: "text-sky-500 dark:text-sky-400",
-        d: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-    },
-    "Harness": {
-        accent: "text-rose-500 dark:text-rose-400",
-        d: "M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
-    }
-};
-
-// A band of related charts under one heading. One heading over all eight
-// sections was a heading that said nothing: a reader scrolling for the cost
-// charts had no waypoint to scroll to. The sections inside a group are wrapped
-// so the first of them keeps its `first:` rules and drops its top rule — the
-// group heading is already the separator there.
-function Group({ title, children }) {
-    const { accent, d } = GROUPS[title];
-    return (
-        <section className="mt-14 first:mt-0">
-            <h2 className={`text-xs font-semibold uppercase tracking-wider flex items-center gap-2 mb-8 ${accent}`}>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={d} />
-                </svg>
-                {title}
-            </h2>
-            <div>{children}</div>
-        </section>
-    );
-}
-
-// --- panel -------------------------------------------------------------------
-
 export function ChartsPanel({ setups, models, harnesses }) {
     const [colorBy, setColorBy] = useState("model");
-    const [harnessMetric, setHarnessMetric] = useState("cost");
-    const [spreadMetric, setSpreadMetric] = useState("composite");
-    const [customX, setCustomX] = useState("tokens");
-    const [customY, setCustomY] = useState("composite");
-    const [logX, setLogX] = useState(false);
-    const [logY, setLogY] = useState(false);
-    // One view per bar section, keyed by metric. Separate rather than shared:
-    // narrowing the cost chart to one task is a question about cost, and
-    // silently re-pointing the token chart with it would be a surprise.
-    const [views, setViews] = useState({});
+    const [vsMetric, setVsMetric] = useState("latency");
+    const [aggregation, setAggregation] = useState("mean");
+    const [boxMetric, setBoxMetric] = useState("composite");
+    const [isBoxPlotOpen, setIsBoxPlotOpen] = useState(false);
 
-    const available = useMemo(() => availableMetrics(setups, CHART_METRICS), [setups]);
-    const tasks = useMemo(() => taskOptions(setups), [setups]);
+    const hasTokenData = useMemo(() => {
+        const tokenKeys = ["tokens", "tokensInput", "inputTokens", "tokensOutput", "outputTokens", "tokensCached", "cachedTokens"];
+        return setups.some(s =>
+            (s.tasks || []).some(t => tokenKeys.some(k => t.scores?.[k] != null)) ||
+            (s.history || []).some(h => tokenKeys.some(k => h.scores?.[k] != null))
+        );
+    }, [setups]);
 
-    // A task the filter bar has since excluded must not keep narrowing a chart
-    // from a control that no longer offers it — fall back to the mean.
-    const viewFor = metric => {
-        const view = views[metric] ?? "mean";
-        return view === "mean" || view === "total" || tasks.some(t => t.folder === view) ? view : "mean";
-    };
-    const setView = (metric, view) => setViews(prev => ({ ...prev, [metric]: view }));
+    const available = useMemo(() => {
+        const list = availableMetrics(setups, CHART_METRICS);
+        if (hasTokenData && !list.includes("tokens")) {
+            return [...list, "tokens"];
+        }
+        return list;
+    }, [setups, hasTokenData]);
 
-    // The props a bar chart needs to honour a view. `task` is null for the two
-    // whole-suite views, where `aggregate` is what distinguishes them.
-    const viewProps = view => ({
-        task: view === "mean" || view === "total" ? null : view,
-        aggregate: view === "total" ? "total" : "mean"
-    });
-
-    // Log scales cannot draw a zero or a negative, and Chart.js drops such points
-    // without comment. Offer the toggle only when every plotted value survives.
-    const customPoints = useMemo(
-        () => scatterPoints(setups, customX, customY),
-        [setups, customX, customY]
+    const availableVsTabs = useMemo(() =>
+        VS_TABS.filter(t => available.includes(t.key)),
+        [available]
     );
-    const logXOk = canUseLogScale(customPoints.map(p => p.x));
-    const logYOk = canUseLogScale(customPoints.map(p => p.y));
 
-    const activeSpreadMetric = available.includes(spreadMetric) ? spreadMetric : (available[0] ?? spreadMetric);
-    const activeHarnessMetric = available.includes(harnessMetric) ? harnessMetric : (available[0] ?? harnessMetric);
+    const activeVsMetric = availableVsTabs.some(t => t.key === vsMetric)
+        ? vsMetric
+        : (availableVsTabs[0]?.key ?? "latency");
 
-    // The colour toggle is a LEGEND ENCODING, not a ranking: it groups the dots
-    // so a cluster is visible. It applies to every scatter at once, because a
-    // reader comparing two charts should not have to re-set it on each.
+    const activeVsTabObj = VS_TABS.find(t => t.key === activeVsMetric) ?? VS_TABS[0];
+
+    const boxMetricOptions = useMemo(() =>
+        BOX_METRIC_CANDIDATES
+            .filter(m => available.includes(m))
+            .map(m => ({
+                key: m,
+                label: m === "latency" ? "Time" : metricShortLabel(m)
+            })),
+        [available]
+    );
+
+    const activeBoxMetric = boxMetricOptions.some(opt => opt.key === boxMetric)
+        ? boxMetric
+        : (boxMetricOptions[0]?.key ?? "composite");
+
     const colorControl = (
         <Segmented
             value={colorBy}
             onChange={setColorBy}
             ariaLabel="Color dots by"
             options={[
-                { key: "model", label: "Color: model", title: "Color the dots by model. Each dot is still one model × harness pairing — this only groups them." },
-                { key: "harness", label: "Color: harness", title: "Color the dots by harness. Each dot is still one model × harness pairing — this only groups them." }
+                { key: "model", label: "Color: model", title: "Color dots by model" },
+                { key: "harness", label: "Color: harness", title: "Color dots by harness" }
             ]}
         />
     );
 
-    const scatterAgainstOutcome = metric => (
-        <div className={SCATTER_H}>
-            <EfficiencyScatter
-                setups={setups}
-                xMetric={metric}
-                yMetric="composite"
-                models={models}
-                harnesses={harnesses}
-                colorBy={colorBy}
-                ariaLabel={`Outcome score against ${METRIC_LABELS[metric].toLowerCase()} for each setup, with the Pareto frontier`}
-                caption={`Outcome score versus ${METRIC_LABELS[metric].toLowerCase()} per setup`}
-            />
-        </div>
+    const aggControl = (
+        <Segmented
+            value={aggregation}
+            onChange={setAggregation}
+            ariaLabel="Aggregation view"
+            options={AGG_OPTIONS}
+        />
     );
 
+    const vsTabsControl = (
+        <Segmented
+            value={activeVsMetric}
+            onChange={setVsMetric}
+            ariaLabel="Comparison tabs"
+            options={availableVsTabs}
+        />
+    );
+
+    const vsSubtitle = `Outcome score vs. ${aggregation === "total" ? "total " : "average "}${activeVsTabObj.subject} ${aggregation === "total" ? "across all tasks" : "per task"} · Up and to the left is better`;
+
     return (
-        <section
-            aria-label="Performance and efficiency charts"
-            className="w-full bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xl shadow-slate-100 dark:shadow-none p-6 flex flex-col"
-        >
-            <Group title="Harness">
-                <Section
-                    title="Harness Comparison"
-                    subtitle={withDirection(`${METRIC_LABELS[activeHarnessMetric]} for one model across harnesses, augmentation held constant · Single-harness models omitted`, activeHarnessMetric)}
-                    controls={
-                        <MetricSelect
-                            id="harness-metric"
-                            label="Metric"
-                            value={activeHarnessMetric}
-                            onChange={setHarnessMetric}
-                            available={available}
-                        />
-                    }
+        <div className="w-full flex flex-col gap-6">
+            {/* Plot 1: Comparison Plot ("vs") */}
+            {availableVsTabs.length > 0 && (
+                <section
+                    aria-label="Performance and efficiency comparison"
+                    className="w-full bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xl shadow-slate-100 dark:shadow-none p-6 flex flex-col gap-4"
                 >
-                    <HarnessSavingsChart
-                        setups={setups}
-                        metric={activeHarnessMetric}
-                        models={models}
-                        harnesses={harnesses}
-                        ariaLabel={`${METRIC_LABELS[activeHarnessMetric]} per harness, with the model and augmentation held constant`}
-                        caption={`${METRIC_LABELS[activeHarnessMetric]} by harness for each model`}
-                    />
-                </Section>
-            </Group>
+                    <div className="flex flex-col gap-3">
+                        <div className="flex flex-wrap items-center justify-between gap-3">
+                            <div className="flex items-center gap-2">
+                                <h2 className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider flex items-center gap-2">
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                    </svg>
+                                    Score vs. Efficiency
+                                </h2>
+                            </div>
+                            {availableVsTabs.length > 1 && vsTabsControl}
+                        </div>
 
-            {available.includes("tokens") && (
-                <Group title={TOKEN_SECTION.group}>
-                    {/* Scatter first here, bar second — the reverse of the spend
-                        bands. "Did the tokens buy anything" is the question a
-                        reader brings to token usage; the bucket breakdown is
-                        the follow-up that explains a dot's position. */}
-                    <Section title="Outcome Index vs. Total Tokens" subtitle={SCATTER_SUBTITLE}>
-                        {scatterAgainstOutcome("tokens")}
-                    </Section>
+                        <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+                            <div>
+                                <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                                    {activeVsTabObj.label}
+                                </h3>
+                                <p className="text-[11px] italic text-slate-500 dark:text-slate-400 mt-0.5">
+                                    {vsSubtitle}
+                                </p>
+                            </div>
+                            <div className="flex flex-wrap items-center gap-3">
+                                <div className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                                    <span>Mode:</span>
+                                    {aggControl}
+                                </div>
+                                {colorControl}
+                            </div>
+                        </div>
+                    </div>
 
-                    <Section
-                        title={viewTitle(viewFor("tokens"), TOKEN_SECTION)}
-                        subtitle={withDirection(`${viewSubject(viewFor("tokens"), TOKEN_SECTION.subject, tasks)} · ${TOKEN_SECTION.qualifier}`, "tokens")}
-                        controls={tasks.length > 1 ? <TaskSelect id="token-task" value={viewFor("tokens")} onChange={v => setView("tokens", v)} tasks={tasks} /> : undefined}
-                    >
-                        <TokenBreakdownChart
+                    <div className={SCATTER_H}>
+                        <EfficiencyScatter
                             setups={setups}
+                            xMetric={activeVsMetric}
+                            yMetric="composite"
+                            xAggregate={aggregation}
                             models={models}
                             harnesses={harnesses}
-                            {...viewProps(viewFor("tokens"))}
-                            ariaLabel={`${viewSubject(viewFor("tokens"), TOKEN_SECTION.subject, tasks)} per setup, stacked by billed bucket`}
-                            caption={`Token usage by bucket per setup — ${viewSubject(viewFor("tokens"), TOKEN_SECTION.subject, tasks).toLowerCase()}`}
+                            colorBy={colorBy}
+                            ariaLabel={`${activeVsTabObj.label} (${aggregation === "total" ? "Total" : "Average"})`}
+                            caption={`${activeVsTabObj.label} for each setup`}
                         />
-                    </Section>
-                </Group>
+                    </div>
+                </section>
             )}
 
-            {SPEND_SECTIONS.filter(s => available.includes(s.metric)).map(section => (
-                <Group key={section.metric} title={section.group}>
-                    <Section
-                        title={viewTitle(viewFor(section.metric), section)}
-                        subtitle={withDirection(`${viewSubject(viewFor(section.metric), section.subject, tasks)} · ${section.qualifier}`, section.metric)}
-                        controls={tasks.length > 1 ? <TaskSelect id={`${section.metric}-task`} value={viewFor(section.metric)} onChange={v => setView(section.metric, v)} tasks={tasks} /> : undefined}
-                    >
-                        <RankedBarChart
+            {/* Plot 2: Box Plot (Task Spread & Consistency) */}
+            <section
+                aria-label="Task spread and consistency"
+                className="w-full bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xl shadow-slate-100 dark:shadow-none p-6 flex flex-col"
+            >
+                <button
+                    type="button"
+                    onClick={() => setIsBoxPlotOpen(prev => !prev)}
+                    aria-expanded={isBoxPlotOpen}
+                    aria-controls="box-plot-content"
+                    className="w-full flex items-center justify-between gap-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-lg p-1 transition-colors"
+                >
+                    <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-sky-50 dark:bg-sky-500/10 flex items-center justify-center text-sky-600 dark:text-sky-400 shrink-0">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 className="text-xs font-semibold text-slate-800 dark:text-slate-100 uppercase tracking-wider">
+                                Task Performance Spread (Box Plot)
+                            </h2>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                                Distribution across individual tasks (min, 25th percentile, median, 75th percentile, max)
+                            </p>
+                        </div>
+                    </div>
+                    <span className="px-3 py-1 text-xs font-medium rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors shrink-0">
+                        {isBoxPlotOpen ? "Collapse Box Plot ▲" : "Expand Box Plot ▼"}
+                    </span>
+                </button>
+
+                {isBoxPlotOpen && (
+                    <div id="box-plot-content" className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-4">
+                        <div className="flex flex-wrap items-center justify-between gap-3">
+                            <div>
+                                <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                                    {METRIC_LABELS[activeBoxMetric]} Spread Across Tasks
+                                </h3>
+                                <p className="text-[11px] italic text-slate-500 dark:text-slate-400 mt-0.5">
+                                    Box shows middle 50% of tasks, line marks median, whiskers reach min and max · {isLowerBetter(activeBoxMetric) ? "Lower values and tighter boxes indicate consistency" : "Higher values and tighter boxes indicate consistency"}
+                                </p>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                                <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">Metric:</span>
+                                <Segmented
+                                    value={activeBoxMetric}
+                                    onChange={setBoxMetric}
+                                    options={boxMetricOptions}
+                                    ariaLabel="Box plot metric"
+                                />
+                            </div>
+                        </div>
+
+                        <ConsistencyChart
                             setups={setups}
-                            metric={section.metric}
+                            metric={activeBoxMetric}
                             models={models}
                             harnesses={harnesses}
-                            {...viewProps(viewFor(section.metric))}
-                            ariaLabel={`${viewSubject(viewFor(section.metric), section.subject, tasks)} per setup, ranked`}
-                            caption={`${viewSubject(viewFor(section.metric), section.subject, tasks)} by setup`}
+                            ariaLabel={`Box plot of ${METRIC_LABELS[activeBoxMetric]} across tasks`}
+                            caption={`Task distribution of ${METRIC_LABELS[activeBoxMetric]} per setup`}
                         />
-                    </Section>
-                    <Section
-                        title={section.scatterTitle}
-                        subtitle={SCATTER_SUBTITLE}
-                        controls={section.metric === SPEND_SECTIONS[0].metric ? colorControl : undefined}
-                    >
-                        {scatterAgainstOutcome(section.metric)}
-                    </Section>
-                </Group>
-            ))}
-
-            <Group title="Consistency">
-                <Section
-                    title="Consistency Across Tasks"
-                    subtitle={`Spread of ${METRIC_LABELS[activeSpreadMetric].toLowerCase()} across tasks · Box is the middle half, line the median, whiskers the best and worst task · Ranked by spread, tightest first`}
-                    controls={
-                        <MetricSelect
-                            id="spread-metric"
-                            label="Metric"
-                            value={activeSpreadMetric}
-                            onChange={setSpreadMetric}
-                            available={available}
-                        />
-                    }
-                >
-                    <ConsistencyChart
-                        setups={setups}
-                        metric={activeSpreadMetric}
-                        models={models}
-                        harnesses={harnesses}
-                        ariaLabel={`Box plot of ${METRIC_LABELS[activeSpreadMetric].toLowerCase()} across tasks for each setup, tightest first`}
-                        caption={`Best task, quartiles, median and worst task ${METRIC_LABELS[activeSpreadMetric].toLowerCase()} by setup`}
-                    />
-                </Section>
-            </Group>
-
-            {/* Folded away, unlike everything above it. Any two of ~17 metrics is
-                270-odd plots and almost none of them mean anything — "cache write
-                tokens versus pass@1" is a question nobody has — but the long tail
-                should still be reachable. */}
-            <details className="mt-14 pt-10 border-t border-slate-100 dark:border-slate-800 group">
-                <summary className="text-sm font-semibold text-slate-800 dark:text-slate-100 cursor-pointer marker:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded">
-                    Plot any two metrics
-                </summary>
-                <p className="text-[11px] italic text-slate-500 dark:text-slate-400 mt-1 mb-4 max-w-3xl">
-                    One dot per setup · No frontier line: an arbitrary metric pair has no agreed better direction · Log scales unavailable on an axis where a plotted value is zero
-                </p>
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-4">
-                    <MetricSelect id="custom-x" label="X" value={customX} onChange={setCustomX} available={available} />
-                    <Checkbox
-                        id="custom-log-x"
-                        label="log X"
-                        checked={logX && logXOk}
-                        disabled={!logXOk}
-                        onChange={setLogX}
-                        title={logXOk ? "Logarithmic x-axis" : "A plotted value is zero or negative, which a log axis cannot show"}
-                    />
-                    <MetricSelect id="custom-y" label="Y" value={customY} onChange={setCustomY} available={available} />
-                    <Checkbox
-                        id="custom-log-y"
-                        label="log Y"
-                        checked={logY && logYOk}
-                        disabled={!logYOk}
-                        onChange={setLogY}
-                        title={logYOk ? "Logarithmic y-axis" : "A plotted value is zero or negative, which a log axis cannot show"}
-                    />
-                </div>
-                <div className={SCATTER_H}>
-                    <EfficiencyScatter
-                        setups={setups}
-                        xMetric={customX}
-                        yMetric={customY}
-                        models={models}
-                        harnesses={harnesses}
-                        colorBy={colorBy}
-                        showFrontier={false}
-                        logX={logX && logXOk}
-                        logY={logY && logYOk}
-                        ariaLabel={`${METRIC_LABELS[customY]} against ${METRIC_LABELS[customX]} for each setup`}
-                        caption={`${METRIC_LABELS[customY]} versus ${METRIC_LABELS[customX]} per setup`}
-                    />
-                </div>
-            </details>
-        </section>
+                    </div>
+                )}
+            </section>
+        </div>
     );
 }

@@ -10,7 +10,7 @@
 // one definition in Logo.jsx, two ways of painting it.
 
 import { Chart } from "chart.js";
-import { BRANDS, HARNESS_PATHS } from "../components/Logo.jsx";
+import { BRANDS, HARNESS_PATHS, MODEL_PATHS } from "../components/Logo.jsx";
 
 const GAP_PX = 4;
 // Authoring viewBox of the harness paths.
@@ -24,21 +24,61 @@ export const iconGutter = (slots, size = MARK_PX) => slots * (size + GAP_PX) + G
 function drawModel(ctx, model, x, y, size) {
     const brand = BRANDS[model?.logo];
     if (!brand) return;
+    const modelPath = MODEL_PATHS[model?.logo];
+
     ctx.save();
-    ctx.fillStyle = brand.fill;
-    ctx.beginPath();
-    ctx.roundRect(x, y, size, size, size * 0.3);
-    ctx.fill();
-    ctx.fillStyle = "#ffffff";
-    ctx.font = `bold ${Math.round(size * 0.68)}px system-ui, sans-serif`;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(brand.letter, x + size / 2, y + size / 2 + 0.5);
+    if (modelPath) {
+        ctx.translate(x, y);
+        ctx.scale(size / modelPath.viewBox, size / modelPath.viewBox);
+        if (modelPath.paths) {
+            for (const p of modelPath.paths) {
+                ctx.fillStyle = p.fill;
+                ctx.fill(new Path2D(p.d));
+            }
+        } else {
+            ctx.fillStyle = modelPath.fill ?? brand.fill ?? "#ffffff";
+            ctx.fill(new Path2D(modelPath.path));
+        }
+    } else {
+        // Fallback letter badge for synthetic/mock models (alpha, beta, gamma)
+        ctx.fillStyle = brand.fill ?? "#64748b";
+        ctx.beginPath();
+        ctx.roundRect(x, y, size, size, size * 0.25);
+        ctx.fill();
+        ctx.fillStyle = "#ffffff";
+        ctx.font = `bold ${Math.round(size * 0.6)}px system-ui, sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(brand.letter, x + size / 2, y + size / 2);
+    }
     ctx.restore();
 }
 
+function getHarnessLogo(harness) {
+    if (!harness) return undefined;
+    const name = harness.name?.toLowerCase();
+    if (name === "antigravity" || harness.logo === "google") {
+        return "google";
+    }
+    if (name === "claude code" || harness.logo === "anthropic") {
+        return "anthropic";
+    }
+    return harness.logo;
+}
+
+function hasHarnessIcon(harness) {
+    const logo = getHarnessLogo(harness);
+    return Boolean(HARNESS_PATHS[logo] || MODEL_PATHS[logo] || BRANDS[logo]);
+}
+
 function drawHarness(ctx, harness, x, y, size) {
-    const paths = HARNESS_PATHS[harness?.logo];
+    const logo = getHarnessLogo(harness);
+    const effectiveHarness = logo !== harness?.logo ? { ...harness, logo } : harness;
+    if (MODEL_PATHS[logo] || BRANDS[logo]) {
+        drawModel(ctx, effectiveHarness, x, y, size);
+        return;
+    }
+    const paths = HARNESS_PATHS[logo];
     if (!paths) return;
     ctx.save();
     ctx.translate(x, y);
@@ -53,7 +93,7 @@ function drawHarness(ctx, harness, x, y, size) {
 
 /** Width `drawMarks` would take, for a caller that must lay out before it paints. */
 export function marksWidth({ model, harness }, size = MARK_PX) {
-    return (BRANDS[model?.logo] ? size + GAP_PX : 0) + (HARNESS_PATHS[harness?.logo] ? size + GAP_PX : 0);
+    return (BRANDS[model?.logo] ? size + GAP_PX : 0) + (hasHarnessIcon(harness) ? size + GAP_PX : 0);
 }
 
 /**
@@ -69,7 +109,7 @@ export function drawMarks(ctx, { model, harness }, x, y, size = MARK_PX) {
         drawModel(ctx, model, x, y, size);
         dx += size + GAP_PX;
     }
-    if (HARNESS_PATHS[harness?.logo]) {
+    if (hasHarnessIcon(harness)) {
         drawHarness(ctx, harness, x + dx, y, size);
         dx += size + GAP_PX;
     }

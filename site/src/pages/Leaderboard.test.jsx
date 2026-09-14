@@ -17,15 +17,15 @@ const FIXTURE = {
     setups: [
         {
             id: "alpha-pro-gemini-cli", order: 0, model: "alpha-pro", harness: "gemini-cli",
-            augmentation: [], color: "#3b82f6",
-            tasks: [{ folder: "a", name: "A", scores: { pass1: 90, pass5: 95, passMax: 100 } }],
-            history: [{ t: "2026-01-15T00:00:00Z", scores: { pass1: 90, pass5: 95, passMax: 100 } }]
+            augmentation: [], color: "#3b82f6", catastrophicCount: 2,
+            tasks: [{ folder: "a", name: "A", scores: { pass1: 90, pass5: 95, passMax: 100, tokens: 150000, inputTokens: 20000, cachedTokens: 120000, outputTokens: 10000 } }],
+            history: [{ t: "2026-01-15T00:00:00Z", scores: { pass1: 90, pass5: 95, passMax: 100, tokens: 150000, inputTokens: 20000, cachedTokens: 120000, outputTokens: 10000 } }]
         },
         {
             id: "gamma-coder-openclaw-mcp-skills", order: 1, model: "gamma-coder", harness: "openclaw",
             augmentation: ["mcp", "skills"], color: "#ec4899",
-            tasks: [{ folder: "a", name: "A", scores: { pass1: 70, pass5: 75, passMax: 80 } }],
-            history: [{ t: "2026-01-15T00:00:00Z", scores: { pass1: 70, pass5: 75, passMax: 80 } }]
+            tasks: [{ folder: "a", name: "A", scores: { pass1: 70, pass5: 75, passMax: 80, tokens: 80000, inputTokens: 15000, cachedTokens: 60000, outputTokens: 5000 } }],
+            history: [{ t: "2026-01-15T00:00:00Z", scores: { pass1: 70, pass5: 75, passMax: 80, tokens: 80000, inputTokens: 15000, cachedTokens: 60000, outputTokens: 5000 } }]
         }
     ],
     loading: false,
@@ -68,15 +68,46 @@ describe("Leaderboard", () => {
         expect(pass5).toHaveAttribute("aria-pressed", "true");
     });
 
-    it("names the selected metric in the trend heading and caption", () => {
-        // The heading used to be hardcoded "Accuracy Performance Trend Over
-        // Time", which reads as a falsehood under an efficiency metric where
-        // the series is seconds or tokens rather than a success rate.
+    it("renders the combined tokens view showing all 3 token counts together", () => {
         renderPage();
-        expect(screen.getByRole("heading", { name: /Outcome Trend Over Time/i })).toBeInTheDocument();
+        const tokensBtn = screen.getByRole("button", { name: "Tokens" });
+        expect(tokensBtn).toBeInTheDocument();
+        fireEvent.click(tokensBtn);
+        expect(tokensBtn).toHaveAttribute("aria-pressed", "true");
 
-        fireEvent.click(screen.getByRole("button", { name: "Pass@5" }));
-        expect(screen.getByRole("heading", { name: /Pass@5 Trend Over Time/i })).toBeInTheDocument();
-        expect(screen.queryByText(/success rates/i)).not.toBeInTheDocument();
+        // Header legend for combined tokens
+        expect(screen.getByText("In")).toBeInTheDocument();
+        expect(screen.getByText("Cached")).toBeInTheDocument();
+        expect(screen.getByText("Out")).toBeInTheDocument();
+
+        // Check that the 3 token counts are visible together for each setup row
+        expect(screen.getByText("20.0k in")).toBeInTheDocument();
+        expect(screen.getByText("120.0k cached")).toBeInTheDocument();
+        expect(screen.getByText("10.0k out")).toBeInTheDocument();
+
+        expect(screen.getByText("15.0k in")).toBeInTheDocument();
+        expect(screen.getByText("60.0k cached")).toBeInTheDocument();
+        expect(screen.getByText("5.0k out")).toBeInTheDocument();
+
+        // Total token figures are rendered
+        expect(screen.getByText("150.0k")).toBeInTheDocument();
+        expect(screen.getByText("80.0k")).toBeInTheDocument();
+    });
+
+    it("notes that metrics are task averages in header and footnote", () => {
+        renderPage();
+        expect(screen.getByText(/All leaderboard scores and metrics represent the average per task/i)).toBeInTheDocument();
+        expect(screen.getByText(/All leaderboard scores and efficiency figures represent task averages/i)).toBeInTheDocument();
+    });
+
+    it("renders the catastrophic failure badge with 'n Catastrophic Failure(s)'", () => {
+        const { unmount } = renderPage();
+        expect(screen.getByText("⚠ 2 Catastrophic Failures")).toBeInTheDocument();
+        unmount();
+
+        FIXTURE.setups[0].catastrophicCount = 1;
+        renderPage();
+        expect(screen.getByText("⚠ 1 Catastrophic Failure")).toBeInTheDocument();
+        FIXTURE.setups[0].catastrophicCount = 2; // Restore fixture
     });
 });

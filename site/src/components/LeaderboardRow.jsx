@@ -4,7 +4,7 @@
 import { Link } from "react-router-dom";
 import { SetupIdentity } from "./SetupIdentity.jsx";
 import { setupScore, setupLabel } from "../lib/accessors.js";
-import { formatMetric, metricBarFraction } from "../lib/vocab.js";
+import { formatMetric, metricBarFraction, TOKEN_BUCKET_COLORS } from "../lib/vocab.js";
 
 // `metricBest` is the best value for this metric across the visible rows — for
 // absolute metrics (latency, tokens) that is the SMALLEST, and the bar shows
@@ -16,6 +16,16 @@ export function LeaderboardRow({ setup, models, harnesses, metric, metricBest })
     const score = setupScore(setup, metric);
     const barPct = metricBarFraction(metric, score, metricBest) * 100;
     const to = `/setup/${encodeURIComponent(setup.id)}?metric=${encodeURIComponent(metric)}`;
+
+    const isTokens = metric === "tokens";
+    const inputTokens = isTokens ? setupScore(setup, "inputTokens") : null;
+    const cachedTokens = isTokens ? setupScore(setup, "cachedTokens") : null;
+    const outputTokens = isTokens ? setupScore(setup, "outputTokens") : null;
+    const sumBuckets = (inputTokens || 0) + (cachedTokens || 0) + (outputTokens || 0);
+
+    const tokensTooltip = isTokens
+        ? `Total: ${formatMetric("tokens", score)} (Input: ${formatMetric("inputTokens", inputTokens)}, Cached: ${formatMetric("cachedTokens", cachedTokens)}, Output: ${formatMetric("outputTokens", outputTokens)}) (task average)`
+        : `${formatMetric(metric, score)} (task average)`;
 
     return (
         <Link
@@ -30,23 +40,83 @@ export function LeaderboardRow({ setup, models, harnesses, metric, metricBest })
 
             {/* Score progression meter — fixed-width badge slot (reserved on every row)
                 keeps the %, bar, and column start identical whether or not a badge shows. */}
-            <div className="col-span-4 sm:col-span-4 flex items-center gap-3 w-full sm:w-auto mt-2 sm:mt-0">
-                <span className="w-10 shrink-0 flex justify-end">
-                    {setup.catastrophicCount > 0 && (
-                        <span
-                            title={`${setup.catastrophicCount} task(s) with a catastrophic safety violation (outcome zeroed)`}
-                            className="inline-flex items-center gap-0.5 rounded-full bg-rose-50 dark:bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-rose-700 dark:text-rose-300 ring-1 ring-rose-200 dark:ring-rose-500/30"
-                        >
-                            ⚠ {setup.catastrophicCount}
-                        </span>
-                    )}
-                </span>
-                <span className="text-sm font-semibold text-slate-900 dark:text-slate-100 w-12 min-w-[48px]">
-                    {formatMetric(metric, score)}
-                </span>
-                <div className="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden relative">
-                    <div className="progress-bar-fill h-full rounded-full" style={{ width: `${barPct}%`, backgroundColor: setup.color }} />
+            <div className="col-span-4 sm:col-span-4 flex flex-col justify-center gap-1 w-full sm:w-auto mt-2 sm:mt-0">
+                <div className="flex items-center gap-3 w-full">
+                    <span className="w-auto sm:w-40 shrink-0 flex justify-end">
+                        {setup.catastrophicCount > 0 && (
+                            <span className="group/badge relative inline-flex">
+                                <span
+                                    title={`${setup.catastrophicCount} task(s) with a catastrophic safety violation (outcome zeroed)`}
+                                    className="inline-flex items-center gap-0.5 rounded-full bg-rose-50 dark:bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-rose-700 dark:text-rose-300 ring-1 ring-rose-200 dark:ring-rose-500/30 whitespace-nowrap"
+                                >
+                                    ⚠ {setup.catastrophicCount} {setup.catastrophicCount === 1 ? "Catastrophic Failure" : "Catastrophic Failures"}
+                                </span>
+                                <span role="tooltip" className="pointer-events-none absolute bottom-full right-0 mb-1.5 hidden group-hover/badge:block z-30 w-max max-w-xs px-2.5 py-1.5 bg-slate-900 dark:bg-slate-700 text-white text-[10px] font-normal rounded-lg shadow-lg whitespace-normal leading-tight text-center">
+                                    {setup.catastrophicCount} task(s) with a catastrophic safety violation (outcome zeroed)
+                                </span>
+                            </span>
+                        )}
+                    </span>
+                    <span
+                        title={tokensTooltip}
+                        className="text-sm font-semibold text-slate-900 dark:text-slate-100 w-12 min-w-[48px]"
+                    >
+                        {formatMetric(metric, score)}
+                    </span>
+                    <div className="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden relative" title={tokensTooltip}>
+                        {isTokens && sumBuckets > 0 ? (
+                            <div className="progress-bar-fill h-full rounded-full flex overflow-hidden" style={{ width: `${barPct}%` }}>
+                                {inputTokens > 0 && (
+                                    <div
+                                        style={{
+                                            width: `${((inputTokens || 0) / sumBuckets) * 100}%`,
+                                            backgroundColor: TOKEN_BUCKET_COLORS.tokensInput
+                                        }}
+                                        title={`Input: ${formatMetric("inputTokens", inputTokens)}`}
+                                    />
+                                )}
+                                {cachedTokens > 0 && (
+                                    <div
+                                        style={{
+                                            width: `${((cachedTokens || 0) / sumBuckets) * 100}%`,
+                                            backgroundColor: TOKEN_BUCKET_COLORS.tokensCached
+                                        }}
+                                        title={`Cached: ${formatMetric("cachedTokens", cachedTokens)}`}
+                                    />
+                                )}
+                                {outputTokens > 0 && (
+                                    <div
+                                        style={{
+                                            width: `${((outputTokens || 0) / sumBuckets) * 100}%`,
+                                            backgroundColor: TOKEN_BUCKET_COLORS.tokensOutput
+                                        }}
+                                        title={`Output: ${formatMetric("outputTokens", outputTokens)}`}
+                                    />
+                                )}
+                            </div>
+                        ) : (
+                            <div className="progress-bar-fill h-full rounded-full" style={{ width: `${barPct}%`, backgroundColor: setup.color }} />
+                        )}
+                    </div>
                 </div>
+                {isTokens && (
+                    <div className="flex items-center justify-end gap-1.5 sm:gap-2 text-[10px] text-slate-500 dark:text-slate-400 flex-wrap">
+                        <span className="inline-flex items-center gap-1" title="Input tokens">
+                            <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: TOKEN_BUCKET_COLORS.tokensInput }} />
+                            <span>{formatMetric("inputTokens", inputTokens)} in</span>
+                        </span>
+                        <span>·</span>
+                        <span className="inline-flex items-center gap-1" title="Cached tokens">
+                            <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: TOKEN_BUCKET_COLORS.tokensCached }} />
+                            <span>{formatMetric("cachedTokens", cachedTokens)} cached</span>
+                        </span>
+                        <span>·</span>
+                        <span className="inline-flex items-center gap-1" title="Output tokens">
+                            <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: TOKEN_BUCKET_COLORS.tokensOutput }} />
+                            <span>{formatMetric("outputTokens", outputTokens)} out</span>
+                        </span>
+                    </div>
+                )}
             </div>
 
             {/* View-details affordance */}

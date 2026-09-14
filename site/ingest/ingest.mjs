@@ -44,11 +44,7 @@ async function main() {
     const runIds = [...new Set(loaded.map(r => r.runId))];
     console.log(`  loaded ${loaded.length} rows across ${runIds.length} run(s): ${runIds.join(", ")}`);
 
-    // 1b. Price each row and stamp `costUsd` on it. Done HERE rather than at
-    // derive time so a row keeps the rate it was actually billed at: derive
-    // re-runs over the full history whenever the formula changes, and re-pricing
-    // a 2026 run at 2027 rates would silently rewrite the past. An unpriced model
-    // yields a null cost — never 0, which would rank it best on the cost axis.
+    // 1b. Price each row and stamp `costUsd` on it
     const { rows: newRows, unpriced } = stampCost(loaded);
     const costed = newRows.filter(r => r.costUsd != null).length;
     console.log(`  costed ${costed}/${newRows.length} rows`);

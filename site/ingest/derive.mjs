@@ -24,7 +24,7 @@
 // catalog (see collectMetadata in catalog.mjs); this module only emits setups.
 // =============================================================================
 
-import { PASS_THRESHOLD, efficiencyFor, meanScores, passAtK } from "../seed/mock-data.mjs";
+import { PASS_THRESHOLD, catastrophicFor, efficiencyFor, meanScores, passAtK } from "../seed/mock-data.mjs";
 import { PALETTE, SETUP_CATALOG } from "./catalog.mjs";
 
 /**
@@ -163,7 +163,7 @@ export function derive(rows, opts = {}) {
                 folder,
                 name: taskRows[0].taskName || folder,
                 scores: scoresFor(taskRows),
-                catastrophic: taskRows.some(r => r.catastrophic === true)
+                ...catastrophicFor(taskRows)
             };
         });
 
@@ -210,6 +210,7 @@ import { fileURLToPath } from "node:url";
 async function main() {
     const { openDb, commitAll } = await import("./firestore.mjs");
     const { collectMetadata } = await import("./catalog.mjs");
+    const { costUsd } = await import("./pricing.mjs");
 
     const { db, info } = openDb();
     console.log(`Re-deriving in ${info}`);
@@ -221,10 +222,33 @@ async function main() {
         return;
     }
 
+    // 1. Ensure all raw results rows in Firestore have costUsd stamped
+    const unstamped = snap.docs
+        .filter(d => d.data().costUsd == null)
+        .map(d => {
+            const data = d.data();
+            const cost = costUsd(data);
+            return cost != null ? { ref: d.ref, data: { costUsd: cost }, merge: true } : null;
+        })
+        .filter(Boolean);
+    if (unstamped.length) {
+        await commitAll(db, unstamped);
+        console.log(`  stamped costUsd on ${unstamped.length} results rows in Firestore`);
+    }
+
+    // 2. Derive setups from full row set
     const setups = derive(rows, { catalog: SETUP_CATALOG, palette: PALETTE });
     await commitAll(db, setups.map(s => ({ ref: db.collection("setups").doc(s.id), data: s })));
     console.log(`  derived ${setups.length} setups from ${rows.length} rows`);
 
+    const missingCost = setups.filter(s => !s.tasks.some(t => t.scores?.cost != null));
+    if (missingCost.length) {
+        console.warn(`  ⚠ ${missingCost.length} setup(s) have no cost data: ${missingCost.map(s => s.id).join(", ")}`);
+    } else {
+        console.log(`  ✓ all ${setups.length} setups have cost data populated`);
+    }
+
+    // 3. Upsert model/harness metadata
     const { models, harnesses, unknown } = collectMetadata(rows);
     const meta = [
         ...[...models].map(([id, data]) => ({ ref: db.collection("models").doc(id), data, merge: true })),
@@ -234,6 +258,13 @@ async function main() {
     console.log(`  upserted ${models.size} models, ${harnesses.size} harnesses`);
     if (unknown.models.size) console.warn(`  ⚠ unknown models (add to catalog.mjs): ${[...unknown.models].join(", ")}`);
     if (unknown.harnesses.size) console.warn(`  ⚠ unknown harnesses (add to catalog.mjs): ${[...unknown.harnesses].join(", ")}`);
+
+    // 4. Remove deprecated/merged models if present
+    try {
+        await db.collection("models").doc("gemini-3.7-flash-high").delete();
+    } catch {
+        // Ignored
+    }
 
     console.log("Derive complete.");
 }

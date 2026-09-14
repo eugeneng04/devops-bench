@@ -10,7 +10,6 @@ import { METRIC_LABELS, availableMetrics, metricDescription, isLowerBetter } fro
 import { FilterBar } from "../components/FilterBar.jsx";
 import { LeaderboardRow } from "../components/LeaderboardRow.jsx";
 import { MetricToggle } from "../components/MetricToggle.jsx";
-import { TrendChart } from "../components/TrendChart.jsx";
 import { ChartsPanel } from "../components/ChartsPanel.jsx";
 import { EmptyState, LoadError, Loading } from "../components/States.jsx";
 
@@ -75,7 +74,7 @@ export function Leaderboard() {
                         </svg>
                         DevOps Bench Leaderboard
                     </h1>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Benchmarking model × harness pairings across DevOps tasks — the LLM and the agent runner driving it.</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Benchmarking model × harness pairings across DevOps tasks — the LLM and the agent runner driving it. All leaderboard scores and metrics represent the average per task across the suite.</p>
                 </header>
 
                 {/* Filter bar */}
@@ -101,13 +100,16 @@ export function Leaderboard() {
                         </span>
                         <span>HARNESS <span className="text-slate-300 dark:text-slate-600 font-normal normal-case tracking-normal">&amp; config</span></span>
                     </div>
-                    <div className="col-span-5 sm:col-span-5 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 sm:gap-x-4 sm:gap-y-2 pr-2">
+                    <div className="col-span-5 sm:col-span-5 flex flex-col gap-2 pr-2">
                         <div className="flex items-center gap-1 min-w-[70px]">
                             {/* "METRIC", not "SCORE": the toggle below can select
                                 latency or tokens, and neither is a score. Naming the
                                 selected metric here instead would just echo the
                                 highlighted button an inch beneath it. */}
                             <span>METRIC</span>
+                            <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal normal-case tracking-normal">
+                                (task average)
+                            </span>
                             <div tabIndex={0} aria-label={`${METRIC_LABELS[metric]} explanation`} className="group relative cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 rounded-full">
                                 <svg aria-hidden="true" className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -116,6 +118,13 @@ export function Leaderboard() {
                                     {metricDescription(metric)}
                                 </div>
                             </div>
+                            {metric === "tokens" && (
+                                <div className="ml-auto flex items-center gap-2 text-[10px] font-normal normal-case tracking-normal text-slate-400 dark:text-slate-500">
+                                    <span className="inline-flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>In</span>
+                                    <span className="inline-flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Cached</span>
+                                    <span className="inline-flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>Out</span>
+                                </div>
+                            )}
                         </div>
                         <MetricToggle value={metric} onChange={setMetric} available={available} />
                     </div>
@@ -130,35 +139,19 @@ export function Leaderboard() {
                             <LeaderboardRow key={setup.id} setup={setup} models={models} harnesses={harnesses} metric={metric} metricBest={metricBest} />
                         ))}
                 </div>
+
+                {/* Table footnote */}
+                {!loading && !error && sorted.length > 0 && (
+                    <div className="px-6 py-2.5 bg-slate-50/50 dark:bg-slate-800/20 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-400 dark:text-slate-500 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">
+                        <span>* All leaderboard scores and efficiency figures represent task averages (mean across evaluated tasks).</span>
+                        <span className="text-[10px] text-slate-400 dark:text-slate-500">Click any row for granular per-task breakdown.</span>
+                    </div>
+                )}
             </div>
 
             {/* Efficiency charts — the same filtered setups the table shows. */}
             {!loading && !error && filtered.length > 0 && (
                 <ChartsPanel setups={filtered} models={models} harnesses={harnesses} />
-            )}
-
-            {/* Trend chart */}
-            {!loading && !error && filtered.length > 0 && (
-                <section className="w-full bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xl shadow-slate-100 dark:shadow-none p-6 flex flex-col">
-                    <div className="mb-4">
-                        <h2 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
-                            <svg className="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 12l3-3 3 3 4-4M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                            </svg>
-                            {METRIC_LABELS[metric]} Trend Over Time
-                        </h2>
-                        <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Comparing agent configuration {METRIC_LABELS[metric].toLowerCase()} across historical run iterations.</p>
-                    </div>
-                    <TrendChart
-                        setups={filtered}
-                        metric={metric}
-                        models={models}
-                        harnesses={harnesses}
-                        showLegend
-                        ariaLabel={`${METRIC_LABELS[metric]} trend over time, comparing setups across historical runs`}
-                        caption={`${METRIC_LABELS[metric]} trend over time data summary`}
-                    />
-                </section>
             )}
         </main>
     );

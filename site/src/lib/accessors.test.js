@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
+    scoreOf,
     setupScore,
     setupTotal,
     setupHistory,
@@ -50,6 +51,34 @@ describe("setupScore", () => {
     it("returns null when no task has a score", () => {
         const s = makeSetup({ tasks: [{ folder: "a", name: "A", scores: {} }] });
         expect(setupScore(s, "pass1")).toBeNull();
+    });
+
+    it("sums token buckets when tasks omit precomputed tokens", () => {
+        const s = makeSetup({
+            tasks: [
+                { folder: "a", name: "A", scores: { inputTokens: 500, outputTokens: 100, cachedTokens: 400 } },
+                { folder: "b", name: "B", scores: { inputTokens: 300, outputTokens: 50, cachedTokens: 150 } }
+            ]
+        });
+        expect(setupScore(s, "tokens")).toBe(750); // (1000 + 500) / 2
+        expect(setupTotal(s, "tokens")).toBe(1500); // 1000 + 500
+    });
+});
+
+describe("scoreOf", () => {
+    it("returns explicit metric score if present", () => {
+        expect(scoreOf({ tokens: 5000 }, "tokens")).toBe(5000);
+    });
+
+    it("resolves metric aliases", () => {
+        expect(scoreOf({ inputTokens: 100 }, "tokensInput")).toBe(100);
+        expect(scoreOf({ tokensInput: 200 }, "inputTokens")).toBe(200);
+    });
+
+    it("sums token buckets when tokens is not present", () => {
+        expect(scoreOf({ inputTokens: 500, outputTokens: 100, cachedTokens: 400 }, "tokens")).toBe(1000);
+        expect(scoreOf({ tokensInput: 300, tokensOutput: 50, tokensCached: 150 }, "tokens")).toBe(500);
+        expect(scoreOf({ pass1: 100 }, "tokens")).toBeNull();
     });
 });
 

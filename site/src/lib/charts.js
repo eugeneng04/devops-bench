@@ -26,11 +26,12 @@ import { augmentationLabel, isLowerBetter } from "./vocab.js";
  * @param {Setup[]} setups
  * @param {MetricKey} xMetric
  * @param {MetricKey} yMetric
+ * @param {import('./accessors').TaskView} [xView]
  * @returns {ScatterPoint[]}
  */
-export function scatterPoints(setups, xMetric, yMetric) {
+export function scatterPoints(setups, xMetric, yMetric, xView = {}) {
     return setups
-        .map(setup => ({ x: setupScore(setup, xMetric), y: setupScore(setup, yMetric), setup }))
+        .map(setup => ({ x: setupValue(setup, xMetric, xView), y: setupScore(setup, yMetric), setup }))
         .filter(p => Number.isFinite(p.x) && Number.isFinite(p.y));
 }
 
