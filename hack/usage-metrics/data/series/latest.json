@@ -2,11 +2,11 @@
   "apiVersion": "usage-metrics/v1",
   "kind": "UsageSeries",
   "formatVersion": 1,
-  "generatedAt": "2026-09-10T10:08:48Z",
+  "generatedAt": "2026-09-14T11:04:54Z",
   "provenance": {
-    "collectorSha": "b5c6724b6b544b85c83b87e6544fe97ac3679794",
-    "workflowRunUrl": "https://github.com/eugeneng04/devops-bench/actions/runs/34463760259",
-    "writtenAt": "2026-09-10T10:08:48Z"
+    "collectorSha": "e24535f93f7bf8544c39dbf975be9f36cff4f330",
+    "workflowRunUrl": "https://github.com/eugeneng04/devops-bench/actions/runs/34835685756",
+    "writtenAt": "2026-09-14T11:04:54Z"
   },
   "unreadable": [
     {
@@ -9615,6 +9615,447 @@
         }
       },
       "changeDetail": true
+    },
+    {
+      "date": "2026-09-14",
+      "collectedAt": "2026-09-14T10:56:59Z",
+      "windowDays": 14,
+      "totals": {
+        "forks": 30,
+        "activeForks": 27,
+        "externalForks": 10,
+        "owners": 21,
+        "activeOwners": 18,
+        "externalOwners": 9,
+        "activeExternalOwners": 6,
+        "divergentBranches": 441,
+        "externalDivergentBranches": 62,
+        "distinctChanges": 347,
+        "externalDistinctChanges": 58,
+        "changedLines": 3051647,
+        "unclassifiedLines": 64036,
+        "trafficRepos": [
+          "gke-labs/devops-bench"
+        ]
+      },
+      "derived": {
+        "externalOwnerRatio": 0.42857142857142855,
+        "activeExternalOwnerRatio": 0.3333333333333333,
+        "externalBranchRatio": 0.14058956916099774,
+        "externalChangeRatio": 0.16714697406340057,
+        "unclassifiedLineRate": 0.02098407843371137
+      },
+      "affiliation": {
+        "inside": 19,
+        "outside": 12,
+        "frozenAt": "2026-09-14"
+      },
+      "references": {
+        "depending": 2,
+        "running": 1,
+        "citing": 13
+      },
+      "referencesUnavailable": null,
+      "traffic": {
+        "gke-labs/devops-bench": {
+          "views": 276,
+          "uniqueVisitors": 24,
+          "clones": 3042,
+          "uniqueCloners": 434
+        },
+        "kubernetes-sigs/devops-bench": null
+      },
+      "coverage": {
+        "partial": false,
+        "skipped": [],
+        "trafficRepos": [
+          "gke-labs/devops-bench"
+        ],
+        "forksUnavailable": []
+      },
+      "provenance": {
+        "collectorSha": "e24535f93f7bf8544c39dbf975be9f36cff4f330",
+        "workflowRunUrl": "https://github.com/eugeneng04/devops-bench/actions/runs/34835685756",
+        "writtenAt": "2026-09-14T10:56:59Z"
+      },
+      "changes": {
+        "since": "2026-09-10",
+        "repos": {
+          "gke-labs/devops-bench": {
+            "comparable": true,
+            "newForks": [],
+            "newBranches": [
+              {
+                "fork": "onix-net/gke-labs-devops-bench",
+                "branch": "codex/release-eh1-0008",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:codex/release-eh1-0008: No common ancestor between main and onix-net:codex/release-eh1-0008. (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/gke-labs-devops-bench",
+                "branch": "codex/semantic-json-contract",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:codex/semantic-json-contract: No common ancestor between main and onix-net:codex/semantic-json-contract. (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/gke-labs-devops-bench",
+                "branch": "codex/stagehand-pradeep-latest",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:codex/stagehand-pradeep-latest: No common ancestor between main and onix-net:codex/stagehand-pradeep-latest. (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/gke-labs-devops-bench",
+                "branch": "codex/stagehand-scoped-credentials",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:codex/stagehand-scoped-credentials: No common ancestor between main and onix-net:codex/stagehand-scoped-credentials. (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/gke-labs-devops-bench",
+                "branch": "codex/task-owned-solver-rbac",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:codex/task-owned-solver-rbac: No common ancestor between main and onix-net:codex/task-owned-solver-rbac. (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/gke-labs-devops-bench",
+                "branch": "integration-plus-home",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:integration-plus-home: No common ancestor between main and onix-net:integration-plus-home. (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/gke-labs-devops-bench",
+                "branch": "jegath/integration-plus-home-stagehand",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:jegath/integration-plus-home-stagehand: No common ancestor between main and onix-net:jegath/integration-plus-home-stagehand. (HTTP 404)"
+              }
+            ],
+            "updatedBranches": [
+              {
+                "fork": "eugeneng04/devops-bench",
+                "branch": "main",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 958863,
+                "changedLinesBefore": 806008,
+                "headCommittedAt": "2026-09-10T10:08:48Z",
+                "unavailable": null
+              }
+            ],
+            "goneForks": [],
+            "goneBranches": []
+          },
+          "kubernetes-sigs/devops-bench": {
+            "comparable": true,
+            "newForks": [],
+            "newBranches": [
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "feat/sandbox-all-harnesses",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingTasks",
+                "external": true,
+                "changedLines": 17867,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-10T16:45:11Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "sandbox/026-openclaw-vertex-creds",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingTasks",
+                "external": true,
+                "changedLines": 18097,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-11T21:33:31Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "sandbox/agy-image",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingTasks",
+                "external": true,
+                "changedLines": 18641,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-10T16:39:38Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "sandbox/agy-model-ids",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingTasks",
+                "external": true,
+                "changedLines": 18570,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-10T17:21:37Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "sandbox/agy-vertex-creds",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingTasks",
+                "external": true,
+                "changedLines": 18137,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-11T21:03:27Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "up/agy-image",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "unclassified",
+                "external": true,
+                "changedLines": 94,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-11T17:43:45Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "up/agy-model-ids",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "agentFramework",
+                "external": true,
+                "changedLines": 224,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-11T17:43:45Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "up/openclaw-version-pin",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "infrastructure",
+                "external": true,
+                "changedLines": 10,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-11T17:43:45Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "up/vertex-location-global",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "agentFramework",
+                "external": true,
+                "changedLines": 358,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-11T17:44:49Z",
+                "unavailable": null
+              },
+              {
+                "fork": "itssimrank/migration",
+                "branch": "feat/task-drift-arbitration",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 990,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-11T20:06:49Z",
+                "unavailable": null
+              },
+              {
+                "fork": "itssimrank/migration",
+                "branch": "feat/task-node-upgrade-pdb",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 1971,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-11T04:56:48Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "fix/a2a-output-extraction",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "agentFramework",
+                "external": false,
+                "changedLines": 184,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-11T16:54:06Z",
+                "unavailable": null
+              },
+              {
+                "fork": "pradeepvrd/devops-bench",
+                "branch": "codex/sandbox-runtime-compat",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingTasks",
+                "external": true,
+                "changedLines": 18278,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-10T18:02:00Z",
+                "unavailable": null
+              },
+              {
+                "fork": "pradeepvrd/devops-bench",
+                "branch": "fable-cc-sandbox",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingTasks",
+                "external": true,
+                "changedLines": 18072,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-13T22:48:36Z",
+                "unavailable": null
+              },
+              {
+                "fork": "pradeepvrd/devops-bench",
+                "branch": "fix/detector-own-fixture-mounts",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingTasks",
+                "external": true,
+                "changedLines": 18259,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-13T22:47:52Z",
+                "unavailable": null
+              },
+              {
+                "fork": "pradeepvrd/devops-bench",
+                "branch": "fix/openclaw-anthropic-transport",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingTasks",
+                "external": true,
+                "changedLines": 18300,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-13T06:16:29Z",
+                "unavailable": null
+              },
+              {
+                "fork": "pradeepvrd/devops-bench",
+                "branch": "fix/sandbox-secret-rotation-and-opa",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingTasks",
+                "external": true,
+                "changedLines": 18085,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-11T22:37:34Z",
+                "unavailable": null
+              },
+              {
+                "fork": "pradeepvrd/devops-bench",
+                "branch": "fix/tf-provisioner-home",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingTasks",
+                "external": true,
+                "changedLines": 17807,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-10T14:54:48Z",
+                "unavailable": null
+              },
+              {
+                "fork": "pradeepvrd/devops-bench",
+                "branch": "sandbox/agy-e2e-stack",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingTasks",
+                "external": true,
+                "changedLines": 18131,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-11T05:53:30Z",
+                "unavailable": null
+              },
+              {
+                "fork": "pradeepvrd/devops-bench",
+                "branch": "sandbox/agy-e2e-stack-run",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingTasks",
+                "external": true,
+                "changedLines": 18132,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-11T05:53:20Z",
+                "unavailable": null
+              },
+              {
+                "fork": "pradeepvrd/devops-bench",
+                "branch": "sandbox/agy-secret-rotation-cloud-cred",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingTasks",
+                "external": true,
+                "changedLines": 17775,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-11T05:53:07Z",
+                "unavailable": null
+              }
+            ],
+            "updatedBranches": [
+              {
+                "fork": "pradeepvrd/devops-bench",
+                "branch": "feat/sandbox-all-harnesses",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingTasks",
+                "external": true,
+                "changedLines": 18318,
+                "changedLinesBefore": 17807,
+                "headCommittedAt": "2026-09-11T20:59:55Z",
+                "unavailable": null
+              },
+              {
+                "fork": "pradeepvrd/devops-bench",
+                "branch": "integration",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingTasks",
+                "external": true,
+                "changedLines": 18097,
+                "changedLinesBefore": 18653,
+                "headCommittedAt": "2026-09-11T21:36:56Z",
+                "unavailable": null
+              },
+              {
+                "fork": "pradeepvrd/devops-bench",
+                "branch": "sandbox/02-credentials",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingTasks",
+                "external": true,
+                "changedLines": 17529,
+                "changedLinesBefore": 18618,
+                "headCommittedAt": "2026-09-11T20:47:33Z",
+                "unavailable": null
+              }
+            ],
+            "goneForks": null,
+            "goneBranches": null
+          }
+        }
+      },
+      "changeDetail": true
     }
   ],
   "daily": {
@@ -9622,7 +10063,7 @@
       "covered": [
         [
           "2026-07-29",
-          "2026-09-09"
+          "2026-09-13"
         ]
       ],
       "gaps": [],
@@ -9927,6 +10368,34 @@
           "uniqueVisitors": 7,
           "clones": 120,
           "uniqueCloners": 29
+        },
+        {
+          "date": "2026-09-10",
+          "views": 32,
+          "uniqueVisitors": 3,
+          "clones": 444,
+          "uniqueCloners": 66
+        },
+        {
+          "date": "2026-09-11",
+          "views": 20,
+          "uniqueVisitors": 6,
+          "clones": 117,
+          "uniqueCloners": 28
+        },
+        {
+          "date": "2026-09-12",
+          "views": 1,
+          "uniqueVisitors": 1,
+          "clones": 156,
+          "uniqueCloners": 60
+        },
+        {
+          "date": "2026-09-13",
+          "views": 3,
+          "uniqueVisitors": 3,
+          "clones": 129,
+          "uniqueCloners": 36
         }
       ]
     }
