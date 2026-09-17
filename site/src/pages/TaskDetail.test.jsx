@@ -14,10 +14,9 @@ describe("TaskDetail", () => {
         );
     }
 
-    it("renders task name and title", () => {
+    it("renders task name as heading", () => {
         renderTask("canary-promotion");
         expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("canary-promotion");
-        expect(screen.getByText(/Canary Analysis/i)).toBeInTheDocument();
     });
 
     it("renders instruction scenario block and toggles expand", () => {

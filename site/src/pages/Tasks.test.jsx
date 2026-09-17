@@ -13,8 +13,8 @@ describe("Tasks Page", () => {
 
         expect(screen.getByText("DevOps Bench Tasks")).toBeInTheDocument();
         expect(screen.getByText(/20 benchmark tasks/i)).toBeInTheDocument();
-        expect(screen.getByText(/Remediate Critical Container Vulnerability/i)).toBeInTheDocument();
-        expect(screen.getByText("TASK & SCENARIO")).toBeInTheDocument();
+        expect(screen.getByText("cve-remediation")).toBeInTheDocument();
+        expect(screen.getByText("TASK")).toBeInTheDocument();
     });
 
     it("filters tasks by search input", () => {
@@ -24,11 +24,11 @@ describe("Tasks Page", () => {
             </MemoryRouter>
         );
 
-        const searchInput = screen.getByPlaceholderText(/Filter tasks by title, category, folder/i);
+        const searchInput = screen.getByPlaceholderText(/Filter tasks by name, category/i);
         fireEvent.change(searchInput, { target: { value: "secret-rotation" } });
 
-        expect(screen.getByText(/Rotate Compromised Database Secret/i)).toBeInTheDocument();
-        expect(screen.queryByText(/Remediate Critical Container Vulnerability/i)).not.toBeInTheDocument();
+        expect(screen.getByText("secret-rotation")).toBeInTheDocument();
+        expect(screen.queryByText("cve-remediation")).not.toBeInTheDocument();
     });
 
     it("filters tasks by category select", () => {
@@ -41,8 +41,8 @@ describe("Tasks Page", () => {
         const select = screen.getByRole("combobox");
         fireEvent.change(select, { target: { value: "Security" } });
 
-        expect(screen.getByText(/Remediate Critical Container Vulnerability/i)).toBeInTheDocument();
-        expect(screen.getByText(/Rotate Compromised Database Secret/i)).toBeInTheDocument();
-        expect(screen.queryByText(/Right-Size Workload Resource Requests/i)).not.toBeInTheDocument();
+        expect(screen.getByText("cve-remediation")).toBeInTheDocument();
+        expect(screen.getByText("secret-rotation")).toBeInTheDocument();
+        expect(screen.queryByText("optimize-scale")).not.toBeInTheDocument();
     });
 });

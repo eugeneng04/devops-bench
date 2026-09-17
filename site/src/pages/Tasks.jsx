@@ -32,10 +32,7 @@ export function Tasks() {
             if (!query) return true;
             return (
                 (task.name && task.name.toLowerCase().includes(query)) ||
-                (task.title && task.title.toLowerCase().includes(query)) ||
-                (task.summary && task.summary.toLowerCase().includes(query)) ||
                 (task.category && task.category.toLowerCase().includes(query)) ||
-                (task.folder && task.folder.toLowerCase().includes(query)) ||
                 (task.prompt && task.prompt.toLowerCase().includes(query))
             );
         });
@@ -65,7 +62,7 @@ export function Tasks() {
                                 type="text"
                                 value={search}
                                 onChange={e => setSearch(e.target.value)}
-                                placeholder="Filter tasks by title, category, folder…"
+                                placeholder="Filter tasks by name, category…"
                                 className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                             />
                             {search && (
@@ -101,7 +98,7 @@ export function Tasks() {
 
                 {/* Table column headers */}
                 <div className="px-6 py-3 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 hidden sm:grid grid-cols-12 gap-4 items-center font-semibold text-xs tracking-wider text-slate-500 dark:text-slate-400 select-none uppercase">
-                    <div className="col-span-6">TASK &amp; SCENARIO</div>
+                    <div className="col-span-6">TASK</div>
                     <div className="col-span-2">CATEGORY</div>
                     <div className="col-span-2">RUBRIC CHECKS</div>
                     <div className="col-span-2 text-right">ENVIRONMENT</div>
@@ -120,19 +117,11 @@ export function Tasks() {
                                 to={`/task/${task.name}`}
                                 className="px-6 py-4 flex flex-col sm:grid sm:grid-cols-12 gap-3 sm:gap-4 items-start sm:items-center hover:bg-slate-50/70 dark:hover:bg-slate-800/40 cursor-pointer transition-colors group select-none"
                             >
-                                {/* Task name & scenario excerpt */}
-                                <div className="col-span-6 flex flex-col pr-4">
-                                    <div className="flex items-center gap-2 flex-wrap">
-                                        <span className="font-semibold text-slate-900 dark:text-slate-100 text-sm font-mono group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                                            {task.name}
-                                        </span>
-                                    </div>
-                                    <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
-                                        {task.title && task.title !== task.name ? (
-                                            <span className="font-medium text-slate-700 dark:text-slate-300">{task.title} — </span>
-                                        ) : null}
-                                        {task.summary || task.prompt}
-                                    </p>
+                                {/* Task name */}
+                                <div className="col-span-6 flex items-center pr-4">
+                                    <span className="font-semibold text-slate-900 dark:text-slate-100 text-sm font-mono group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                                        {task.name}
+                                    </span>
                                 </div>
 
                                 {/* Category badge */}
