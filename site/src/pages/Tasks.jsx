@@ -123,14 +123,14 @@ export function Tasks() {
                                 {/* Task name & scenario excerpt */}
                                 <div className="col-span-6 flex flex-col pr-4">
                                     <div className="flex items-center gap-2 flex-wrap">
-                                        <span className="font-semibold text-slate-900 dark:text-slate-100 text-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                                            {task.title || task.name}
-                                        </span>
-                                        <span className="font-mono text-[11px] text-slate-400 dark:text-slate-500">
-                                            {task.folder || `tasks/${task.name}`}
+                                        <span className="font-semibold text-slate-900 dark:text-slate-100 text-sm font-mono group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                                            {task.name}
                                         </span>
                                     </div>
                                     <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                                        {task.title && task.title !== task.name ? (
+                                            <span className="font-medium text-slate-700 dark:text-slate-300">{task.title} — </span>
+                                        ) : null}
                                         {task.summary || task.prompt}
                                     </p>
                                 </div>
