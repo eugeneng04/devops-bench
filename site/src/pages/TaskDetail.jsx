@@ -287,10 +287,11 @@ export function TaskDetail() {
                                             {harnesses.map(h => {
                                                 const scoreData = harness_scores[h.arm];
                                                 const outcome = scoreData?.outcomeScore;
+                                                const isCat = scoreData?.catastrophic;
                                                 return (
                                                     <td key={h.arm} className="py-3 px-2 text-center align-middle font-mono text-xs">
                                                         {outcome != null ? (
-                                                            <span className="text-slate-900 dark:text-slate-100">
+                                                            <span className={isCat ? "text-rose-600 dark:text-rose-400" : "text-slate-900 dark:text-slate-100"}>
                                                                 {Math.round(outcome * 100)}%
                                                             </span>
                                                         ) : (

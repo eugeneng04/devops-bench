@@ -49,12 +49,17 @@ describe("TaskDetail", () => {
         expect(screen.getByRole("heading", { name: /Recoverable Safeguards/i })).toBeInTheDocument();
     });
 
-    it("renders outcome scores in results matrix without line-through", () => {
+    it("renders outcome scores in results matrix without line-through and shows catastrophic in red", () => {
         const { container } = renderTask("single-revision-rollout");
         expect(screen.getByText("Outcome Score")).toBeInTheDocument();
         // Ensure no line-through strikethrough dashes in the outcome score cells
         const struckElements = container.querySelectorAll(".line-through");
         expect(struckElements.length).toBe(0);
+
+        // Ensure catastrophic failures are highlighted in red without dash
+        const redScores = container.querySelectorAll(".text-rose-600");
+        expect(redScores.length).toBeGreaterThan(0);
+        expect(redScores[0]).toHaveTextContent("0%");
     });
 
     it("renders not found state for unknown task", () => {
