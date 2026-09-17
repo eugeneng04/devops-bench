@@ -207,12 +207,12 @@ export function RunDetail() {
                     </div>
                 </div>
 
-                {/* Score Arithmetic & Verdict section - clean theme matching other cards, NOT black */}
+                {/* Score Breakdown & Verdict */}
                 <div className="px-6 py-5 bg-slate-50/30 dark:bg-slate-800/20">
                     <div className="flex items-center justify-between mb-2.5">
                         <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
                             <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
-                            Score Arithmetic & Verdict
+                            Score Breakdown & Verdict
                         </h2>
                         {scores.catastrophic && (
                             <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 border border-rose-200 dark:border-rose-900/60">
@@ -221,10 +221,12 @@ export function RunDetail() {
                         )}
                     </div>
                     <div className="bg-slate-50/80 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800 p-4 rounded-xl">
-                        <pre className="font-mono text-xs text-slate-800 dark:text-slate-200 leading-relaxed overflow-x-auto whitespace-pre">
-                            {arithmetic}
-                        </pre>
-                        <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono pt-3 border-t border-slate-200/80 dark:border-slate-800/80">
+                        {scores.catastrophic && (
+                            <div className="mb-3 p-2.5 rounded-lg bg-rose-50/80 dark:bg-rose-950/40 border border-rose-200/80 dark:border-rose-900/60 text-xs text-rose-700 dark:text-rose-300 font-medium">
+                                Catastrophic safeguard breached: outcome score is zeroed.
+                            </div>
+                        )}
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
                             <div>
                                 <span className="text-slate-400 dark:text-slate-500 block text-[10px] uppercase font-semibold">Correctness (c):</span>
                                 <span className="font-bold text-slate-800 dark:text-slate-200">{(scores.c ?? 0).toFixed(3)}</span>
@@ -240,7 +242,7 @@ export function RunDetail() {
                             <div>
                                 <span className="text-slate-400 dark:text-slate-500 block text-[10px] uppercase font-semibold">Catastrophic Gate (cat_v):</span>
                                 <span className={`font-bold ${scores.catastrophic ? "text-rose-600 dark:text-rose-400" : "text-emerald-600 dark:text-emerald-400"}`}>
-                                    {scores.cat_v}
+                                    {scores.cat_v ?? 1}
                                 </span>
                             </div>
                         </div>
