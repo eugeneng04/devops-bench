@@ -11,8 +11,8 @@ export function TopBar() {
     const isTasks = pathname.startsWith("/tasks") || pathname.startsWith("/task");
     const isLeaderboard = pathname === "/" || pathname.startsWith("/setup");
 
-    // Contextual backwards tabs for navigating back up the view hierarchy
-    const backTabs = [];
+    // Contextual single back button for navigating back to the immediate parent view
+    let backButton = null;
 
     const runMatch = pathname.match(/^\/task\/([^/]+)\/run\/([^/]+)/);
     const taskMatch = !runMatch && pathname.match(/^\/task\/([^/]+)/);
@@ -20,24 +20,17 @@ export function TopBar() {
 
     if (runMatch) {
         const taskName = runMatch[1];
-        backTabs.push(
-            { label: taskName, to: `/task/${taskName}`, title: `Back to task ${taskName}` },
-            { label: "Tasks", to: "/tasks", title: "Back to all tasks" }
-        );
+        backButton = { label: taskName, to: `/task/${taskName}`, title: `Back to task ${taskName}` };
     } else if (taskMatch) {
-        backTabs.push(
-            { label: "Tasks", to: "/tasks", title: "Back to all tasks" }
-        );
+        backButton = { label: "Tasks", to: "/tasks", title: "Back to all tasks" };
     } else if (setupMatch) {
-        backTabs.push(
-            { label: "Leaderboard", to: "/", title: "Back to Leaderboard" }
-        );
+        backButton = { label: "Leaderboard", to: "/", title: "Back to Leaderboard" };
     }
 
     return (
         <header className="sticky top-0 z-30 w-full border-b border-slate-200/80 dark:border-slate-800 bg-white/85 dark:bg-slate-900/85 backdrop-blur-md transition-colors">
             <div className="max-w-6xl mx-auto px-4 sm:px-8 h-14 flex items-center justify-between gap-4">
-                {/* Left: Brand + Navigation & Backwards Tabs */}
+                {/* Left: Brand + Navigation & Back Button */}
                 <div className="flex items-center gap-2 sm:gap-4 min-w-0">
                     {/* Brand */}
                     <Link
@@ -81,20 +74,17 @@ export function TopBar() {
                         </Link>
                     </nav>
 
-                    {/* Backwards Tabs */}
-                    {backTabs.length > 0 && (
-                        <div className="flex items-center gap-1 pl-2 sm:pl-3 border-l border-slate-200 dark:border-slate-800 overflow-x-auto">
-                            {backTabs.map((tab, idx) => (
-                                <Link
-                                    key={idx}
-                                    to={tab.to}
-                                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100/90 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-200/70 dark:hover:bg-slate-800 border border-slate-200/60 dark:border-slate-700/60 transition-colors shrink-0"
-                                    title={tab.title}
-                                >
-                                    <span className="text-slate-400 dark:text-slate-500">←</span>
-                                    <span className="truncate max-w-[100px] sm:max-w-[160px] font-mono text-[11px]">{tab.label}</span>
-                                </Link>
-                            ))}
+                    {/* Exactly 1 Back Button */}
+                    {backButton && (
+                        <div className="flex items-center pl-2 sm:pl-3 border-l border-slate-200 dark:border-slate-800">
+                            <Link
+                                to={backButton.to}
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100/90 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-200/70 dark:hover:bg-slate-800 border border-slate-200/60 dark:border-slate-700/60 transition-colors shrink-0"
+                                title={backButton.title}
+                            >
+                                <span className="text-slate-400 dark:text-slate-500">←</span>
+                                <span className="truncate max-w-[120px] sm:max-w-[200px] font-mono text-[11px]">{backButton.label}</span>
+                            </Link>
                         </div>
                     )}
                 </div>

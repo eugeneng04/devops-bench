@@ -30,9 +30,9 @@ describe("TopBar Component", () => {
         expect(screen.getByRole("link", { name: /← Tasks/i })).toBeInTheDocument();
     });
 
-    it("renders backwards tabs for Run Detail", () => {
+    it("renders exactly 1 back button for Run Detail", () => {
         renderTopBar("/task/canary-promotion/run/antigravity_gemini-3.7-flash-high");
         expect(screen.getByRole("link", { name: /← canary-promotion/i })).toBeInTheDocument();
-        expect(screen.getByRole("link", { name: /← Tasks/i })).toBeInTheDocument();
+        expect(screen.queryByRole("link", { name: /← Tasks/i })).not.toBeInTheDocument();
     });
 });
