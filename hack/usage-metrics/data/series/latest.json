@@ -2,11 +2,11 @@
   "apiVersion": "usage-metrics/v1",
   "kind": "UsageSeries",
   "formatVersion": 1,
-  "generatedAt": "2026-09-14T11:04:54Z",
+  "generatedAt": "2026-09-17T10:32:06Z",
   "provenance": {
-    "collectorSha": "e24535f93f7bf8544c39dbf975be9f36cff4f330",
-    "workflowRunUrl": "https://github.com/eugeneng04/devops-bench/actions/runs/34835685756",
-    "writtenAt": "2026-09-14T11:04:54Z"
+    "collectorSha": "9a30937e47b9cf604d94a826140af322583f7612",
+    "workflowRunUrl": "https://github.com/eugeneng04/devops-bench/actions/runs/35210227725",
+    "writtenAt": "2026-09-17T10:32:06Z"
   },
   "unreadable": [
     {
@@ -149,213 +149,23 @@
         "repos": {
           "gke-labs/devops-bench": {
             "comparable": true,
-            "newForks": [],
-            "newBranches": [
-              {
-                "fork": "eugeneng04/devops-bench",
-                "branch": "feat/multi-server-mcp-and-skills",
-                "upstream": "gke-labs/devops-bench",
-                "primary": "agentFramework",
-                "external": false,
-                "changedLines": 1743,
-                "changedLinesBefore": null,
-                "headCommittedAt": "2026-08-14T17:31:36Z",
-                "unavailable": null
-              },
-              {
-                "fork": "eugeneng04/devops-bench",
-                "branch": "main",
-                "upstream": "gke-labs/devops-bench",
-                "primary": "infrastructure",
-                "external": false,
-                "changedLines": 196535,
-                "changedLinesBefore": null,
-                "headCommittedAt": "2026-08-18T23:24:01Z",
-                "unavailable": null
-              }
-            ],
-            "updatedBranches": [],
-            "goneForks": [],
-            "goneBranches": []
+            "newForks": 0,
+            "newBranches": 2,
+            "updatedBranches": 0,
+            "goneForks": 0,
+            "goneBranches": 0
           },
           "kubernetes-sigs/devops-bench": {
             "comparable": true,
-            "newForks": [],
-            "newBranches": [
-              {
-                "fork": "eugeneng04/devops-bench-sigs",
-                "branch": "multi-server-mcp-and-skills",
-                "upstream": "kubernetes-sigs/devops-bench",
-                "primary": "agentFramework",
-                "external": false,
-                "changedLines": 1724,
-                "changedLinesBefore": null,
-                "headCommittedAt": "2026-08-18T16:45:57Z",
-                "unavailable": null
-              },
-              {
-                "fork": "isadominguez314/devops-bench",
-                "branch": "feat/chaos-dynamic-port-and-notes",
-                "upstream": "kubernetes-sigs/devops-bench",
-                "primary": "infrastructure",
-                "external": true,
-                "changedLines": 1950,
-                "changedLinesBefore": null,
-                "headCommittedAt": "2026-08-18T17:52:23Z",
-                "unavailable": null
-              },
-              {
-                "fork": "onix-net/devops-bench",
-                "branch": "cloud-resource-property",
-                "upstream": "kubernetes-sigs/devops-bench",
-                "primary": "addingVerifiers",
-                "external": true,
-                "changedLines": 2205,
-                "changedLinesBefore": null,
-                "headCommittedAt": "2026-08-14T00:36:06Z",
-                "unavailable": null
-              },
-              {
-                "fork": "pradeepvrd/devops-bench-1",
-                "branch": "docs/scoring-methodology",
-                "upstream": "kubernetes-sigs/devops-bench",
-                "primary": "docs",
-                "external": false,
-                "changedLines": 81,
-                "changedLinesBefore": null,
-                "headCommittedAt": "2026-08-14T22:42:56Z",
-                "unavailable": null
-              }
-            ],
-            "updatedBranches": [
-              {
-                "fork": "geojaz/k8s-devops-bench",
-                "branch": "ehole/pin-checks-to-run-cluster",
-                "upstream": "kubernetes-sigs/devops-bench",
-                "primary": "core",
-                "external": false,
-                "changedLines": 263,
-                "changedLinesBefore": 259,
-                "headCommittedAt": "2026-08-15T16:08:04Z",
-                "unavailable": null
-              },
-              {
-                "fork": "geojaz/k8s-devops-bench",
-                "branch": "ehole/verifier-http-probe",
-                "upstream": "kubernetes-sigs/devops-bench",
-                "primary": "addingVerifiers",
-                "external": false,
-                "changedLines": 572,
-                "changedLinesBefore": 445,
-                "headCommittedAt": "2026-08-15T16:05:41Z",
-                "unavailable": null
-              },
-              {
-                "fork": "isadominguez314/devops-bench",
-                "branch": "feat/vcluster-factory-and-smoke-test",
-                "upstream": "kubernetes-sigs/devops-bench",
-                "primary": "infrastructure",
-                "external": true,
-                "changedLines": 1791,
-                "changedLinesBefore": 1800,
-                "headCommittedAt": "2026-08-18T20:04:43Z",
-                "unavailable": null
-              },
-              {
-                "fork": "isadominguez314/devops-bench",
-                "branch": "feat/vcluster-provider-integration",
-                "upstream": "kubernetes-sigs/devops-bench",
-                "primary": "infrastructure",
-                "external": true,
-                "changedLines": 1652,
-                "changedLinesBefore": 1661,
-                "headCommittedAt": "2026-08-18T20:04:35Z",
-                "unavailable": null
-              },
-              {
-                "fork": "isadominguez314/devops-bench",
-                "branch": "feat/vcluster-tf-stack",
-                "upstream": "kubernetes-sigs/devops-bench",
-                "primary": "infrastructure",
-                "external": true,
-                "changedLines": 653,
-                "changedLinesBefore": 662,
-                "headCommittedAt": "2026-08-18T20:02:08Z",
-                "unavailable": null
-              },
-              {
-                "fork": "itssimrank/migration",
-                "branch": "docs/roadmap-and-contribution-tracks",
-                "upstream": "kubernetes-sigs/devops-bench",
-                "primary": "docs",
-                "external": false,
-                "changedLines": 122,
-                "changedLinesBefore": 120,
-                "headCommittedAt": "2026-08-17T17:41:54Z",
-                "unavailable": null
-              },
-              {
-                "fork": "jessie1111101/devops-bench-upstream",
-                "branch": "add-agents-docs",
-                "upstream": "kubernetes-sigs/devops-bench",
-                "primary": "docs",
-                "external": false,
-                "changedLines": 329,
-                "changedLinesBefore": 326,
-                "headCommittedAt": "2026-08-18T20:32:31Z",
-                "unavailable": null
-              },
-              {
-                "fork": "jessie1111101/devops-bench-upstream",
-                "branch": "add-review-skills",
-                "upstream": "kubernetes-sigs/devops-bench",
-                "primary": "docs",
-                "external": false,
-                "changedLines": 526,
-                "changedLinesBefore": 930,
-                "headCommittedAt": "2026-08-18T20:31:31Z",
-                "unavailable": null
-              },
-              {
-                "fork": "jessie1111101/devops-bench-upstream",
-                "branch": "fair-verification-budget",
-                "upstream": "kubernetes-sigs/devops-bench",
-                "primary": "core",
-                "external": false,
-                "changedLines": 149,
-                "changedLinesBefore": 143,
-                "headCommittedAt": "2026-08-17T21:20:07Z",
-                "unavailable": null
-              },
-              {
-                "fork": "jessie1111101/devops-bench-upstream",
-                "branch": "fix-parallel-child-handoff",
-                "upstream": "kubernetes-sigs/devops-bench",
-                "primary": "addingVerifiers",
-                "external": false,
-                "changedLines": 51,
-                "changedLinesBefore": 48,
-                "headCommittedAt": "2026-08-17T21:22:25Z",
-                "unavailable": null
-              },
-              {
-                "fork": "onix-net/devops-bench",
-                "branch": "ehole/team-integration",
-                "upstream": "kubernetes-sigs/devops-bench",
-                "primary": "infrastructure",
-                "external": true,
-                "changedLines": 18172,
-                "changedLinesBefore": 16817,
-                "headCommittedAt": "2026-08-14T18:58:36Z",
-                "unavailable": null
-              }
-            ],
+            "newForks": 0,
+            "newBranches": 4,
+            "updatedBranches": 11,
             "goneForks": null,
             "goneBranches": null
           }
         }
       },
-      "changeDetail": true
+      "changeDetail": false
     },
     {
       "date": "2026-08-20",
@@ -10056,6 +9866,1564 @@
         }
       },
       "changeDetail": true
+    },
+    {
+      "date": "2026-09-17",
+      "collectedAt": "2026-09-17T10:23:35Z",
+      "windowDays": 14,
+      "totals": {
+        "forks": 31,
+        "activeForks": 28,
+        "externalForks": 13,
+        "owners": 21,
+        "activeOwners": 18,
+        "externalOwners": 11,
+        "activeExternalOwners": 8,
+        "divergentBranches": 555,
+        "externalDivergentBranches": 91,
+        "distinctChanges": 404,
+        "externalDistinctChanges": 87,
+        "changedLines": 3611316,
+        "unclassifiedLines": 77337,
+        "trafficRepos": [
+          "gke-labs/devops-bench"
+        ]
+      },
+      "derived": {
+        "externalOwnerRatio": 0.5238095238095238,
+        "activeExternalOwnerRatio": 0.4444444444444444,
+        "externalBranchRatio": 0.16396396396396395,
+        "externalChangeRatio": 0.21534653465346534,
+        "unclassifiedLineRate": 0.021415184935353205
+      },
+      "affiliation": {
+        "inside": 19,
+        "outside": 12,
+        "frozenAt": "2026-09-17"
+      },
+      "references": {
+        "depending": 2,
+        "running": 1,
+        "citing": 13
+      },
+      "referencesUnavailable": null,
+      "traffic": {
+        "gke-labs/devops-bench": {
+          "views": 238,
+          "uniqueVisitors": 23,
+          "clones": 2212,
+          "uniqueCloners": 426
+        },
+        "kubernetes-sigs/devops-bench": null
+      },
+      "coverage": {
+        "partial": false,
+        "skipped": [],
+        "trafficRepos": [
+          "gke-labs/devops-bench"
+        ],
+        "forksUnavailable": []
+      },
+      "provenance": {
+        "collectorSha": "9a30937e47b9cf604d94a826140af322583f7612",
+        "workflowRunUrl": "https://github.com/eugeneng04/devops-bench/actions/runs/35210227725",
+        "writtenAt": "2026-09-17T10:23:35Z"
+      },
+      "changes": {
+        "since": "2026-09-14",
+        "repos": {
+          "gke-labs/devops-bench": {
+            "comparable": true,
+            "newForks": [
+              {
+                "fullName": "isadominguez314/devops-bench-leaderboard",
+                "owner": "isadominguez314",
+                "external": true
+              }
+            ],
+            "newBranches": [
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "AishSundar-patch-1",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 3,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-07-06T22:52:11Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "add-b0011-sandbox",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "addingTasks",
+                "external": false,
+                "changedLines": 16626,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-01T15:48:06Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "agents",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "agentFramework",
+                "external": false,
+                "changedLines": 170,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-05-05T00:41:57Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "backsync/from-upstream",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "tests",
+                "external": true,
+                "changedLines": 2793,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-16T04:30:03Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "chore/ruff-format-baseline",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "tests",
+                "external": false,
+                "changedLines": 549,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-07-08T02:17:25Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "dependabot/npm_and_yarn/site/baseline-browser-mapping-2.11.22",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "docs",
+                "external": true,
+                "changedLines": 6,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-11T01:38:23Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "dependabot/npm_and_yarn/site/browserslist-4.28.9",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "docs",
+                "external": true,
+                "changedLines": 46,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-07T14:24:09Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "dependabot/npm_and_yarn/site/multi-d0c2d048a7",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "docs",
+                "external": true,
+                "changedLines": 98,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-10T07:09:18Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "dependabot/npm_and_yarn/site/postcss-8.5.25",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "docs",
+                "external": true,
+                "changedLines": 18,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-05T20:47:33Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "dependabot/npm_and_yarn/site/react-router-dom-6.30.6",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "docs",
+                "external": true,
+                "changedLines": 28,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-08T17:34:09Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "dependabot/npm_and_yarn/site/seed/fast-xml-parser-5.10.1",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "docs",
+                "external": true,
+                "changedLines": 48,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-07-24T09:53:12Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "dependabot/uv/aiohttp-3.14.3",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "unclassified",
+                "external": true,
+                "changedLines": 170,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-04T20:17:36Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "dependabot/uv/cryptography-50.0.0",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "unclassified",
+                "external": true,
+                "changedLines": 84,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-05T04:47:41Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "dependabot/uv/mcp-1.28.1",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "unclassified",
+                "external": true,
+                "changedLines": 18,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-07-31T22:12:55Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "dependabot/uv/pyasn1-0.6.4",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "unclassified",
+                "external": true,
+                "changedLines": 6,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-07-24T13:46:23Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "dependabot/uv/setuptools-83.0.0",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "unclassified",
+                "external": true,
+                "changedLines": 6,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-07-25T04:10:54Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "diagnosis",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "changingGrading",
+                "external": false,
+                "changedLines": 7,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-06-02T01:45:50Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "docs/kube-agents-decoupling",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 81,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-07-28T21:03:17Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "docs/out-of-tree-tasks",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 473,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-07-28T18:48:00Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "docs/pr-plan-wave-update",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "unclassified",
+                "external": false,
+                "changedLines": 134,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-07-23T03:33:55Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "docs/task-authoring-best-practices",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 18,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-07-14T07:09:59Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "experiment/parallel-eval-runs",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "tests",
+                "external": false,
+                "changedLines": 19481,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-06-25T00:20:53Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "feat/bastion-matrix",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 5259,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-06-27T02:02:54Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "feat/bridge-result-model",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "core",
+                "external": false,
+                "changedLines": 1253,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-06-27T04:50:44Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "feat/catalog-gemini-3-7-flash",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 21,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-27T23:19:47Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "feat/cve-remediation-main",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 647,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-06-30T17:44:53Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "feat/efficiency-turns",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "core",
+                "external": false,
+                "changedLines": 50,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-07-28T17:06:05Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "feat/eval-bastion",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 1846,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-06-27T01:16:02Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "feat/greenops-consolidation",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 532,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-07-28T17:06:15Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "feat/matrix-aggregate-for-ingest",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 76,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-27T23:35:53Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "feat/mesh-federation",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 615,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-07-28T17:06:06Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "feat/parallel-eval-runs",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 4146,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-06-27T01:54:37Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "feat/pods-on-node-verifier",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "addingVerifiers",
+                "external": false,
+                "changedLines": 316,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-07-28T17:06:06Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "feat/run-isolation",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 3405,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-06-27T02:05:43Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "feat/run-isolation-legacy",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 5259,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-06-27T02:03:04Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "feat/scoring-v1-docs",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "changingGrading",
+                "external": false,
+                "changedLines": 1138,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-07-28T17:01:57Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "feat/scoring-v1-frontend",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 382,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-25T22:55:05Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "feat/scoring-v1-outcome-score",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "changingGrading",
+                "external": false,
+                "changedLines": 341,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-07-22T18:25:48Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "feat/scoring-v1-results-wiring",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "changingGrading",
+                "external": false,
+                "changedLines": 794,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-07-28T17:01:42Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "feat/scoring-v1-safety-metric",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "changingGrading",
+                "external": false,
+                "changedLines": 505,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-07-27T21:22:21Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "feat/scoring-v1-task-retrofit",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "changingGrading",
+                "external": false,
+                "changedLines": 1004,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-07-28T17:01:57Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "feat/secret-rotation-task",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 5259,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-06-27T02:02:59Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "feat/site-catalog-entries",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 122,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-28T22:36:54Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "feat/site-dark-mode",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 607,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-26T00:35:52Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "feat/site-dev-database",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 453,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-16T00:06:13Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "feat/site-efficiency-metrics",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 1598,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-31T23:54:39Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "feat/spot-rebalancing",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 574,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-06-30T17:57:59Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "feat/wb-board-caveats",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 785,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-15T16:55:59Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "feat/wb-coverage-on-row",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 1193,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-15T17:37:37Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "fix-backsync-load-encode-guardrails",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 43,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-07-01T07:16:28Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "fix/backsync-ci-credentials",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 17,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-07-07T01:25:09Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "fix/bastion-host-skill-gap",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 16,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-06-30T18:29:28Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "fix/doc-retrieval-rate-url-normalization",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "changingGrading",
+                "external": false,
+                "changedLines": 90,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-07-28T17:06:05Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "fix/oc-trajectory-node-on-path",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "agentFramework",
+                "external": false,
+                "changedLines": 71,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-06-30T16:56:28Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "fix/site-catastrophic-task-rows",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 129,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-08T19:09:39Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "fix/site-readme-emulator-project",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 29,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-14T22:27:53Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "fix/site-vite8-code-splitting",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 27,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-07-14T01:23:43Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "fix/suggest-flips-tree-check",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 2,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-07-17T17:36:48Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "fix/task-review-verifier-robustness",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 26,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-07-28T21:48:26Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "fix/token-cache-aliases",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "core",
+                "external": false,
+                "changedLines": 53,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-01T19:15:58Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "fix/wb-entry-resolution",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "addingVerifiers",
+                "external": false,
+                "changedLines": 489,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-15T16:32:41Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "fix/wb-pass1-gate",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 188,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-15T16:44:11Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "flip-core-foundation",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "unclassified",
+                "external": false,
+                "changedLines": 4,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-07-06T23:40:47Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "flip/wave4-5-parity",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "unclassified",
+                "external": false,
+                "changedLines": 34,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-07-22T18:39:48Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "harden-cve-remediation",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "addingTasks",
+                "external": false,
+                "changedLines": 2133,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-18T19:15:08Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "migration/flip-content-parity",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 281,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-07-14T18:19:09Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "parallel-task-fixes-132",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 7823,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-06-26T22:21:49Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "passk-metrics",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "docs",
+                "external": true,
+                "changedLines": 334,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-16T22:13:18Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "pr-plan-batch-waves-4-5",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "unclassified",
+                "external": false,
+                "changedLines": 103,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-07-16T18:18:24Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "refactor/comparison",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 1846,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-06-26T22:21:48Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "sandbox-fixture-mounts",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "addingTasks",
+                "external": false,
+                "changedLines": 16706,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-02T04:52:22Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "skills/agent-skills",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 4869,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-06-27T01:54:56Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "split/4-eval-skills",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 2822,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-06-29T22:40:53Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "submit/2-verification",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "agentFramework",
+                "external": false,
+                "changedLines": 7771,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-06-26T04:36:55Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "submit/3-agents-capabilities",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "agentFramework",
+                "external": false,
+                "changedLines": 7310,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-06-26T04:36:06Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "submit/4-agents-base-cli",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "addingChaos",
+                "external": false,
+                "changedLines": 4484,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-06-26T04:35:28Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "submit/5-agents-api",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "addingChaos",
+                "external": false,
+                "changedLines": 2310,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-06-26T04:32:29Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "submit/6-chaos",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "core",
+                "external": false,
+                "changedLines": 5899,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-06-26T04:34:19Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "submit/7-metrics",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "core",
+                "external": false,
+                "changedLines": 3352,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-06-26T04:31:34Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench-leaderboard",
+                "branch": "sync/upstream-scoring-verification",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "addingVerifiers",
+                "external": false,
+                "changedLines": 7812,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-07-31T21:57:11Z",
+                "unavailable": null
+              },
+              {
+                "fork": "onix-net/gke-labs-devops-bench",
+                "branch": "claude/gemini-stream-persist",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:claude/gemini-stream-persist: No common ancestor between main and onix-net:claude/gemini-stream-persist. (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/gke-labs-devops-bench",
+                "branch": "codex/gemini-timeout-evidence",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:codex/gemini-timeout-evidence: No common ancestor between main and onix-net:codex/gemini-timeout-evidence. (HTTP 404)"
+              },
+              {
+                "fork": "onix-net/gke-labs-devops-bench",
+                "branch": "codex/verification-contract-runtime",
+                "upstream": "gke-labs/devops-bench",
+                "primary": null,
+                "external": null,
+                "changedLines": null,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": "repos/gke-labs/devops-bench/compare/main...onix-net:codex/verification-contract-runtime: No common ancestor between main and onix-net:codex/verification-contract-runtime. (HTTP 404)"
+              }
+            ],
+            "updatedBranches": [
+              {
+                "fork": "eugeneng04/devops-bench",
+                "branch": "feat/site-efficiency-charts",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 50138,
+                "changedLinesBefore": 5175,
+                "headCommittedAt": "2026-09-17T00:44:16Z",
+                "unavailable": null
+              },
+              {
+                "fork": "eugeneng04/devops-bench",
+                "branch": "main",
+                "upstream": "gke-labs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 1127188,
+                "changedLinesBefore": 958863,
+                "headCommittedAt": "2026-09-14T11:04:54Z",
+                "unavailable": null
+              }
+            ],
+            "goneForks": [],
+            "goneBranches": []
+          },
+          "kubernetes-sigs/devops-bench": {
+            "comparable": true,
+            "newForks": [],
+            "newBranches": [
+              {
+                "fork": "eugeneng04/devops-bench-sigs",
+                "branch": "feat/catastrophic-reasons",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "tests",
+                "external": false,
+                "changedLines": 976,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-16T18:22:26Z",
+                "unavailable": null
+              },
+              {
+                "fork": "eugeneng04/devops-bench-sigs",
+                "branch": "int/run-telemetry",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingTasks",
+                "external": true,
+                "changedLines": 17325,
+                "changedLinesBefore": null,
+                "headCommittedAt": null,
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "feat/chaos-wip",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingChaos",
+                "external": true,
+                "changedLines": 3014,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-08-25T18:08:15Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "fix/openclaw-keep-export-bundle",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingTasks",
+                "external": true,
+                "changedLines": 18212,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-14T19:01:03Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "fix/openclaw-placeholder-fallback",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingTasks",
+                "external": true,
+                "changedLines": 18182,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-14T17:41:12Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "fix/openclaw-version-skew",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingTasks",
+                "external": true,
+                "changedLines": 18085,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-15T17:05:56Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "fix/report-empty-extraction",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingTasks",
+                "external": true,
+                "changedLines": 18169,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-14T17:24:13Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "int/catastrophic-details",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingTasks",
+                "external": true,
+                "changedLines": 18212,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-14T22:55:58Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "sandbox/03-lifecycle-teardown",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingTasks",
+                "external": true,
+                "changedLines": 18120,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-15T17:41:25Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "sandbox/04-provenance",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingTasks",
+                "external": true,
+                "changedLines": 17890,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-16T18:50:09Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "up/catastrophic-details",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "core",
+                "external": true,
+                "changedLines": 265,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-15T18:31:44Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "up/openclaw-keep-export-bundle",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "agentFramework",
+                "external": true,
+                "changedLines": 115,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-15T20:22:01Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "up/passk-metrics",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "changingGrading",
+                "external": true,
+                "changedLines": 589,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-16T21:30:22Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "up/sandbox-01-core-seam",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "agentFramework",
+                "external": true,
+                "changedLines": 2322,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-16T18:47:34Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "up/sandbox-02-credentials",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "core",
+                "external": true,
+                "changedLines": 5251,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-16T22:06:47Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "up/sandbox-025-vertex-metadata",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "core",
+                "external": true,
+                "changedLines": 6119,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-16T22:49:32Z",
+                "unavailable": null
+              },
+              {
+                "fork": "itssimrank/migration",
+                "branch": "feat/evidence-preserving-rca",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 1270,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-15T20:53:31Z",
+                "unavailable": null
+              },
+              {
+                "fork": "itssimrank/migration",
+                "branch": "feat/task-readonly-pr-remediation",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 1621,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-16T16:17:31Z",
+                "unavailable": null
+              },
+              {
+                "fork": "itssimrank/migration",
+                "branch": "feat/task-upgrade-deferral",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 1483,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-15T00:24:48Z",
+                "unavailable": null
+              },
+              {
+                "fork": "itssimrank/migration",
+                "branch": "fix/openclaw-vertex-sandbox-auth",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingTasks",
+                "external": true,
+                "changedLines": 17933,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-16T16:15:01Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "docs/wb-scoring-comparability",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "docs",
+                "external": false,
+                "changedLines": 179,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-15T16:47:14Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "feat/a2a-client-from-config",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "agentFramework",
+                "external": false,
+                "changedLines": 850,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-14T18:11:54Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "feat/a2a-extra",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "unclassified",
+                "external": false,
+                "changedLines": 300,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-15T15:25:22Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "feat/a2a-subagent-attribution",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "agentFramework",
+                "external": false,
+                "changedLines": 1122,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-16T19:07:52Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "feat/adk-subagent-attribution",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "tests",
+                "external": false,
+                "changedLines": 876,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-14T16:56:54Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "feat/kind-mirror-and-gke-notes",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 189,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-15T16:58:43Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "feat/multi-turn-conversations",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "agentFramework",
+                "external": false,
+                "changedLines": 446,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-16T18:39:11Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "fix/chaos-spike-never-fires",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "core",
+                "external": false,
+                "changedLines": 583,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-15T15:37:16Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "fix/cleanup-leaked-stack",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "infrastructure",
+                "external": false,
+                "changedLines": 345,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-15T15:33:48Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "fix/provider-from-the-task",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "core",
+                "external": false,
+                "changedLines": 480,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-15T17:11:25Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "fix/teardown-when-cluster-is-gone",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "core",
+                "external": false,
+                "changedLines": 936,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-15T16:27:24Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "fix/upstream-entry-resolution",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingVerifiers",
+                "external": false,
+                "changedLines": 490,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-15T17:15:26Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "test/task-spec-contract",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "tests",
+                "external": false,
+                "changedLines": 294,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-15T17:25:58Z",
+                "unavailable": null
+              },
+              {
+                "fork": "pradeepvrd/devops-bench",
+                "branch": "add-owners",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "unclassified",
+                "external": false,
+                "changedLines": 3,
+                "changedLinesBefore": null,
+                "headCommittedAt": "2026-09-17T01:55:53Z",
+                "unavailable": null
+              }
+            ],
+            "updatedBranches": [
+              {
+                "fork": "eugeneng04/devops-bench-sigs",
+                "branch": "feat/run-telemetry",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "tests",
+                "external": false,
+                "changedLines": 4501,
+                "changedLinesBefore": 2823,
+                "headCommittedAt": "2026-09-16T22:25:59Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "feat/catastrophic-kinds",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "core",
+                "external": true,
+                "changedLines": 86,
+                "changedLinesBefore": 2805,
+                "headCommittedAt": "2026-09-15T18:01:10Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "feat/detection-core",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "tests",
+                "external": true,
+                "changedLines": 2290,
+                "changedLinesBefore": 2176,
+                "headCommittedAt": "2026-09-14T22:22:34Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "feat/integrity-gate",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "changingGrading",
+                "external": true,
+                "changedLines": 603,
+                "changedLinesBefore": 2735,
+                "headCommittedAt": "2026-09-15T17:31:03Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "up/agy-image",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "unclassified",
+                "external": true,
+                "changedLines": 114,
+                "changedLinesBefore": 94,
+                "headCommittedAt": "2026-09-16T21:41:29Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "up/openclaw-version-pin",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "infrastructure",
+                "external": true,
+                "changedLines": 14,
+                "changedLinesBefore": 10,
+                "headCommittedAt": "2026-09-17T00:31:45Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "up/vertex-location-global",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "agentFramework",
+                "external": true,
+                "changedLines": 371,
+                "changedLinesBefore": 358,
+                "headCommittedAt": "2026-09-17T00:49:06Z",
+                "unavailable": null
+              },
+              {
+                "fork": "isadominguez314/devops-bench",
+                "branch": "validation/sandbox-probes",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingTasks",
+                "external": true,
+                "changedLines": 18660,
+                "changedLinesBefore": 18644,
+                "headCommittedAt": "2026-09-16T17:26:28Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "add-task-migration-and-upgrade",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingTasks",
+                "external": false,
+                "changedLines": 1427,
+                "changedLinesBefore": 1405,
+                "headCommittedAt": "2026-09-16T00:42:45Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "feat/greenops-consolidation-v2",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingTasks",
+                "external": false,
+                "changedLines": 1530,
+                "changedLinesBefore": 1207,
+                "headCommittedAt": "2026-09-14T18:48:22Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "feat/mesh-federation-v2",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingTasks",
+                "external": false,
+                "changedLines": 1728,
+                "changedLinesBefore": 1262,
+                "headCommittedAt": "2026-09-14T22:03:58Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "feat/trajectory-actor-attribution",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingHarness",
+                "external": false,
+                "changedLines": 660,
+                "changedLinesBefore": 547,
+                "headCommittedAt": "2026-09-15T20:01:55Z",
+                "unavailable": null
+              },
+              {
+                "fork": "jessie1111101/devops-bench-upstream",
+                "branch": "fix/a2a-output-extraction",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "agentFramework",
+                "external": false,
+                "changedLines": 297,
+                "changedLinesBefore": 184,
+                "headCommittedAt": "2026-09-15T18:44:22Z",
+                "unavailable": null
+              },
+              {
+                "fork": "pradeepvrd/devops-bench",
+                "branch": "integration",
+                "upstream": "kubernetes-sigs/devops-bench",
+                "primary": "addingTasks",
+                "external": true,
+                "changedLines": 18085,
+                "changedLinesBefore": 18097,
+                "headCommittedAt": "2026-09-15T17:07:21Z",
+                "unavailable": null
+              }
+            ],
+            "goneForks": null,
+            "goneBranches": null
+          }
+        }
+      },
+      "changeDetail": true
     }
   ],
   "daily": {
@@ -10063,7 +11431,7 @@
       "covered": [
         [
           "2026-07-29",
-          "2026-09-13"
+          "2026-09-16"
         ]
       ],
       "gaps": [],
@@ -10396,6 +11764,27 @@
           "uniqueVisitors": 3,
           "clones": 129,
           "uniqueCloners": 36
+        },
+        {
+          "date": "2026-09-14",
+          "views": 40,
+          "uniqueVisitors": 9,
+          "clones": 174,
+          "uniqueCloners": 32
+        },
+        {
+          "date": "2026-09-15",
+          "views": 17,
+          "uniqueVisitors": 6,
+          "clones": 186,
+          "uniqueCloners": 39
+        },
+        {
+          "date": "2026-09-16",
+          "views": 27,
+          "uniqueVisitors": 7,
+          "clones": 206,
+          "uniqueCloners": 44
         }
       ]
     }
