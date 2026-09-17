@@ -14,11 +14,10 @@ describe("TaskDetail", () => {
         );
     }
 
-    it("renders task name, title, and folder", () => {
+    it("renders task name and title", () => {
         renderTask("canary-promotion");
-        expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(/Canary Analysis/i);
-        expect(screen.getAllByText(/canary-promotion/).length).toBeGreaterThanOrEqual(1);
-        expect(screen.getByText(/b-0033/)).toBeInTheDocument();
+        expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("canary-promotion");
+        expect(screen.getByText(/Canary Analysis/i)).toBeInTheDocument();
     });
 
     it("renders instruction scenario block and toggles expand", () => {

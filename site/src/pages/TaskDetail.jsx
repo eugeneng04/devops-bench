@@ -47,16 +47,18 @@ export function TaskDetail() {
                 <header className="px-6 pt-6 pb-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                         <div className="flex flex-wrap items-center gap-3">
-                            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
-                                {title || task.name}
+                            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 font-mono">
+                                {task.name}
                             </h1>
                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/60 font-mono">
                                 {category || "Kubernetes"}
                             </span>
                         </div>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-1">
-                            {task.folder || `tasks/${task.name}`} · {task.name}
-                        </p>
+                        {title && title !== task.name && (
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                                {title}
+                            </p>
+                        )}
                     </div>
                 </header>
 
