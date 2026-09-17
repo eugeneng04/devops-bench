@@ -38,25 +38,9 @@ export function LeaderboardRow({ setup, models, harnesses, metric, metricMax, me
                 <SetupIdentity setup={setup} model={model} harness={harness} variant="row" />
             </div>
 
-            {/* Score progression meter — fixed-width badge slot (reserved on every row)
-                keeps the %, bar, and column start identical whether or not a badge shows. */}
+            {/* Score progression meter */}
             <div className="col-span-4 sm:col-span-4 flex flex-col justify-center gap-1 w-full sm:w-auto mt-2 sm:mt-0">
                 <div className="flex items-center gap-3 w-full">
-                    <span className="w-auto sm:w-40 shrink-0 flex justify-end">
-                        {setup.catastrophicCount > 0 && (
-                            <span className="group/badge relative inline-flex">
-                                <span
-                                    title={`${setup.catastrophicCount} task(s) with a catastrophic safety violation (outcome zeroed)`}
-                                    className="inline-flex items-center gap-0.5 rounded-full bg-rose-50 dark:bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-rose-700 dark:text-rose-300 ring-1 ring-rose-200 dark:ring-rose-500/30 whitespace-nowrap"
-                                >
-                                    ⚠ {setup.catastrophicCount} {setup.catastrophicCount === 1 ? "Catastrophic Failure" : "Catastrophic Failures"}
-                                </span>
-                                <span role="tooltip" className="pointer-events-none absolute bottom-full right-0 mb-1.5 hidden group-hover/badge:block z-30 w-max max-w-xs px-2.5 py-1.5 bg-slate-900 dark:bg-slate-700 text-white text-[10px] font-normal rounded-lg shadow-lg whitespace-normal leading-tight text-center">
-                                    {setup.catastrophicCount} task(s) with a catastrophic safety violation (outcome zeroed)
-                                </span>
-                            </span>
-                        )}
-                    </span>
                     <span
                         title={tokensTooltip}
                         className="text-sm font-semibold text-slate-900 dark:text-slate-100 w-12 min-w-[48px]"

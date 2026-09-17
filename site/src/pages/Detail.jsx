@@ -68,8 +68,12 @@ function CatastrophicDetails({ task }) {
             const label = k.replace(/Catastrophic$/, "");
             return count > 0 ? `${label} (${count})` : label;
         }).filter(Boolean);
-        return labels.length > 0 ? `Failure: ${labels.join(", ")}` : "Failure: Catastrophic";
+        return labels.length > 0 ? `Failure: ${labels.join(", ")}` : null;
     }, [task.catastrophicKinds, flatEntries]);
+
+    if (!kindsLabel) {
+        return null;
+    }
 
     if (flatEntries.length === 0) {
         return (
@@ -545,7 +549,7 @@ export function Detail() {
                                         : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
                                 }`}
                             >
-                                Common Tasks ({effectiveSetup.tasks?.length || 0})
+                                Common Tasks ({commonTaskKeys.length})
                             </button>
                         </div>
                         {taskScope === "common" && (

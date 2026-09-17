@@ -100,15 +100,10 @@ describe("Leaderboard", () => {
         expect(screen.getByText(/All leaderboard scores and efficiency figures represent task averages/i)).toBeInTheDocument();
     });
 
-    it("renders the catastrophic failure badge with 'n Catastrophic Failure(s)'", () => {
-        const { unmount } = renderPage();
-        expect(screen.getByText("⚠ 2 Catastrophic Failures")).toBeInTheDocument();
-        unmount();
-
-        FIXTURE.setups[0].catastrophicCount = 1;
+    it("does not render the catastrophic failure badge on the leaderboard rows", () => {
         renderPage();
-        expect(screen.getByText("⚠ 1 Catastrophic Failure")).toBeInTheDocument();
-        FIXTURE.setups[0].catastrophicCount = 2; // Restore fixture
+        expect(screen.queryByText(/Catastrophic Failure/i)).not.toBeInTheDocument();
+        expect(screen.queryByText(/⚠ \d+/)).not.toBeInTheDocument();
     });
 
     it("renders Scope toggle buttons and switches between scopes", () => {
