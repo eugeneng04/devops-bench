@@ -156,13 +156,12 @@ function TaskTable({ setup, metric }) {
         });
     }, [setup, metric, sort]);
 
-    // Best value across this setup's tasks — the smallest for a lower-is-better
-    // metric — so an absolute metric's bar has a scale (percentage metrics
-    // ignore it).
-    const taskBest = useMemo(() => {
-        const vals = setup.tasks.map(t => scoreOf(t.scores, metric)).filter(v => v != null);
+    // Maximum value across this setup's tasks so an absolute metric's bar scales
+    // to actual magnitude (percentage metrics ignore it).
+    const taskMax = useMemo(() => {
+        const vals = setup.tasks.map(t => scoreOf(t.scores, metric)).filter(v => v != null && v > 0);
         if (!vals.length) return null;
-        return isLowerBetter(metric) ? Math.min(...vals) : Math.max(...vals);
+        return Math.max(...vals);
     }, [setup, metric]);
 
     function sortBy(key) {
@@ -223,7 +222,7 @@ function TaskTable({ setup, metric }) {
                     {tasks.map(task => {
                         // Null-safe: an unscored task shows an empty bar and "—".
                         const s = scoreOf(task.scores, metric);
-                        const barPct = metricBarFraction(metric, s, taskBest) * 100;
+                        const barPct = metricBarFraction(metric, s, taskMax) * 100;
                         const isTokens = metric === "tokens";
                         const taskInputTokens = isTokens ? scoreOf(task.scores, "inputTokens") : null;
                         const taskCachedTokens = isTokens ? scoreOf(task.scores, "cachedTokens") : null;

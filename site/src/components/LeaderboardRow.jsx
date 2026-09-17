@@ -6,15 +6,15 @@ import { SetupIdentity } from "./SetupIdentity.jsx";
 import { setupScore, setupLabel } from "../lib/accessors.js";
 import { formatMetric, metricBarFraction, TOKEN_BUCKET_COLORS } from "../lib/vocab.js";
 
-// `metricBest` is the best value for this metric across the visible rows — for
-// absolute metrics (latency, tokens) that is the SMALLEST, and the bar shows
-// each row's ratio to it, since those metrics have no natural ceiling. Unused by
-// percentage metrics.
-export function LeaderboardRow({ setup, models, harnesses, metric, metricBest, taskScope = "full" }) {
+// `metricMax` is the maximum value for this metric across the visible rows — for
+// absolute metrics (latency, tokens, cost), the bar width directly represents
+// the actual magnitude relative to this ceiling. Unused by percentage metrics.
+export function LeaderboardRow({ setup, models, harnesses, metric, metricMax, metricBest, taskScope = "full" }) {
     const model = models[setup.model];
     const harness = harnesses[setup.harness];
     const score = setupScore(setup, metric);
-    const barPct = metricBarFraction(metric, score, metricBest) * 100;
+    const scale = metricMax ?? metricBest;
+    const barPct = metricBarFraction(metric, score, scale) * 100;
     const to = `/setup/${encodeURIComponent(setup.id)}?metric=${encodeURIComponent(metric)}${taskScope === "common" ? "&scope=common" : ""}`;
 
     const isTokens = metric === "tokens";

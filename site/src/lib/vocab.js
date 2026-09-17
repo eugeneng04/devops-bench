@@ -213,22 +213,20 @@ export function formatMetric(metric, value) {
 /**
  * Fraction (0..1) of the bar to fill for `value`.
  *
- * A percentage metric maps directly. An absolute metric has no natural ceiling,
- * so it is expressed as a RATIO TO THE BEST value currently on screen (`best` =
- * the smallest, since lower is better): the fastest/cheapest setup earns a full
- * bar, and something twice as slow earns half of one. That keeps the "longer bar
- * is better" reading every other metric has, while staying proportional —
- * normalizing across `min..max` instead would render a 99s setup full and a 100s
- * setup empty, exaggerating a 1% gap into the whole width.
+ * A percentage metric maps directly (0..100%).
+ * An absolute metric (latency, tokens, cost, etc.) has no natural ceiling,
+ * so it is scaled against the maximum value currently on screen (`scale` / `max`):
+ * the largest value earns a full bar, and smaller values earn a proportionally
+ * narrower bar so the bar width directly represents the actual magnitude.
  */
-export function metricBarFraction(metric, value, best) {
+export function metricBarFraction(metric, value, scale) {
     if (value == null || !Number.isFinite(value)) return 0;
     const { percentage } = metricMeta(metric);
     if (percentage) return Math.max(0, Math.min(1, value / 100));
     // `value <= 0` can't be a real reading (0 latency is the unmeasured sentinel,
-    // 0 tokens means nothing was captured), and a non-positive best gives no scale.
-    if (!Number.isFinite(best) || best <= 0 || value <= 0) return 0;
-    return Math.max(0, Math.min(1, best / value));
+    // 0 tokens means nothing was captured), and a non-positive scale gives no basis.
+    if (!Number.isFinite(scale) || scale <= 0 || value <= 0) return 0;
+    return Math.max(0, Math.min(1, value / scale));
 }
 
 // One-line explanation per metric — the single source of truth for the score
@@ -244,7 +242,7 @@ export const METRIC_DESCRIPTIONS = {
         "Pass@1: share of task attempts whose correctness clears the pass threshold (1.0).",
     pass5: "Pass@5: needs multi-iteration runs (not produced yet).",
     passMax: "Pass^5: needs multi-iteration runs (not produced yet).",
-    latency: "Latency: mean agent wall-clock seconds per task. Lower is better, so the bar is scaled against the fastest setup on screen — a full bar is the fastest, half a bar is twice as slow.",
+    latency: "Latency: mean agent wall-clock seconds per task. Lower is better.",
     tokens: "Tokens: mean total tokens per task (the provider total when reported, else the sum of the captured buckets). Lower is better.",
     cost: "Average Cost: mean USD per task, from the run's own token buckets priced at the provider's published rates — input, cache reads, cache writes, output, and reasoning billed at the output rate. Stamped at ingest, so a past run keeps the rate it was billed at. Blank when the model has no rate on file.",
     turns: "Turns: mean model round-trips per task. Not tool calls — one turn can issue several, and a text-only turn issues none.",

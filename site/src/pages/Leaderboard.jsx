@@ -67,12 +67,11 @@ export function Leaderboard() {
         });
     }, [filtered, metric]);
 
-    // Best value on screen — the smallest, for the lower-is-better absolute
-    // metrics — so their bars have a scale. Null for percentage metrics, which
-    // need none.
-    const metricBest = useMemo(() => {
-        const vals = sorted.map(s => setupScore(s, metric)).filter(v => v != null);
-        return vals.length ? Math.min(...vals) : null;
+    // Maximum value on screen for absolute metrics so their bars scale to
+    // actual magnitude. Null for percentage metrics, which need none.
+    const metricMax = useMemo(() => {
+        const vals = sorted.map(s => setupScore(s, metric)).filter(v => v != null && v > 0);
+        return vals.length ? Math.max(...vals) : null;
     }, [sorted, metric]);
 
     function toggleFilter(groupKey, value) {
@@ -171,7 +170,7 @@ export function Leaderboard() {
                                 models={models}
                                 harnesses={harnesses}
                                 metric={metric}
-                                metricBest={metricBest}
+                                metricMax={metricMax}
                                 taskScope={taskScope}
                             />
                         ))}
