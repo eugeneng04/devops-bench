@@ -221,16 +221,11 @@ export function RunDetail() {
                         )}
                     </div>
                     <div className="bg-slate-50/80 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800 p-4 rounded-xl flex flex-col gap-3">
-                        <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-200/60 dark:border-slate-800/80">
-                            <div className="flex items-center gap-2">
-                                <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">Formula:</span>
-                                <code className="font-mono text-xs font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50/70 dark:bg-indigo-950/40 px-2 py-0.5 rounded border border-indigo-100 dark:border-indigo-900/50">
-                                    outcome_score = cat_v × √(c × rec_v)
-                                </code>
-                            </div>
-                            <span className="text-[11px] text-slate-400 dark:text-slate-500">
-                                Geometric mean of correctness &amp; recoverable safety, gated by catastrophic checks
-                            </span>
+                        <div className="flex items-center gap-2 pb-2.5 border-b border-slate-200/60 dark:border-slate-800/80">
+                            <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">Formula:</span>
+                            <code className="font-mono text-xs font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50/70 dark:bg-indigo-950/40 px-2 py-0.5 rounded border border-indigo-100 dark:border-indigo-900/50">
+                                outcome_score = cat_v × √(c × rec_v)
+                            </code>
                         </div>
                         {scores.catastrophic && (
                             <div className="p-2.5 rounded-lg bg-rose-50/80 dark:bg-rose-950/40 border border-rose-200/80 dark:border-rose-900/60 text-xs text-rose-700 dark:text-rose-300 font-medium">
