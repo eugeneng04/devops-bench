@@ -377,25 +377,14 @@ export function Detail() {
             : "Setup Detail · DevOps Bench Leaderboard";
     }, [setup, models, harnesses]);
 
-    const backLink = (
-        <div className="w-full">
-            <Link to="/" className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-                </svg>
-                Back to Leaderboard
-            </Link>
-        </div>
-    );
-
     if (loading) {
-        return <main className="w-full max-w-5xl flex flex-col items-center gap-6">{backLink}<Loading /></main>;
+        return <main className="w-full max-w-6xl flex flex-col items-center gap-8"><Loading /></main>;
     }
     if (error) {
-        return <main className="w-full max-w-5xl flex flex-col items-center gap-6">{backLink}<LoadError /></main>;
+        return <main className="w-full max-w-6xl flex flex-col items-center gap-8"><LoadError /></main>;
     }
     if (!setup) {
-        return <main className="w-full max-w-5xl flex flex-col items-center gap-6">{backLink}<NotFound id={id} /></main>;
+        return <main className="w-full max-w-6xl flex flex-col items-center gap-8"><NotFound id={id} /></main>;
     }
 
     const model = models[setup.model];
@@ -429,9 +418,7 @@ export function Detail() {
         : null;
 
     return (
-        <main className="w-full max-w-5xl flex flex-col items-center gap-6">
-            {backLink}
-
+        <main className="w-full max-w-6xl flex flex-col items-center gap-8 pb-16">
             <div className="w-full flex flex-col gap-6">
                 {/* Identity hero */}
                 <div className="w-full bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xl shadow-slate-100 dark:shadow-none p-6 flex flex-col lg:flex-row lg:items-center gap-6 justify-between">

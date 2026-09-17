@@ -46,15 +46,7 @@ export function TaskDetail() {
                 {/* Header banner */}
                 <header className="px-6 pt-6 pb-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <div className="flex items-center gap-2 text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                            <svg className="w-4 h-4 text-indigo-500 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                            </svg>
-                            <span>DevOps Bench Tasks</span>
-                            <span className="text-slate-300 dark:text-slate-600 font-normal">/</span>
-                            <span className="text-indigo-600 dark:text-indigo-400 font-mono lowercase">{task.name}</span>
-                        </div>
-                        <div className="mt-2 flex flex-wrap items-center gap-3">
+                        <div className="flex flex-wrap items-center gap-3">
                             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
                                 {title || task.name}
                             </h1>
@@ -65,22 +57,6 @@ export function TaskDetail() {
                         <p className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-1">
                             {task.folder || `tasks/${task.name}`} · {task.name}
                         </p>
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0 self-start sm:self-center">
-                        <Link
-                            to="/tasks"
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-indigo-400 dark:hover:border-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors shadow-sm cursor-pointer"
-                            title="Browse all benchmark tasks"
-                        >
-                            <span>← All Tasks</span>
-                        </Link>
-                        <Link
-                            to="/"
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-indigo-400 dark:hover:border-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors shadow-sm cursor-pointer"
-                            title="Go to Leaderboard"
-                        >
-                            <span>Leaderboard →</span>
-                        </Link>
                     </div>
                 </header>
 
