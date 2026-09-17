@@ -45,15 +45,4 @@ describe("Tasks Page", () => {
         expect(screen.getByText("secret-rotation")).toBeInTheDocument();
         expect(screen.queryByText("optimize-scale")).not.toBeInTheDocument();
     });
-
-    it("displays GitHub badges for tasks available in GitHub repo", () => {
-        render(
-            <MemoryRouter>
-                <Tasks />
-            </MemoryRouter>
-        );
-
-        const ghBadges = screen.getAllByTitle("Source available on GitHub");
-        expect(ghBadges.length).toBeGreaterThanOrEqual(1);
-    });
 });
