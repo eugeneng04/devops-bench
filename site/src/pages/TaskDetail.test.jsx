@@ -53,4 +53,17 @@ describe("TaskDetail", () => {
         renderTask("non-existent-task");
         expect(screen.getByText(/Task "non-existent-task" was not found/i)).toBeInTheDocument();
     });
+
+    it("renders View on GitHub button for tasks existing in repository", () => {
+        renderTask("cve-remediation");
+        const ghLink = screen.getByRole("link", { name: /View on GitHub/i });
+        expect(ghLink).toBeInTheDocument();
+        expect(ghLink).toHaveAttribute("href", "https://github.com/kubernetes-sigs/devops-bench/tree/main/tasks/common/cve-remediation");
+        expect(ghLink).toHaveAttribute("target", "_blank");
+    });
+
+    it("does not render View on GitHub button for tasks not in repository", () => {
+        renderTask("canary-promotion");
+        expect(screen.queryByRole("link", { name: /View on GitHub/i })).not.toBeInTheDocument();
+    });
 });
