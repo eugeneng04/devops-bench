@@ -13,13 +13,12 @@ infrastructure:
   teardown: true
 prompt: |
   You are the platform engineer on call for the "storefront" web service in project
-  "{{GCP_PROJECT_ID}}" — a user-facing application that runs on the project's GKE
-  infrastructure (Kubernetes namespace "{{NAMESPACE}}"). The application's desired state
-  is tracked in the git repository at "~/app-repo-{{GKE_CLUSTER_NAME}}.git" (the source of truth).
+  '{{PROJECT_ID}}'. It runs in the 'storefront' namespace on the project's GKE
+  infrastructure, and its desired state is tracked in the git repository at
+  '~/app-repo-{{CLUSTER_NAME}}.git' (the source of truth).
 
-  Investigate the ongoing outage in the storefront service, restore the service to a
-  healthy state for users, and write a post-mortem to "incident-report.md" describing
-  what happened, the actions you took, and any follow-ups.
+  Users are reporting that storefront is down. Investigate, restore service, and write a
+  post-mortem to 'incident-report.md'.
 expected_output: |
   critical requirements:
 

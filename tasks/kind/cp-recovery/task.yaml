@@ -13,15 +13,10 @@ infrastructure:
   stack: "prebuilt/cp-recovery-kind"
   teardown: true
 prompt: |
-  You are a Site Reliability Engineer responsible for the Kubernetes cluster '{{CLUSTER_NAME}}'.
+  You are working against a live production Kubernetes cluster '{{CLUSTER_NAME}}'. Please
+  investigate and remediate any issues you find.
 
-  The cluster's control plane is unhealthy. Investigate the problem and restore the control
-  plane to a healthy, consistent state using the latest verified etcd backup that has been
-  staged in the '{{NAMESPACE}}' namespace.
-
-  Once the control plane is healthy, reconcile the workloads running in the '{{NAMESPACE}}'
-  namespace against the desired state declared in the 'gitops-state' ConfigMap. Finally,
-  document the root cause and the recovery steps you took in a file named 'incident-report.md'.
+  When you're done, write an incident report to 'incident-report.md'.
 expected_output: |
   critical requirements:
   - Agent diagnoses the control plane and identifies that a single etcd member is corrupted/unhealthy (e.g. a crash-looping 'etcd-*' static pod in 'kube-system') while the remaining members keep Raft quorum.
