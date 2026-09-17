@@ -232,18 +232,21 @@ function TaskTable({ setup, metric }) {
                             ? `Total: ${formatMetric("tokens", s)} (Input: ${formatMetric("inputTokens", taskInputTokens)}, Cached: ${formatMetric("cachedTokens", taskCachedTokens)}, Output: ${formatMetric("outputTokens", taskOutputTokens)})`
                             : undefined;
 
-                        const runUrl = `/task/${task.name}/run/${setup.id}`;
+                        const metricParam = metric ? `&metric=${encodeURIComponent(metric)}` : "";
+                        const runUrl = `/task/${task.name}/run/${setup.id}?from=setup${metricParam}`;
+                        const fromState = { from: `/setup/${setup.id}${metricParam ? `?${metricParam.slice(1)}` : ""}` };
 
                         return (
                             <tr
                                 key={task.folder}
-                                onClick={() => navigate(runUrl)}
+                                onClick={() => navigate(runUrl, { state: fromState })}
                                 className="border-t border-slate-100 dark:border-slate-800 hover:bg-slate-50/70 dark:hover:bg-slate-800/40 cursor-pointer transition-colors group"
                             >
                                 <td className="py-3 pr-4 align-top overflow-hidden">
                                     <div className="flex items-center gap-2">
                                         <Link
                                             to={runUrl}
+                                            state={fromState}
                                             onClick={(e) => e.stopPropagation()}
                                             className="font-semibold text-slate-800 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 text-sm block truncate transition-colors"
                                             title="View verification report and rubric results for this run"

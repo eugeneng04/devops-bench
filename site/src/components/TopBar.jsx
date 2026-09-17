@@ -8,19 +8,29 @@ export function TopBar() {
     const location = useLocation();
     const pathname = location.pathname;
 
-    const isTasks = pathname.startsWith("/tasks") || pathname.startsWith("/task");
-    const isLeaderboard = pathname === "/" || pathname.startsWith("/setup");
-
-    // Contextual single back button for navigating back to the immediate parent view
-    let backButton = null;
+    const searchParams = new URLSearchParams(location.search);
+    const fromSetup = searchParams.get("from") === "setup" || Boolean(location.state?.from && location.state.from.startsWith("/setup"));
 
     const runMatch = pathname.match(/^\/task\/([^/]+)\/run\/([^/]+)/);
     const taskMatch = !runMatch && pathname.match(/^\/task\/([^/]+)/);
     const setupMatch = pathname.match(/^\/setup\/([^/]+)/);
 
+    const isLeaderboard = pathname === "/" || pathname.startsWith("/setup") || Boolean(runMatch && fromSetup);
+    const isTasks = !isLeaderboard && (pathname.startsWith("/tasks") || pathname.startsWith("/task"));
+
+    // Contextual single back button for navigating back to the immediate parent view
+    let backButton = null;
+
     if (runMatch) {
         const taskName = runMatch[1];
-        backButton = { label: "Task", to: `/task/${taskName}`, title: `Back to task ${taskName}` };
+        const setupId = runMatch[2];
+        if (fromSetup) {
+            const metric = searchParams.get("metric");
+            const toUrl = location.state?.from || `/setup/${setupId}${metric ? `?metric=${encodeURIComponent(metric)}` : ""}`;
+            backButton = { label: "Setup", to: toUrl, title: `Back to setup ${setupId}` };
+        } else {
+            backButton = { label: "Task", to: `/task/${taskName}`, title: `Back to task ${taskName}` };
+        }
     } else if (taskMatch) {
         backButton = { label: "Tasks", to: "/tasks", title: "Back to all tasks" };
     } else if (setupMatch) {
@@ -51,7 +61,7 @@ export function TopBar() {
                         <Link
                             to="/"
                             className={`px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                                isLeaderboard && !setupMatch
+                                isLeaderboard && pathname === "/"
                                     ? "bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/80"
                                     : isLeaderboard
                                     ? "text-indigo-600 dark:text-indigo-400 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800/50"
@@ -63,7 +73,7 @@ export function TopBar() {
                         <Link
                             to="/tasks"
                             className={`px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                                isTasks && !taskMatch && !runMatch
+                                isTasks && pathname === "/tasks"
                                     ? "bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/80"
                                     : isTasks
                                     ? "text-indigo-600 dark:text-indigo-400 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800/50"

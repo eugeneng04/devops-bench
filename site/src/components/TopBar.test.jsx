@@ -35,4 +35,11 @@ describe("TopBar Component", () => {
         expect(screen.getByRole("link", { name: /← Task/i })).toBeInTheDocument();
         expect(screen.queryByRole("link", { name: /← Tasks/i })).not.toBeInTheDocument();
     });
+
+    it("renders back button to Setup when Run Detail is opened from setup flow", () => {
+        renderTopBar("/task/canary-promotion/run/gemini-3-7-flash-high-antigravity?from=setup&metric=composite");
+        const backBtn = screen.getByRole("link", { name: /← Setup/i });
+        expect(backBtn).toBeInTheDocument();
+        expect(backBtn).toHaveAttribute("href", "/setup/gemini-3-7-flash-high-antigravity?metric=composite");
+    });
 });
