@@ -110,4 +110,18 @@ describe("Leaderboard", () => {
         expect(screen.getByText("⚠ 1 Catastrophic Failure")).toBeInTheDocument();
         FIXTURE.setups[0].catastrophicCount = 2; // Restore fixture
     });
+
+    it("renders Scope toggle buttons and switches between scopes", () => {
+        renderPage();
+        const fullBtn = screen.getByRole("button", { name: /Full Suite/i });
+        const commonBtn = screen.getByRole("button", { name: /Common Tasks/i });
+        expect(fullBtn).toBeInTheDocument();
+        expect(commonBtn).toBeInTheDocument();
+        expect(fullBtn).toHaveAttribute("aria-pressed", "true");
+        expect(commonBtn).toHaveAttribute("aria-pressed", "false");
+
+        fireEvent.click(commonBtn);
+        expect(commonBtn).toHaveAttribute("aria-pressed", "true");
+        expect(fullBtn).toHaveAttribute("aria-pressed", "false");
+    });
 });

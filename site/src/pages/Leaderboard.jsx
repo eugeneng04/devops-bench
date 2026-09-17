@@ -3,11 +3,12 @@
 // score-over-time trend chart.
 
 import { useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useBenchmark } from "../context/BenchmarkContext.jsx";
 import { buildFilterGroups, getFilteredSetups, emptyFilterState } from "../lib/filters.js";
 import { setupScore } from "../lib/accessors.js";
 import { METRIC_LABELS, availableMetrics, metricDescription, isLowerBetter } from "../lib/vocab.js";
+import { getCommonTaskKeys, getMaxTaskCount, getScopedSetups } from "../lib/taskScope.js";
 import { FilterBar } from "../components/FilterBar.jsx";
 import { LeaderboardRow } from "../components/LeaderboardRow.jsx";
 import { MetricToggle } from "../components/MetricToggle.jsx";
@@ -34,15 +35,38 @@ function BrowseTasksButton() {
 
 export function Leaderboard() {
     const { models, harnesses, setups, loading, error } = useBenchmark();
+    const [searchParams, setSearchParams] = useSearchParams();
     const [metric, setMetric] = useState("composite");
     const [filterState, setFilterState] = useState(emptyFilterState);
 
-    const groups = useMemo(() => buildFilterGroups(models, harnesses, setups), [models, harnesses, setups]);
-    const available = useMemo(() => availableMetrics(setups), [setups]);
+    const queryScope = searchParams.get("scope");
+    const [taskScope, setTaskScope] = useState(queryScope === "common" ? "common" : "full");
+
+    const commonTaskKeys = useMemo(() => getCommonTaskKeys(setups), [setups]);
+    const fullTaskCount = useMemo(() => getMaxTaskCount(setups), [setups]);
+    const commonTaskCount = commonTaskKeys.length;
+
+    function handleScopeChange(newScope) {
+        setTaskScope(newScope);
+        setSearchParams(prev => {
+            const next = new URLSearchParams(prev);
+            if (newScope === "common") next.set("scope", "common");
+            else next.delete("scope");
+            return next;
+        }, { replace: true });
+    }
+
+    const scopedSetups = useMemo(
+        () => getScopedSetups(setups, taskScope, commonTaskKeys),
+        [setups, taskScope, commonTaskKeys]
+    );
+
+    const groups = useMemo(() => buildFilterGroups(models, harnesses, scopedSetups), [models, harnesses, scopedSetups]);
+    const available = useMemo(() => availableMetrics(scopedSetups), [scopedSetups]);
 
     const filtered = useMemo(
-        () => getFilteredSetups(setups, groups, filterState),
-        [setups, groups, filterState]
+        () => getFilteredSetups(scopedSetups, groups, filterState),
+        [scopedSetups, groups, filterState]
     );
 
     // Sort the filtered setups by aggregated score under the selected metric.
@@ -109,7 +133,11 @@ export function Leaderboard() {
                         onToggle={toggleFilter}
                         onClear={clearFilters}
                         shown={filtered.length}
-                        total={setups.length}
+                        total={scopedSetups.length}
+                        taskScope={taskScope}
+                        onScopeChange={handleScopeChange}
+                        fullTaskCount={fullTaskCount}
+                        commonTaskCount={commonTaskCount}
                     />
                 )}
 
@@ -160,14 +188,26 @@ export function Leaderboard() {
                         : error ? <LoadError />
                         : sorted.length === 0 ? <EmptyState onClear={clearFilters} />
                         : sorted.map(setup => (
-                            <LeaderboardRow key={setup.id} setup={setup} models={models} harnesses={harnesses} metric={metric} metricBest={metricBest} />
+                            <LeaderboardRow
+                                key={setup.id}
+                                setup={setup}
+                                models={models}
+                                harnesses={harnesses}
+                                metric={metric}
+                                metricBest={metricBest}
+                                taskScope={taskScope}
+                            />
                         ))}
                 </div>
 
                 {/* Table footnote */}
                 {!loading && !error && sorted.length > 0 && (
                     <div className="px-6 py-2.5 bg-slate-50/50 dark:bg-slate-800/20 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-400 dark:text-slate-500 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">
-                        <span>* All leaderboard scores and efficiency figures represent task averages (mean across evaluated tasks).</span>
+                        <span>
+                            * {taskScope === "common"
+                                ? `Common tasks view: all figures evaluated across the ${commonTaskCount} common task(s) (${commonTaskKeys.join(", ")}).`
+                                : "All leaderboard scores and efficiency figures represent task averages (mean across evaluated tasks)."}
+                        </span>
                         <span className="text-[10px] text-slate-400 dark:text-slate-500">Click any row for granular per-task breakdown.</span>
                     </div>
                 )}

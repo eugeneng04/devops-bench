@@ -403,4 +403,16 @@ describe("Detail", () => {
         renderAt(`/setup/${SETUP_ID}?metric=latency`);
         expect(screen.queryByText(/Failure: Verification/i)).not.toBeInTheDocument();
     });
+
+    it("honors ?scope=common and switches task scope on click", () => {
+        renderAt(`/setup/${SETUP_ID}?scope=common`);
+        const commonBtn = screen.getByRole("button", { name: /Common Tasks/i });
+        const allBtn = screen.getByRole("button", { name: /All Tasks/i });
+        expect(commonBtn).toHaveAttribute("aria-pressed", "true");
+        expect(allBtn).toHaveAttribute("aria-pressed", "false");
+
+        fireEvent.click(allBtn);
+        expect(allBtn).toHaveAttribute("aria-pressed", "true");
+        expect(commonBtn).toHaveAttribute("aria-pressed", "false");
+    });
 });

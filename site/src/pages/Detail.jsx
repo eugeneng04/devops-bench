@@ -7,6 +7,7 @@ import { useParams, useSearchParams, Link, useNavigate } from "react-router-dom"
 import { useBenchmark } from "../context/BenchmarkContext.jsx";
 import { setupScore, setupLabel, scoreOf } from "../lib/accessors.js";
 import { METRICS, METRIC_LABELS, availableMetrics, formatMetric, metricBarFraction, isLowerBetter, metricMeta, TOKEN_BUCKET_COLORS } from "../lib/vocab.js";
+import { getCommonTaskKeys, normalizeTaskKey } from "../lib/taskScope.js";
 import { SetupIdentity } from "../components/SetupIdentity.jsx";
 import { MetricToggle } from "../components/MetricToggle.jsx";
 import { NotFound, Loading, LoadError } from "../components/States.jsx";
@@ -363,7 +364,7 @@ function TaskTable({ setup, metric }) {
 
 export function Detail() {
     const { id } = useParams();
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
     const { models, harnesses, setups, loading, error } = useBenchmark();
 
     const queryMetric = searchParams.get("metric");
@@ -371,8 +372,38 @@ export function Detail() {
         queryMetric && METRIC_LABELS[queryMetric] ? queryMetric : "composite"
     );
 
+    const queryScope = searchParams.get("scope");
+    const [taskScope, setTaskScope] = useState(queryScope === "common" ? "common" : "full");
+
     const setup = useMemo(() => setups.find(s => s.id === id) || null, [setups, id]);
-    const available = useMemo(() => (setup ? availableMetrics([setup]) : []), [setup]);
+    const commonTaskKeys = useMemo(() => getCommonTaskKeys(setups), [setups]);
+    const commonSet = useMemo(() => new Set(commonTaskKeys), [commonTaskKeys]);
+
+    const effectiveSetup = useMemo(() => {
+        if (!setup) return null;
+        if (taskScope !== "common") return setup;
+        const scopedTasks = (setup.tasks || []).filter(t => commonSet.has(normalizeTaskKey(t)));
+        const catastrophicCount = scopedTasks.filter(
+            t => t.catastrophic || (t.catastrophicDetails && Object.keys(t.catastrophicDetails).length > 0)
+        ).length;
+        return {
+            ...setup,
+            tasks: scopedTasks,
+            catastrophicCount
+        };
+    }, [setup, taskScope, commonSet]);
+
+    function handleScopeChange(newScope) {
+        setTaskScope(newScope);
+        setSearchParams(prev => {
+            const next = new URLSearchParams(prev);
+            if (newScope === "common") next.set("scope", "common");
+            else next.delete("scope");
+            return next;
+        }, { replace: true });
+    }
+
+    const available = useMemo(() => (effectiveSetup ? availableMetrics([effectiveSetup]) : []), [effectiveSetup]);
 
     useEffect(() => {
         document.title = setup
@@ -386,19 +417,19 @@ export function Detail() {
     if (error) {
         return <main className="w-full max-w-6xl flex flex-col items-center gap-8"><LoadError /></main>;
     }
-    if (!setup) {
+    if (!setup || !effectiveSetup) {
         return <main className="w-full max-w-6xl flex flex-col items-center gap-8"><NotFound id={id} /></main>;
     }
 
-    const model = models[setup.model];
-    const harness = harnesses[setup.harness];
-    const score = setupScore(setup, metric);
+    const model = models[effectiveSetup.model];
+    const harness = harnesses[effectiveSetup.harness];
+    const score = setupScore(effectiveSetup, metric);
 
     // Null-safe summary stats: drop tasks with no score for this metric, and
     // guard the all-empty case so a sparse setup renders "—" instead of NaN /
     // -Infinity. Mirrors setupScore()'s null handling; `vals.length` is the
     // number of *scored* tasks, which is what "Average over N tasks" should mean.
-    const vals = setup.tasks.map(t => scoreOf(t.scores, metric)).filter(v => v != null);
+    const vals = effectiveSetup.tasks.map(t => scoreOf(t.scores, metric)).filter(v => v != null);
     // "Best" follows the metric's direction: the fastest task, not the slowest.
     const best = vals.length ? (isLowerBetter(metric) ? Math.min(...vals) : Math.max(...vals)) : null;
     const avg = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
@@ -414,7 +445,7 @@ export function Detail() {
     // Latency and Latency everywhere else, without naming either key here.
     const companion = METRICS.find(m => !metricMeta(m).percentage && m !== metric);
     const companionVals = companion
-        ? setup.tasks.map(t => scoreOf(t.scores, companion)).filter(v => v != null)
+        ? effectiveSetup.tasks.map(t => scoreOf(t.scores, companion)).filter(v => v != null)
         : [];
     const companionAvg = companionVals.length
         ? companionVals.reduce((a, b) => a + b, 0) / companionVals.length
@@ -464,14 +495,14 @@ export function Detail() {
                     {metricMeta(metric).percentage && (
                         <StatCard
                             label="Catastrophic"
-                            value={String(setup.catastrophicCount ?? 0)}
+                            value={String(effectiveSetup.catastrophicCount ?? 0)}
                             // "outcome zeroed", not "task zeroed": the task still ran
                             // and still has its other measurements; what a
                             // catastrophic violation zeroes is the Outcome score.
                             sub={
-                                setup.catastrophicCount === 1
+                                effectiveSetup.catastrophicCount === 1
                                     ? "outcome zeroed"
-                                    : setup.catastrophicCount
+                                    : effectiveSetup.catastrophicCount
                                       ? "outcomes zeroed"
                                       : "none"
                             }
@@ -486,8 +517,48 @@ export function Detail() {
                     ) : null}
                 </div>
 
+                {/* Task scope controls */}
+                {commonTaskKeys.length > 0 && (
+                    <div className="flex flex-wrap items-center justify-between gap-4 mt-2 px-1">
+                        <div className="flex items-center gap-2">
+                            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                Scope:
+                            </span>
+                            <button
+                                type="button"
+                                onClick={() => handleScopeChange("full")}
+                                aria-pressed={taskScope === "full"}
+                                className={`px-3 py-1 text-xs rounded-full border font-medium transition-colors ${
+                                    taskScope === "full"
+                                        ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
+                                        : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
+                                }`}
+                            >
+                                All Tasks ({setup.tasks?.length || 0})
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => handleScopeChange("common")}
+                                aria-pressed={taskScope === "common"}
+                                className={`px-3 py-1 text-xs rounded-full border font-medium transition-colors ${
+                                    taskScope === "common"
+                                        ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
+                                        : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
+                                }`}
+                            >
+                                Common Tasks ({effectiveSetup.tasks?.length || 0})
+                            </button>
+                        </div>
+                        {taskScope === "common" && (
+                            <span className="text-xs text-slate-400 dark:text-slate-500 italic">
+                                Evaluated across the {commonTaskKeys.length} common benchmark task(s) ({commonTaskKeys.join(", ")})
+                            </span>
+                        )}
+                    </div>
+                )}
+
                 {/* Task breakdown */}
-                <TaskTable setup={setup} metric={metric} />
+                <TaskTable setup={effectiveSetup} metric={metric} />
             </div>
         </main>
     );
