@@ -287,20 +287,12 @@ export function TaskDetail() {
                                             {harnesses.map(h => {
                                                 const scoreData = harness_scores[h.arm];
                                                 const outcome = scoreData?.outcomeScore;
-                                                const isCat = scoreData?.catastrophic;
                                                 return (
                                                     <td key={h.arm} className="py-3 px-2 text-center align-middle font-mono text-xs">
                                                         {outcome != null ? (
-                                                            <div className="flex flex-col items-center">
-                                                                <span className={isCat ? "text-rose-600 dark:text-rose-400 line-through" : "text-slate-900 dark:text-slate-100"}>
-                                                                    {Math.round(outcome * 100)}%
-                                                                </span>
-                                                                {isCat && (
-                                                                    <span className="text-[9px] text-rose-500 font-bold tracking-tighter">
-                                                                        CAT 0%
-                                                                    </span>
-                                                                )}
-                                                            </div>
+                                                            <span className="text-slate-900 dark:text-slate-100">
+                                                                {Math.round(outcome * 100)}%
+                                                            </span>
                                                         ) : (
                                                             <span className="text-slate-400">—</span>
                                                         )}
