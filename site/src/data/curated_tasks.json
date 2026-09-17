@@ -460,7 +460,7 @@
             "reasoning": 4998,
             "total": 859425
           },
-          "toolCalls": 0,
+          "toolCalls": 28,
           "checks": [
             {
               "name": "pods-envfrom-set@vault.wl",
@@ -538,7 +538,7 @@
             "reasoning": 44446,
             "total": 6829144
           },
-          "toolCalls": 0,
+          "toolCalls": 99,
           "checks": [
             {
               "name": "pods-envfrom-set@vault.wl",
@@ -616,7 +616,7 @@
             "reasoning": 1640,
             "total": 204103
           },
-          "toolCalls": 0,
+          "toolCalls": 7,
           "checks": [
             {
               "name": "pods-envfrom-set@vault.wl",
@@ -694,7 +694,7 @@
             "reasoning": null,
             "total": 620699
           },
-          "toolCalls": 0,
+          "toolCalls": 23,
           "checks": [
             {
               "name": "pods-envfrom-set@vault.wl",
@@ -772,7 +772,7 @@
             "reasoning": null,
             "total": 889270
           },
-          "toolCalls": 0,
+          "toolCalls": 14,
           "checks": [
             {
               "name": "pods-envfrom-set@vault.wl",
@@ -850,7 +850,7 @@
             "reasoning": null,
             "total": 555902
           },
-          "toolCalls": 0,
+          "toolCalls": 18,
           "checks": [
             {
               "name": "pods-envfrom-set@vault.wl",
@@ -928,7 +928,7 @@
             "reasoning": null,
             "total": 837433
           },
-          "toolCalls": 0,
+          "toolCalls": 21,
           "checks": [
             {
               "name": "pods-envfrom-set@vault.wl",
@@ -1006,7 +1006,7 @@
             "reasoning": 3458,
             "total": 448484
           },
-          "toolCalls": 0,
+          "toolCalls": 13,
           "checks": [
             {
               "name": "pods-envfrom-set@vault.wl",
@@ -1084,7 +1084,7 @@
             "reasoning": null,
             "total": 810480
           },
-          "toolCalls": 0,
+          "toolCalls": 20,
           "checks": [
             {
               "name": "pods-envfrom-set@vault.wl",
@@ -1851,7 +1851,7 @@
             "reasoning": 9355,
             "total": 1251121
           },
-          "toolCalls": 0,
+          "toolCalls": 34,
           "checks": [
             {
               "name": "pod-ready@waybill.wl",
@@ -1969,7 +1969,7 @@
             "reasoning": 17827,
             "total": 2094195
           },
-          "toolCalls": 0,
+          "toolCalls": 51,
           "checks": [
             {
               "name": "pod-ready@waybill.wl",
@@ -2087,7 +2087,7 @@
             "reasoning": 6573,
             "total": 323093
           },
-          "toolCalls": 0,
+          "toolCalls": 9,
           "checks": [
             {
               "name": "pod-ready@waybill.wl",
@@ -2205,7 +2205,7 @@
             "reasoning": null,
             "total": 577955
           },
-          "toolCalls": 0,
+          "toolCalls": 26,
           "checks": [
             {
               "name": "pod-ready@waybill.wl",
@@ -2323,7 +2323,7 @@
             "reasoning": null,
             "total": 750919
           },
-          "toolCalls": 0,
+          "toolCalls": 12,
           "checks": [
             {
               "name": "pod-ready@waybill.wl",
@@ -2441,7 +2441,7 @@
             "reasoning": null,
             "total": 1638829
           },
-          "toolCalls": 0,
+          "toolCalls": 30,
           "checks": [
             {
               "name": "pod-ready@waybill.wl",
@@ -2559,7 +2559,7 @@
             "reasoning": null,
             "total": 1032470
           },
-          "toolCalls": 0,
+          "toolCalls": 28,
           "checks": [
             {
               "name": "pod-ready@waybill.wl",
@@ -2677,7 +2677,7 @@
             "reasoning": 4525,
             "total": 476273
           },
-          "toolCalls": 0,
+          "toolCalls": 13,
           "checks": [
             {
               "name": "pod-ready@waybill.wl",
@@ -2795,7 +2795,7 @@
             "reasoning": null,
             "total": 1000607
           },
-          "toolCalls": 0,
+          "toolCalls": 26,
           "checks": [
             {
               "name": "pod-ready@waybill.wl",
@@ -3354,7 +3354,7 @@
             "reasoning": 7353,
             "total": 2535126
           },
-          "toolCalls": 0,
+          "toolCalls": 53,
           "checks": [
             {
               "name": "etcd-quorum-healthy",
@@ -3432,7 +3432,7 @@
             "reasoning": 10776,
             "total": 3276630
           },
-          "toolCalls": 0,
+          "toolCalls": 63,
           "checks": [
             {
               "name": "etcd-quorum-healthy",
@@ -3510,7 +3510,7 @@
             "reasoning": 1931,
             "total": 465921
           },
-          "toolCalls": 0,
+          "toolCalls": 19,
           "checks": [
             {
               "name": "etcd-quorum-healthy",
@@ -3588,7 +3588,7 @@
             "reasoning": null,
             "total": 1752428
           },
-          "toolCalls": 0,
+          "toolCalls": 50,
           "checks": [
             {
               "name": "etcd-quorum-healthy",
@@ -3666,7 +3666,7 @@
             "reasoning": null,
             "total": 1664714
           },
-          "toolCalls": 0,
+          "toolCalls": 24,
           "checks": [
             {
               "name": "etcd-quorum-healthy",
@@ -3744,7 +3744,7 @@
             "reasoning": null,
             "total": 2285579
           },
-          "toolCalls": 0,
+          "toolCalls": 38,
           "checks": [
             {
               "name": "etcd-quorum-healthy",
@@ -3822,7 +3822,7 @@
             "reasoning": null,
             "total": 4532011
           },
-          "toolCalls": 0,
+          "toolCalls": 72,
           "checks": [
             {
               "name": "etcd-quorum-healthy",
@@ -3900,7 +3900,7 @@
             "reasoning": 4511,
             "total": 1839401
           },
-          "toolCalls": 0,
+          "toolCalls": 53,
           "checks": [
             {
               "name": "etcd-quorum-healthy",
@@ -3978,7 +3978,7 @@
             "reasoning": null,
             "total": 2232975
           },
-          "toolCalls": 0,
+          "toolCalls": 43,
           "checks": [
             {
               "name": "etcd-quorum-healthy",
@@ -5458,7 +5458,7 @@
             "reasoning": 29004,
             "total": 5291358
           },
-          "toolCalls": 0,
+          "toolCalls": 84,
           "checks": [
             {
               "name": "web-gateway-version-patched",
@@ -5686,7 +5686,7 @@
             "reasoning": 47918,
             "total": 9264242
           },
-          "toolCalls": 0,
+          "toolCalls": 125,
           "checks": [
             {
               "name": "web-gateway-version-patched",
@@ -5914,7 +5914,7 @@
             "reasoning": 13074,
             "total": 720926
           },
-          "toolCalls": 0,
+          "toolCalls": 17,
           "checks": [
             {
               "name": "web-gateway-version-patched",
@@ -6142,7 +6142,7 @@
             "reasoning": null,
             "total": 5933654
           },
-          "toolCalls": 0,
+          "toolCalls": 76,
           "checks": [
             {
               "name": "web-gateway-version-patched",
@@ -6370,7 +6370,7 @@
             "reasoning": null,
             "total": 2720263
           },
-          "toolCalls": 0,
+          "toolCalls": 35,
           "checks": [
             {
               "name": "web-gateway-version-patched",
@@ -6598,7 +6598,7 @@
             "reasoning": null,
             "total": 2656191
           },
-          "toolCalls": 0,
+          "toolCalls": 49,
           "checks": [
             {
               "name": "web-gateway-version-patched",
@@ -6826,7 +6826,7 @@
             "reasoning": null,
             "total": 5845195
           },
-          "toolCalls": 0,
+          "toolCalls": 91,
           "checks": [
             {
               "name": "web-gateway-version-patched",
@@ -7054,7 +7054,7 @@
             "reasoning": 11371,
             "total": 5163938
           },
-          "toolCalls": 0,
+          "toolCalls": 95,
           "checks": [
             {
               "name": "web-gateway-version-patched",
@@ -7282,7 +7282,7 @@
             "reasoning": null,
             "total": 3098754
           },
-          "toolCalls": 0,
+          "toolCalls": 50,
           "checks": [
             {
               "name": "web-gateway-version-patched",
@@ -8320,7 +8320,7 @@
             "reasoning": 8762,
             "total": 1219845
           },
-          "toolCalls": 0,
+          "toolCalls": 35,
           "checks": [
             {
               "name": "pod-ready@waybill.wl",
@@ -8458,7 +8458,7 @@
             "reasoning": 18015,
             "total": 2611489
           },
-          "toolCalls": 0,
+          "toolCalls": 60,
           "checks": [
             {
               "name": "pod-ready@waybill.wl",
@@ -8596,7 +8596,7 @@
             "reasoning": 5984,
             "total": 234254
           },
-          "toolCalls": 0,
+          "toolCalls": 7,
           "checks": [
             {
               "name": "pod-ready@waybill.wl",
@@ -8734,7 +8734,7 @@
             "reasoning": null,
             "total": 401452
           },
-          "toolCalls": 0,
+          "toolCalls": 17,
           "checks": [
             {
               "name": "pod-ready@waybill.wl",
@@ -8872,7 +8872,7 @@
             "reasoning": null,
             "total": 1690913
           },
-          "toolCalls": 0,
+          "toolCalls": 25,
           "checks": [
             {
               "name": "pod-ready@waybill.wl",
@@ -9010,7 +9010,7 @@
             "reasoning": null,
             "total": 327668
           },
-          "toolCalls": 0,
+          "toolCalls": 10,
           "checks": [
             {
               "name": "pod-ready@waybill.wl",
@@ -9148,7 +9148,7 @@
             "reasoning": null,
             "total": 1472750
           },
-          "toolCalls": 0,
+          "toolCalls": 33,
           "checks": [
             {
               "name": "pod-ready@waybill.wl",
@@ -9286,7 +9286,7 @@
             "reasoning": 3182,
             "total": 597943
           },
-          "toolCalls": 0,
+          "toolCalls": 17,
           "checks": [
             {
               "name": "pod-ready@waybill.wl",
@@ -9424,7 +9424,7 @@
             "reasoning": null,
             "total": 831587
           },
-          "toolCalls": 0,
+          "toolCalls": 24,
           "checks": [
             {
               "name": "pod-ready@waybill.wl",
@@ -10065,7 +10065,7 @@
             "reasoning": 6867,
             "total": 1112428
           },
-          "toolCalls": 0,
+          "toolCalls": 32,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -10153,7 +10153,7 @@
             "reasoning": 9564,
             "total": 2413478
           },
-          "toolCalls": 0,
+          "toolCalls": 56,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -10241,7 +10241,7 @@
             "reasoning": 1866,
             "total": 220090
           },
-          "toolCalls": 0,
+          "toolCalls": 7,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -10329,7 +10329,7 @@
             "reasoning": null,
             "total": 469219
           },
-          "toolCalls": 0,
+          "toolCalls": 20,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -10417,7 +10417,7 @@
             "reasoning": null,
             "total": 636891
           },
-          "toolCalls": 0,
+          "toolCalls": 10,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -10505,7 +10505,7 @@
             "reasoning": null,
             "total": 759167
           },
-          "toolCalls": 0,
+          "toolCalls": 19,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -10593,7 +10593,7 @@
             "reasoning": null,
             "total": 1086850
           },
-          "toolCalls": 0,
+          "toolCalls": 28,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -10681,7 +10681,7 @@
             "reasoning": 2670,
             "total": 446889
           },
-          "toolCalls": 0,
+          "toolCalls": 14,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -10769,7 +10769,7 @@
             "reasoning": null,
             "total": 871853
           },
-          "toolCalls": 0,
+          "toolCalls": 28,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -11561,7 +11561,7 @@
             "reasoning": 7672,
             "total": 1488307
           },
-          "toolCalls": 0,
+          "toolCalls": 40,
           "checks": [
             {
               "name": "workload-replicas-set@shelfview.wl",
@@ -11679,7 +11679,7 @@
             "reasoning": 22065,
             "total": 4176232
           },
-          "toolCalls": 0,
+          "toolCalls": 80,
           "checks": [
             {
               "name": "workload-replicas-set@shelfview.wl",
@@ -11797,7 +11797,7 @@
             "reasoning": 691,
             "total": 167165
           },
-          "toolCalls": 0,
+          "toolCalls": 15,
           "checks": [
             {
               "name": "workload-replicas-set@shelfview.wl",
@@ -11915,7 +11915,7 @@
             "reasoning": null,
             "total": 420185
           },
-          "toolCalls": 0,
+          "toolCalls": 17,
           "checks": [
             {
               "name": "workload-replicas-set@shelfview.wl",
@@ -12033,7 +12033,7 @@
             "reasoning": null,
             "total": 505271
           },
-          "toolCalls": 0,
+          "toolCalls": 8,
           "checks": [
             {
               "name": "workload-replicas-set@shelfview.wl",
@@ -12151,7 +12151,7 @@
             "reasoning": null,
             "total": 492956
           },
-          "toolCalls": 0,
+          "toolCalls": 12,
           "checks": [
             {
               "name": "workload-replicas-set@shelfview.wl",
@@ -12269,7 +12269,7 @@
             "reasoning": null,
             "total": 1011149
           },
-          "toolCalls": 0,
+          "toolCalls": 25,
           "checks": [
             {
               "name": "workload-replicas-set@shelfview.wl",
@@ -12387,7 +12387,7 @@
             "reasoning": 1586,
             "total": 523860
           },
-          "toolCalls": 0,
+          "toolCalls": 16,
           "checks": [
             {
               "name": "workload-replicas-set@shelfview.wl",
@@ -12505,7 +12505,7 @@
             "reasoning": null,
             "total": 418901
           },
-          "toolCalls": 0,
+          "toolCalls": 17,
           "checks": [
             {
               "name": "workload-replicas-set@shelfview.wl",
@@ -13448,7 +13448,7 @@
             "reasoning": 15944,
             "total": 3833611
           },
-          "toolCalls": 0,
+          "toolCalls": 64,
           "checks": [
             {
               "name": "repo-ingress-api-migrated",
@@ -13586,7 +13586,7 @@
             "reasoning": 22741,
             "total": 5809642
           },
-          "toolCalls": 0,
+          "toolCalls": 94,
           "checks": [
             {
               "name": "repo-ingress-api-migrated",
@@ -13724,7 +13724,7 @@
             "reasoning": 4460,
             "total": 395978
           },
-          "toolCalls": 0,
+          "toolCalls": 13,
           "checks": [
             {
               "name": "repo-ingress-api-migrated",
@@ -13862,7 +13862,7 @@
             "reasoning": null,
             "total": 1321871
           },
-          "toolCalls": 0,
+          "toolCalls": 44,
           "checks": [
             {
               "name": "repo-ingress-api-migrated",
@@ -14000,7 +14000,7 @@
             "reasoning": null,
             "total": 3512225
           },
-          "toolCalls": 0,
+          "toolCalls": 51,
           "checks": [
             {
               "name": "repo-ingress-api-migrated",
@@ -14138,7 +14138,7 @@
             "reasoning": null,
             "total": 3115809
           },
-          "toolCalls": 0,
+          "toolCalls": 56,
           "checks": [
             {
               "name": "repo-ingress-api-migrated",
@@ -14276,7 +14276,7 @@
             "reasoning": null,
             "total": 2322343
           },
-          "toolCalls": 0,
+          "toolCalls": 32,
           "checks": [
             {
               "name": "repo-ingress-api-migrated",
@@ -14414,7 +14414,7 @@
             "reasoning": 3622,
             "total": 2777218
           },
-          "toolCalls": 0,
+          "toolCalls": 57,
           "checks": [
             {
               "name": "repo-ingress-api-migrated",
@@ -14552,7 +14552,7 @@
             "reasoning": null,
             "total": 3976391
           },
-          "toolCalls": 0,
+          "toolCalls": 88,
           "checks": [
             {
               "name": "repo-ingress-api-migrated",
@@ -15048,7 +15048,7 @@
             "reasoning": 12917,
             "total": 6009770
           },
-          "toolCalls": 0,
+          "toolCalls": 95,
           "checks": [
             {
               "name": "Standby Region Still Has Serving Capacity",
@@ -15106,7 +15106,7 @@
             "reasoning": 13234,
             "total": 2932117
           },
-          "toolCalls": 0,
+          "toolCalls": 73,
           "checks": [
             {
               "name": "Standby Region Still Has Serving Capacity",
@@ -15164,7 +15164,7 @@
             "reasoning": 5257,
             "total": 504099
           },
-          "toolCalls": 0,
+          "toolCalls": 23,
           "checks": [
             {
               "name": "Standby Region Still Has Serving Capacity",
@@ -15222,7 +15222,7 @@
             "reasoning": null,
             "total": 1103818
           },
-          "toolCalls": 0,
+          "toolCalls": 37,
           "checks": [
             {
               "name": "Standby Region Still Has Serving Capacity",
@@ -15280,7 +15280,7 @@
             "reasoning": null,
             "total": 1057577
           },
-          "toolCalls": 0,
+          "toolCalls": 14,
           "checks": [
             {
               "name": "Standby Region Still Has Serving Capacity",
@@ -15338,7 +15338,7 @@
             "reasoning": null,
             "total": 3035282
           },
-          "toolCalls": 0,
+          "toolCalls": 49,
           "checks": [
             {
               "name": "Standby Region Still Has Serving Capacity",
@@ -15396,7 +15396,7 @@
             "reasoning": null,
             "total": 2281194
           },
-          "toolCalls": 0,
+          "toolCalls": 43,
           "checks": [
             {
               "name": "Standby Region Still Has Serving Capacity",
@@ -15454,7 +15454,7 @@
             "reasoning": 3492,
             "total": 1375310
           },
-          "toolCalls": 0,
+          "toolCalls": 44,
           "checks": [
             {
               "name": "Standby Region Still Has Serving Capacity",
@@ -15512,7 +15512,7 @@
             "reasoning": null,
             "total": 3244279
           },
-          "toolCalls": 0,
+          "toolCalls": 73,
           "checks": [
             {
               "name": "Standby Region Still Has Serving Capacity",
@@ -16688,7 +16688,7 @@
             "reasoning": 11189,
             "total": 2556026
           },
-          "toolCalls": 0,
+          "toolCalls": 50,
           "checks": [
             {
               "name": "cache-not-privileged",
@@ -16866,7 +16866,7 @@
             "reasoning": 32604,
             "total": 4571909
           },
-          "toolCalls": 0,
+          "toolCalls": 75,
           "checks": [
             {
               "name": "cache-not-privileged",
@@ -17044,7 +17044,7 @@
             "reasoning": 948,
             "total": 356470
           },
-          "toolCalls": 0,
+          "toolCalls": 12,
           "checks": [
             {
               "name": "cache-not-privileged",
@@ -17222,7 +17222,7 @@
             "reasoning": null,
             "total": 616598
           },
-          "toolCalls": 0,
+          "toolCalls": 27,
           "checks": [
             {
               "name": "cache-not-privileged",
@@ -17400,7 +17400,7 @@
             "reasoning": null,
             "total": 1343454
           },
-          "toolCalls": 0,
+          "toolCalls": 17,
           "checks": [
             {
               "name": "cache-not-privileged",
@@ -17578,7 +17578,7 @@
             "reasoning": null,
             "total": 1043894
           },
-          "toolCalls": 0,
+          "toolCalls": 28,
           "checks": [
             {
               "name": "cache-not-privileged",
@@ -17756,7 +17756,7 @@
             "reasoning": null,
             "total": 1789662
           },
-          "toolCalls": 0,
+          "toolCalls": 35,
           "checks": [
             {
               "name": "cache-not-privileged",
@@ -17934,7 +17934,7 @@
             "reasoning": 2319,
             "total": 889148
           },
-          "toolCalls": 0,
+          "toolCalls": 23,
           "checks": [
             {
               "name": "cache-not-privileged",
@@ -18112,7 +18112,7 @@
             "reasoning": null,
             "total": 1291047
           },
-          "toolCalls": 0,
+          "toolCalls": 30,
           "checks": [
             {
               "name": "cache-not-privileged",
@@ -18959,7 +18959,7 @@
             "reasoning": 10751,
             "total": 1865112
           },
-          "toolCalls": 0,
+          "toolCalls": 43,
           "checks": [
             {
               "name": "Planned Load Spike Verification",
@@ -19057,7 +19057,7 @@
             "reasoning": 30840,
             "total": 6256219
           },
-          "toolCalls": 0,
+          "toolCalls": 115,
           "checks": [
             {
               "name": "Planned Load Spike Verification",
@@ -19155,7 +19155,7 @@
             "reasoning": 2012,
             "total": 196687
           },
-          "toolCalls": 0,
+          "toolCalls": 7,
           "checks": [
             {
               "name": "Planned Load Spike Verification",
@@ -19253,7 +19253,7 @@
             "reasoning": null,
             "total": 1809281
           },
-          "toolCalls": 0,
+          "toolCalls": 40,
           "checks": [
             {
               "name": "Planned Load Spike Verification",
@@ -19351,7 +19351,7 @@
             "reasoning": null,
             "total": 1429817
           },
-          "toolCalls": 0,
+          "toolCalls": 23,
           "checks": [
             {
               "name": "Planned Load Spike Verification",
@@ -19449,7 +19449,7 @@
             "reasoning": null,
             "total": 3459692
           },
-          "toolCalls": 0,
+          "toolCalls": 61,
           "checks": [
             {
               "name": "Planned Load Spike Verification",
@@ -19547,7 +19547,7 @@
             "reasoning": null,
             "total": 1278743
           },
-          "toolCalls": 0,
+          "toolCalls": 33,
           "checks": [
             {
               "name": "Planned Load Spike Verification",
@@ -19645,7 +19645,7 @@
             "reasoning": 2751,
             "total": 764507
           },
-          "toolCalls": 0,
+          "toolCalls": 21,
           "checks": [
             {
               "name": "Planned Load Spike Verification",
@@ -19743,7 +19743,7 @@
             "reasoning": null,
             "total": 1704199
           },
-          "toolCalls": 0,
+          "toolCalls": 46,
           "checks": [
             {
               "name": "Planned Load Spike Verification",
@@ -20220,7 +20220,7 @@
             "reasoning": 11439,
             "total": 1455793
           },
-          "toolCalls": 0,
+          "toolCalls": 39,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -20288,7 +20288,7 @@
             "reasoning": 23107,
             "total": 2663577
           },
-          "toolCalls": 0,
+          "toolCalls": 60,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -20356,7 +20356,7 @@
             "reasoning": 2250,
             "total": 244183
           },
-          "toolCalls": 0,
+          "toolCalls": 8,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -20424,7 +20424,7 @@
             "reasoning": null,
             "total": 462108
           },
-          "toolCalls": 0,
+          "toolCalls": 22,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -20492,7 +20492,7 @@
             "reasoning": null,
             "total": 529788
           },
-          "toolCalls": 0,
+          "toolCalls": 8,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -20560,7 +20560,7 @@
             "reasoning": null,
             "total": 368747
           },
-          "toolCalls": 0,
+          "toolCalls": 6,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -20628,7 +20628,7 @@
             "reasoning": null,
             "total": 664632
           },
-          "toolCalls": 0,
+          "toolCalls": 24,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -20696,7 +20696,7 @@
             "reasoning": 4567,
             "total": 917722
           },
-          "toolCalls": 0,
+          "toolCalls": 34,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -20764,7 +20764,7 @@
             "reasoning": null,
             "total": 790865
           },
-          "toolCalls": 0,
+          "toolCalls": 19,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -22694,7 +22694,7 @@
             "reasoning": 15091,
             "total": 7127642
           },
-          "toolCalls": 0,
+          "toolCalls": 84,
           "checks": [
             {
               "name": "workload-restored",
@@ -23002,7 +23002,7 @@
             "reasoning": 50036,
             "total": 9683601
           },
-          "toolCalls": 0,
+          "toolCalls": 123,
           "checks": [
             {
               "name": "workload-restored",
@@ -23310,7 +23310,7 @@
             "reasoning": 6739,
             "total": 643762
           },
-          "toolCalls": 0,
+          "toolCalls": 23,
           "checks": [
             {
               "name": "workload-restored",
@@ -23618,7 +23618,7 @@
             "reasoning": null,
             "total": 1286958
           },
-          "toolCalls": 0,
+          "toolCalls": 36,
           "checks": [
             {
               "name": "workload-restored",
@@ -23926,7 +23926,7 @@
             "reasoning": null,
             "total": 2352754
           },
-          "toolCalls": 0,
+          "toolCalls": 29,
           "checks": [
             {
               "name": "workload-restored",
@@ -24234,7 +24234,7 @@
             "reasoning": null,
             "total": 1662764
           },
-          "toolCalls": 0,
+          "toolCalls": 32,
           "checks": [
             {
               "name": "workload-restored",
@@ -24542,7 +24542,7 @@
             "reasoning": null,
             "total": 2802619
           },
-          "toolCalls": 0,
+          "toolCalls": 40,
           "checks": [
             {
               "name": "workload-restored",
@@ -24850,7 +24850,7 @@
             "reasoning": 7419,
             "total": 3409178
           },
-          "toolCalls": 0,
+          "toolCalls": 46,
           "checks": [
             {
               "name": "workload-restored",
@@ -25158,7 +25158,7 @@
             "reasoning": null,
             "total": 1558384
           },
-          "toolCalls": 0,
+          "toolCalls": 36,
           "checks": [
             {
               "name": "workload-restored",
@@ -27065,7 +27065,7 @@
             "reasoning": 1158,
             "total": 1774716
           },
-          "toolCalls": 0,
+          "toolCalls": 43,
           "checks": [
             {
               "name": "workload-restored",
@@ -27333,7 +27333,7 @@
             "reasoning": 30798,
             "total": 4225256
           },
-          "toolCalls": 0,
+          "toolCalls": 67,
           "checks": [
             {
               "name": "workload-restored",
@@ -27601,7 +27601,7 @@
             "reasoning": 10992,
             "total": 623426
           },
-          "toolCalls": 0,
+          "toolCalls": 29,
           "checks": [
             {
               "name": "workload-restored",
@@ -27869,7 +27869,7 @@
             "reasoning": null,
             "total": 1916934
           },
-          "toolCalls": 0,
+          "toolCalls": 44,
           "checks": [
             {
               "name": "workload-restored",
@@ -28137,7 +28137,7 @@
             "reasoning": null,
             "total": 2125558
           },
-          "toolCalls": 0,
+          "toolCalls": 27,
           "checks": [
             {
               "name": "workload-restored",
@@ -28405,7 +28405,7 @@
             "reasoning": null,
             "total": 3939990
           },
-          "toolCalls": 0,
+          "toolCalls": 60,
           "checks": [
             {
               "name": "workload-restored",
@@ -28673,7 +28673,7 @@
             "reasoning": null,
             "total": 3724444
           },
-          "toolCalls": 0,
+          "toolCalls": 49,
           "checks": [
             {
               "name": "workload-restored",
@@ -28941,7 +28941,7 @@
             "reasoning": 3861,
             "total": 1053463
           },
-          "toolCalls": 0,
+          "toolCalls": 20,
           "checks": [
             {
               "name": "workload-restored",
@@ -29209,7 +29209,7 @@
             "reasoning": null,
             "total": 611373
           },
-          "toolCalls": 0,
+          "toolCalls": 18,
           "checks": [
             {
               "name": "workload-restored",
@@ -31076,7 +31076,7 @@
             "reasoning": 11661,
             "total": 5145465
           },
-          "toolCalls": 0,
+          "toolCalls": 79,
           "checks": [
             {
               "name": "workload-restored",
@@ -31344,7 +31344,7 @@
             "reasoning": 36415,
             "total": 9466724
           },
-          "toolCalls": 0,
+          "toolCalls": 129,
           "checks": [
             {
               "name": "workload-restored",
@@ -31612,7 +31612,7 @@
             "reasoning": 4151,
             "total": 290645
           },
-          "toolCalls": 0,
+          "toolCalls": 22,
           "checks": [
             {
               "name": "workload-restored",
@@ -31880,7 +31880,7 @@
             "reasoning": null,
             "total": 1392471
           },
-          "toolCalls": 0,
+          "toolCalls": 44,
           "checks": [
             {
               "name": "workload-restored",
@@ -32148,7 +32148,7 @@
             "reasoning": null,
             "total": 2132403
           },
-          "toolCalls": 0,
+          "toolCalls": 30,
           "checks": [
             {
               "name": "workload-restored",
@@ -32416,7 +32416,7 @@
             "reasoning": null,
             "total": 2136878
           },
-          "toolCalls": 0,
+          "toolCalls": 43,
           "checks": [
             {
               "name": "workload-restored",
@@ -32684,7 +32684,7 @@
             "reasoning": null,
             "total": 4928281
           },
-          "toolCalls": 0,
+          "toolCalls": 49,
           "checks": [
             {
               "name": "workload-restored",
@@ -32952,7 +32952,7 @@
             "reasoning": 4865,
             "total": 1615133
           },
-          "toolCalls": 0,
+          "toolCalls": 32,
           "checks": [
             {
               "name": "workload-restored",
@@ -33220,7 +33220,7 @@
             "reasoning": null,
             "total": 900484
           },
-          "toolCalls": 0,
+          "toolCalls": 27,
           "checks": [
             {
               "name": "workload-restored",
@@ -33978,7 +33978,7 @@
             "reasoning": 10621,
             "total": 3166504
           },
-          "toolCalls": 0,
+          "toolCalls": 72,
           "checks": [
             {
               "name": "Secret Reference No Longer Pinned To The Compromised Version",
@@ -34056,7 +34056,7 @@
             "reasoning": 29078,
             "total": 4346373
           },
-          "toolCalls": 0,
+          "toolCalls": 84,
           "checks": [
             {
               "name": "Secret Reference No Longer Pinned To The Compromised Version",
@@ -34134,7 +34134,7 @@
             "reasoning": 12139,
             "total": 729536
           },
-          "toolCalls": 0,
+          "toolCalls": 18,
           "checks": [
             {
               "name": "Secret Reference No Longer Pinned To The Compromised Version",
@@ -34212,7 +34212,7 @@
             "reasoning": null,
             "total": 633667
           },
-          "toolCalls": 0,
+          "toolCalls": 26,
           "checks": [
             {
               "name": "Secret Reference No Longer Pinned To The Compromised Version",
@@ -34290,7 +34290,7 @@
             "reasoning": null,
             "total": 1757277
           },
-          "toolCalls": 0,
+          "toolCalls": 25,
           "checks": [
             {
               "name": "Secret Reference No Longer Pinned To The Compromised Version",
@@ -34368,7 +34368,7 @@
             "reasoning": null,
             "total": 1783024
           },
-          "toolCalls": 0,
+          "toolCalls": 33,
           "checks": [
             {
               "name": "Secret Reference No Longer Pinned To The Compromised Version",
@@ -34446,7 +34446,7 @@
             "reasoning": null,
             "total": 1535054
           },
-          "toolCalls": 0,
+          "toolCalls": 46,
           "checks": [
             {
               "name": "Secret Reference No Longer Pinned To The Compromised Version",
@@ -34524,7 +34524,7 @@
             "reasoning": 7592,
             "total": 1903497
           },
-          "toolCalls": 0,
+          "toolCalls": 58,
           "checks": [
             {
               "name": "Secret Reference No Longer Pinned To The Compromised Version",
@@ -34602,7 +34602,7 @@
             "reasoning": null,
             "total": 9287966
           },
-          "toolCalls": 0,
+          "toolCalls": 143,
           "checks": [
             {
               "name": "Secret Reference No Longer Pinned To The Compromised Version",
@@ -35183,7 +35183,7 @@
             "reasoning": 7481,
             "total": 1320864
           },
-          "toolCalls": 0,
+          "toolCalls": 40,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -35271,7 +35271,7 @@
             "reasoning": 19489,
             "total": 3085402
           },
-          "toolCalls": 0,
+          "toolCalls": 59,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -35359,7 +35359,7 @@
             "reasoning": 2147,
             "total": 280805
           },
-          "toolCalls": 0,
+          "toolCalls": 9,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -35447,7 +35447,7 @@
             "reasoning": null,
             "total": 212983
           },
-          "toolCalls": 0,
+          "toolCalls": 13,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -35535,7 +35535,7 @@
             "reasoning": null,
             "total": 1041394
           },
-          "toolCalls": 0,
+          "toolCalls": 16,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -35623,7 +35623,7 @@
             "reasoning": null,
             "total": 509602
           },
-          "toolCalls": 0,
+          "toolCalls": 13,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -35711,7 +35711,7 @@
             "reasoning": null,
             "total": 1261122
           },
-          "toolCalls": 0,
+          "toolCalls": 25,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -35799,7 +35799,7 @@
             "reasoning": 3750,
             "total": 827202
           },
-          "toolCalls": 0,
+          "toolCalls": 21,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -35887,7 +35887,7 @@
             "reasoning": null,
             "total": 631040
           },
-          "toolCalls": 0,
+          "toolCalls": 16,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -36354,7 +36354,7 @@
             "reasoning": 8004,
             "total": 1042329
           },
-          "toolCalls": 0,
+          "toolCalls": 30,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -36422,7 +36422,7 @@
             "reasoning": 20830,
             "total": 3113800
           },
-          "toolCalls": 0,
+          "toolCalls": 62,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -36490,7 +36490,7 @@
             "reasoning": 6961,
             "total": 450568
           },
-          "toolCalls": 0,
+          "toolCalls": 14,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -36558,7 +36558,7 @@
             "reasoning": null,
             "total": 287865
           },
-          "toolCalls": 0,
+          "toolCalls": 16,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -36626,7 +36626,7 @@
             "reasoning": null,
             "total": 581289
           },
-          "toolCalls": 0,
+          "toolCalls": 9,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -36694,7 +36694,7 @@
             "reasoning": null,
             "total": 443065
           },
-          "toolCalls": 0,
+          "toolCalls": 14,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -36762,7 +36762,7 @@
             "reasoning": null,
             "total": 1345084
           },
-          "toolCalls": 0,
+          "toolCalls": 32,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -36830,7 +36830,7 @@
             "reasoning": 3273,
             "total": 676934
           },
-          "toolCalls": 0,
+          "toolCalls": 17,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -36898,7 +36898,7 @@
             "reasoning": null,
             "total": 795557
           },
-          "toolCalls": 0,
+          "toolCalls": 18,
           "checks": [
             {
               "name": "pod-ready@courier.wl",
@@ -38365,7 +38365,7 @@
             "reasoning": 19209,
             "total": 1951164
           },
-          "toolCalls": 0,
+          "toolCalls": 44,
           "checks": [
             {
               "name": "image-resizer-on-spot",
@@ -38563,7 +38563,7 @@
             "reasoning": 31352,
             "total": 3525064
           },
-          "toolCalls": 0,
+          "toolCalls": 69,
           "checks": [
             {
               "name": "image-resizer-on-spot",
@@ -38761,7 +38761,7 @@
             "reasoning": 2454,
             "total": 275401
           },
-          "toolCalls": 0,
+          "toolCalls": 9,
           "checks": [
             {
               "name": "image-resizer-on-spot",
@@ -38959,7 +38959,7 @@
             "reasoning": null,
             "total": 676372
           },
-          "toolCalls": 0,
+          "toolCalls": 18,
           "checks": [
             {
               "name": "image-resizer-on-spot",
@@ -39157,7 +39157,7 @@
             "reasoning": null,
             "total": 1378178
           },
-          "toolCalls": 0,
+          "toolCalls": 17,
           "checks": [
             {
               "name": "image-resizer-on-spot",
@@ -39355,7 +39355,7 @@
             "reasoning": null,
             "total": 1050430
           },
-          "toolCalls": 0,
+          "toolCalls": 20,
           "checks": [
             {
               "name": "image-resizer-on-spot",
@@ -39553,7 +39553,7 @@
             "reasoning": null,
             "total": 1423050
           },
-          "toolCalls": 0,
+          "toolCalls": 29,
           "checks": [
             {
               "name": "image-resizer-on-spot",
@@ -39751,7 +39751,7 @@
             "reasoning": 2523,
             "total": 479869
           },
-          "toolCalls": 0,
+          "toolCalls": 18,
           "checks": [
             {
               "name": "image-resizer-on-spot",
@@ -39949,7 +39949,7 @@
             "reasoning": null,
             "total": 752958
           },
-          "toolCalls": 0,
+          "toolCalls": 22,
           "checks": [
             {
               "name": "image-resizer-on-spot",
@@ -40712,7 +40712,7 @@
             "reasoning": 8855,
             "total": 910089
           },
-          "toolCalls": 0,
+          "toolCalls": 32,
           "checks": [
             {
               "name": "resource-request-inflated@checkout.wl",
@@ -40810,7 +40810,7 @@
             "reasoning": 40771,
             "total": 4569858
           },
-          "toolCalls": 0,
+          "toolCalls": 74,
           "checks": [
             {
               "name": "resource-request-inflated@checkout.wl",
@@ -40908,7 +40908,7 @@
             "reasoning": 4886,
             "total": 271566
           },
-          "toolCalls": 0,
+          "toolCalls": 7,
           "checks": [
             {
               "name": "resource-request-inflated@checkout.wl",
@@ -41006,7 +41006,7 @@
             "reasoning": null,
             "total": 529705
           },
-          "toolCalls": 0,
+          "toolCalls": 21,
           "checks": [
             {
               "name": "resource-request-inflated@checkout.wl",
@@ -41104,7 +41104,7 @@
             "reasoning": null,
             "total": 381208
           },
-          "toolCalls": 0,
+          "toolCalls": 6,
           "checks": [
             {
               "name": "resource-request-inflated@checkout.wl",
@@ -41202,7 +41202,7 @@
             "reasoning": null,
             "total": 1850458
           },
-          "toolCalls": 0,
+          "toolCalls": 28,
           "checks": [
             {
               "name": "resource-request-inflated@checkout.wl",
@@ -41300,7 +41300,7 @@
             "reasoning": null,
             "total": 984210
           },
-          "toolCalls": 0,
+          "toolCalls": 28,
           "checks": [
             {
               "name": "resource-request-inflated@checkout.wl",
@@ -41398,7 +41398,7 @@
             "reasoning": 1541,
             "total": 327358
           },
-          "toolCalls": 0,
+          "toolCalls": 9,
           "checks": [
             {
               "name": "resource-request-inflated@checkout.wl",
@@ -41496,7 +41496,7 @@
             "reasoning": null,
             "total": 621170
           },
-          "toolCalls": 0,
+          "toolCalls": 20,
           "checks": [
             {
               "name": "resource-request-inflated@checkout.wl",

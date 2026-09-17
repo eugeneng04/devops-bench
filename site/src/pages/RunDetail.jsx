@@ -190,7 +190,7 @@ export function RunDetail() {
                             Tool Calls
                         </span>
                         <span className="text-lg font-bold text-slate-900 dark:text-slate-100 font-mono">
-                            {toolCalls || 0}
+                            {toolCalls != null ? toolCalls : "—"}
                         </span>
                     </div>
                     <div className={`rounded-xl p-3 border ${

@@ -452,11 +452,19 @@ def build_curated_data(source_dir: str, output_file: str) -> None:
                     }
                 )
 
+            tools = res.get("tools") or []
             trajectory = res.get("trajectory") or []
-            tool_calls_count = sum(
-                1
-                for step in trajectory
-                if step.get("type") in ("tool_call", "action") or step.get("tool_calls")
+            tool_calls_count = (
+                len(tools)
+                if tools
+                else sum(
+                    1
+                    for step in trajectory
+                    if step.get("type") in ("tool_call", "action")
+                    or step.get("tool_calls")
+                    or "name" in step
+                    or "command" in step
+                )
             )
 
             runs_output[arm] = {
