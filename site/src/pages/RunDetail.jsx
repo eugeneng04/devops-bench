@@ -211,7 +211,7 @@ export function RunDetail() {
                 <pre className="font-mono text-xs leading-relaxed overflow-x-auto whitespace-pre p-2 rounded-lg bg-black/20">
                     {arithmetic}
                 </pre>
-                <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs font-mono pt-2 border-t border-white/10">
+                <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono pt-2 border-t border-white/10">
                     <div>
                         <span className="opacity-60 block text-[10px]">Correctness (c):</span>
                         <span className="font-bold">{(scores.c ?? 0).toFixed(3)}</span>
@@ -223,6 +223,10 @@ export function RunDetail() {
                     <div>
                         <span className="opacity-60 block text-[10px]">Rescaled Safety (rec_v):</span>
                         <span className="font-bold">{(scores.rec_v ?? 1.0).toFixed(3)}</span>
+                    </div>
+                    <div>
+                        <span className="opacity-60 block text-[10px]">Catastrophic Gate (cat_v):</span>
+                        <span className="font-bold">{scores.cat_v}</span>
                     </div>
                 </div>
             </div>

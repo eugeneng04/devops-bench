@@ -30,7 +30,7 @@ describe("RunDetail", () => {
     it("renders score arithmetic formula and breakdown", () => {
         renderRun("canary-promotion", "antigravity_gemini-3.7-flash-high");
         expect(screen.getByText(/Score Arithmetic & Verdict/i)).toBeInTheDocument();
-        expect(screen.getByText(/outcome_score = sqrt\(c \* rec_v\)/i)).toBeInTheDocument();
+        expect(screen.getByText(/outcome_score = cat_v \* sqrt\(c \* rec_v\)/i)).toBeInTheDocument();
         expect(screen.getByText(/Correctness \(c\):/i)).toBeInTheDocument();
         expect(screen.getByText(/Rescaled Safety \(rec_v\):/i)).toBeInTheDocument();
     });

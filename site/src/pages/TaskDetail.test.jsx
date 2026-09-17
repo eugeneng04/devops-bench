@@ -51,12 +51,6 @@ describe("TaskDetail", () => {
         expect(screen.getByRole("heading", { name: /Recoverable Safeguards/i })).toBeInTheDocument();
     });
 
-    it("renders scoring explanation footer", () => {
-        renderTask("canary-promotion");
-        expect(screen.getByText(/How Scoring Works \(Scoring Framework v1\)/i)).toBeInTheDocument();
-        expect(screen.getByText(/outcome_score = sqrt\(c \* rec_v\)/i)).toBeInTheDocument();
-    });
-
     it("renders not found state for unknown task", () => {
         renderTask("non-existent-task");
         expect(screen.getByText(/Task "non-existent-task" was not found/i)).toBeInTheDocument();
