@@ -27,7 +27,7 @@ describe("derive — data-driven", () => {
             "2026-06-01T12:00:00Z", "2026-06-15T12:00:00Z"
         ]);
 
-        // Latest run (June 15): both iterations >= 0.7 -> pass1 = 100. pass5/passMax
+        // Latest run (June 15): both iterations >= 1.0 -> pass1 = 100. pass5/passMax
         // stay null (pass1-only until the harness emits multi-iteration runs).
         const arch = alpha.tasks.find(t => t.folder === "get-app-architecture");
         // toMatchObject: v1 adds composite/correctness/recoverableSafety keys;
@@ -38,8 +38,8 @@ describe("derive — data-driven", () => {
         expect(byId["gamma-coder-api-loop"]).toBeTruthy();
     });
 
-    it("computes pass@1 from the iteration outcomeScores at a threshold of 0.7", () => {
-        // 1 pass (0.9) + 1 fail (0.5) of 2 -> 50%.
+    it("computes pass@1 from the iteration outcomeScores at a threshold of 1.0", () => {
+        // 1 pass (1.0) + 1 fail (0.5) of 2 -> 50%.
         const rows = loadResults([path.join(FIXTURES, "run_20260601_120000", "rows.json")]);
         const setups = derive(rows);
         const alpha = setups.find(s => s.id === "alpha-pro-gemini-cli-mcp-skills");

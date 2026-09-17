@@ -6,7 +6,7 @@ RUN npm ci
 COPY . .
 
 # Mode argument: "dev" (uses leaderboard-dev), "staging" (uses leaderboard-test) or "production" (uses leaderboard)
-ARG MODE=staging
+ARG MODE=dev
 RUN if [ "$MODE" = "dev" ]; then npm run build:dev; elif [ "$MODE" = "staging" ]; then npm run build:staging; else npm run build; fi
 
 # Stage 2: Serve static files with Nginx

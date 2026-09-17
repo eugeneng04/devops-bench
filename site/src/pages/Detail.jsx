@@ -3,7 +3,7 @@
 // a single-setup trend chart. Metric carries over from the leaderboard via ?metric=.
 
 import { useEffect, useMemo, useState } from "react";
-import { useParams, useSearchParams, Link } from "react-router-dom";
+import { useParams, useSearchParams, Link, useNavigate } from "react-router-dom";
 import { useBenchmark } from "../context/BenchmarkContext.jsx";
 import { setupScore, setupLabel, scoreOf } from "../lib/accessors.js";
 import { METRICS, METRIC_LABELS, availableMetrics, formatMetric, metricBarFraction, isLowerBetter, metricMeta, TOKEN_BUCKET_COLORS } from "../lib/vocab.js";
@@ -134,6 +134,7 @@ function CatastrophicDetails({ task }) {
 }
 
 function TaskTable({ setup, metric }) {
+    const navigate = useNavigate();
     const [sort, setSort] = useState({ key: "score", dir: "asc" });
 
     // Defaults to ascending so failing / low-scoring tasks surface first.
@@ -231,12 +232,29 @@ function TaskTable({ setup, metric }) {
                             ? `Total: ${formatMetric("tokens", s)} (Input: ${formatMetric("inputTokens", taskInputTokens)}, Cached: ${formatMetric("cachedTokens", taskCachedTokens)}, Output: ${formatMetric("outputTokens", taskOutputTokens)})`
                             : undefined;
 
+                        const runUrl = `/task/${task.name}/run/${setup.id}`;
+
                         return (
-                            <tr key={task.folder} className="border-t border-slate-100 dark:border-slate-800">
+                            <tr
+                                key={task.folder}
+                                onClick={() => navigate(runUrl)}
+                                className="border-t border-slate-100 dark:border-slate-800 hover:bg-slate-50/70 dark:hover:bg-slate-800/40 cursor-pointer transition-colors group"
+                            >
                                 <td className="py-3 pr-4 align-top overflow-hidden">
-                                    <span className="font-semibold text-slate-700 dark:text-slate-200 text-sm block truncate">{task.name}</span>
+                                    <div className="flex items-center gap-2">
+                                        <Link
+                                            to={runUrl}
+                                            onClick={(e) => e.stopPropagation()}
+                                            className="font-semibold text-slate-800 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 text-sm block truncate transition-colors"
+                                            title="View verification report and rubric results for this run"
+                                        >
+                                            {task.name}
+                                        </Link>
+                                    </div>
                                     {badgeable && task.catastrophic && (
-                                        <CatastrophicDetails task={task} />
+                                        <div onClick={(e) => e.stopPropagation()}>
+                                            <CatastrophicDetails task={task} />
+                                        </div>
                                     )}
                                 </td>
                                 <td className="py-3 pr-4 w-1/2 align-top">

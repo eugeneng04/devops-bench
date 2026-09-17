@@ -3,6 +3,7 @@
 // score-over-time trend chart.
 
 import { useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useBenchmark } from "../context/BenchmarkContext.jsx";
 import { buildFilterGroups, getFilteredSetups, emptyFilterState } from "../lib/filters.js";
 import { setupScore } from "../lib/accessors.js";
@@ -12,6 +13,24 @@ import { LeaderboardRow } from "../components/LeaderboardRow.jsx";
 import { MetricToggle } from "../components/MetricToggle.jsx";
 import { ChartsPanel } from "../components/ChartsPanel.jsx";
 import { EmptyState, LoadError, Loading } from "../components/States.jsx";
+
+function BrowseTasksButton() {
+    const navigate = useNavigate();
+    return (
+        <button
+            type="button"
+            onClick={() => navigate("/tasks")}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-indigo-400 dark:hover:border-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors shadow-sm cursor-pointer"
+            title="Browse all 20 benchmark tasks"
+        >
+            <svg className="w-3.5 h-3.5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+            </svg>
+            <span>Browse Tasks</span>
+            <span className="text-slate-400">→</span>
+        </button>
+    );
+}
 
 export function Leaderboard() {
     const { models, harnesses, setups, loading, error } = useBenchmark();
@@ -67,14 +86,19 @@ export function Leaderboard() {
         <main className="w-full max-w-6xl flex flex-col items-center gap-8">
             <div className="w-full bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xl shadow-slate-100 dark:shadow-none overflow-hidden">
                 {/* Header banner */}
-                <header className="px-6 pt-6 pb-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30">
-                    <h1 className="text-sm font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-2 uppercase tracking-wider">
-                        <svg className="w-4 h-4 text-indigo-500 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                        </svg>
-                        DevOps Bench Leaderboard
-                    </h1>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Benchmarking model × harness pairings across DevOps tasks — the LLM and the agent runner driving it. All leaderboard scores and metrics represent the average per task across the suite.</p>
+                <header className="px-6 pt-6 pb-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h1 className="text-sm font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-2 uppercase tracking-wider">
+                            <svg className="w-4 h-4 text-indigo-500 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                            DevOps Bench Leaderboard
+                        </h1>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Benchmarking model × harness pairings across DevOps tasks — the LLM and the agent runner driving it. All leaderboard scores and metrics represent the average per task across the suite.</p>
+                    </div>
+                    <div className="shrink-0 self-start sm:self-center">
+                        <BrowseTasksButton />
+                    </div>
                 </header>
 
                 {/* Filter bar */}
