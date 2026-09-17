@@ -136,46 +136,62 @@ export function RunDetail() {
             {/* Main Header & Telemetry Card */}
             <div className="w-full bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xl shadow-slate-100 dark:shadow-none overflow-hidden">
                 {/* Header banner */}
-                <header className="px-6 pt-6 pb-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30">
-                    <div className="flex items-center gap-2 mb-2 text-xs font-semibold">
-                        <Link
-                            to="/"
-                            className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
-                        >
-                            ← Leaderboard
-                        </Link>
-                        <span className="text-slate-300 dark:text-slate-600">/</span>
-                        <Link
-                            to={`/task/${taskName}`}
-                            className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
-                        >
-                            {taskName}
-                        </Link>
-                        <span className="text-slate-300 dark:text-slate-600">/</span>
-                        <span className="text-slate-700 dark:text-slate-300 font-mono">{run.arm}</span>
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-2">
-                        <div>
-                            <div className="flex items-center gap-3">
-                                <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50 font-mono">
-                                    {taskName}
-                                </h1>
-                                <span className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-                                    {harness} · {model}
-                                </span>
-                            </div>
-                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 font-mono">
-                                Arm: {run.arm} · Setup: {run.setupId}
-                            </p>
+                <header className="px-6 pt-6 pb-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <div className="flex items-center gap-2 text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                            <svg className="w-4 h-4 text-indigo-500 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                            </svg>
+                            <span>DevOps Bench Tasks</span>
+                            <span className="text-slate-300 dark:text-slate-600 font-normal">/</span>
+                            <Link to={`/task/${taskName}`} className="hover:text-indigo-600 dark:hover:text-indigo-400 font-mono lowercase">
+                                {taskName}
+                            </Link>
+                            <span className="text-slate-300 dark:text-slate-600 font-normal">/</span>
+                            <span className="text-indigo-600 dark:text-indigo-400 font-mono lowercase">{run.arm}</span>
                         </div>
 
-                        {scores.catastrophic && (
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-900/60 shrink-0">
-                                <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
-                                Catastrophic Safeguard Breached
+                        <div className="mt-2 flex flex-wrap items-center gap-3">
+                            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50 font-mono">
+                                {taskName}
+                            </h1>
+                            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 font-mono">
+                                {harness} · {model}
                             </span>
-                        )}
+                            {scores.catastrophic && (
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-900/60">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
+                                    Catastrophic Safeguard Breached
+                                </span>
+                            )}
+                        </div>
+                        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 font-mono">
+                            Arm: {run.arm} · Setup: {run.setupId}
+                        </p>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0 self-start sm:self-center">
+                        <Link
+                            to={`/task/${taskName}`}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-indigo-400 dark:hover:border-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors shadow-sm cursor-pointer"
+                            title={`Back to task ${taskName}`}
+                        >
+                            <span>← Task Spec</span>
+                        </Link>
+                        <Link
+                            to="/tasks"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-indigo-400 dark:hover:border-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors shadow-sm cursor-pointer"
+                            title="Browse all tasks"
+                        >
+                            <span>All Tasks</span>
+                        </Link>
+                        <Link
+                            to="/"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-indigo-400 dark:hover:border-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors shadow-sm cursor-pointer"
+                            title="Leaderboard"
+                        >
+                            <span>Leaderboard →</span>
+                        </Link>
                     </div>
                 </header>
 

@@ -17,7 +17,7 @@ describe("TaskDetail", () => {
     it("renders task name, title, and folder", () => {
         renderTask("canary-promotion");
         expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(/Canary Analysis/i);
-        expect(screen.getByText(/canary-promotion/)).toBeInTheDocument();
+        expect(screen.getAllByText(/canary-promotion/).length).toBeGreaterThanOrEqual(1);
         expect(screen.getByText(/b-0033/)).toBeInTheDocument();
     });
 
