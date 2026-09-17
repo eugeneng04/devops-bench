@@ -146,9 +146,6 @@ export function RunDetail() {
                                 {harness} · {model}
                             </span>
                         </div>
-                        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 font-mono">
-                            Arm: {run.arm} · Setup: {run.setupId}
-                        </p>
                     </div>
 
                     {scores.catastrophic && (

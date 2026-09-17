@@ -20,7 +20,7 @@ export function TopBar() {
 
     if (runMatch) {
         const taskName = runMatch[1];
-        backButton = { label: taskName, to: `/task/${taskName}`, title: `Back to task ${taskName}` };
+        backButton = { label: "Task", to: `/task/${taskName}`, title: `Back to task ${taskName}` };
     } else if (taskMatch) {
         backButton = { label: "Tasks", to: "/tasks", title: "Back to all tasks" };
     } else if (setupMatch) {

@@ -17,7 +17,8 @@ describe("RunDetail", () => {
     it("renders run header with task name and arm", () => {
         renderRun("canary-promotion", "antigravity_gemini-3.7-flash-high");
         expect(screen.getByRole("heading", { level: 1, name: "canary-promotion" })).toBeInTheDocument();
-        expect(screen.getByText(/Arm: antigravity_gemini-3.7-flash-high/i)).toBeInTheDocument();
+        expect(screen.getByText(/antigravity · gemini-3.7-flash-high/i)).toBeInTheDocument();
+        expect(screen.queryByText(/Arm:/i)).not.toBeInTheDocument();
     });
 
     it("renders telemetry stat cards (latency, tokens, tool calls)", () => {
