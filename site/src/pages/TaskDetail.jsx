@@ -14,7 +14,8 @@ export function TaskDetail() {
     const [promptExpanded, setPromptExpanded] = useState(false);
     const [activeTab, setActiveTab] = useState("matrix");
 
-    const task = curatedData.tasks?.[taskName];
+    const normalizedTaskName = taskName?.replace(/-gitops$/, "");
+    const task = curatedData.tasks?.[taskName] || curatedData.tasks?.[normalizedTaskName];
 
     if (!task) {
         return (

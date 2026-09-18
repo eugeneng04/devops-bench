@@ -43,6 +43,17 @@ describe("RunDetail", () => {
         expect(screen.getAllByText("Observed").length).toBeGreaterThanOrEqual(1);
     });
 
+    it("renders kubeagents run with both canonical and -gitops task names", () => {
+        const { unmount } = renderRun("unsafe-rollback-gitops", "gemini-3-7-flash-kubeagents");
+        expect(screen.getByRole("heading", { level: 1, name: "unsafe-rollback" })).toBeInTheDocument();
+        expect(screen.getByText(/kubeagents · gemini-3.7-flash/i)).toBeInTheDocument();
+        unmount();
+
+        renderRun("unsafe-rollback", "gemini-3-7-flash-kubeagents");
+        expect(screen.getByRole("heading", { level: 1, name: "unsafe-rollback" })).toBeInTheDocument();
+        expect(screen.getByText(/kubeagents · gemini-3.7-flash/i)).toBeInTheDocument();
+    });
+
     it("renders not found state for unknown run", () => {
         renderRun("canary-promotion", "unknown-harness");
         expect(screen.getByText(/Run "unknown-harness" for task "canary-promotion" was not found/i)).toBeInTheDocument();

@@ -237,7 +237,8 @@ function TaskTable({ setup, metric }) {
                             : undefined;
 
                         const metricParam = metric ? `&metric=${encodeURIComponent(metric)}` : "";
-                        const runUrl = `/task/${task.name}/run/${setup.id}?from=setup${metricParam}`;
+                        const taskKey = task.name?.replace(/-gitops$/, "") || task.folder?.replace(/-gitops$/, "");
+                        const runUrl = `/task/${taskKey}/run/${setup.id}?from=setup${metricParam}`;
                         const fromState = { from: `/setup/${setup.id}${metricParam ? `?${metricParam.slice(1)}` : ""}` };
 
                         return (

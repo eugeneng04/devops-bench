@@ -291,8 +291,10 @@ def build_curated_data(source_dir: str, output_file: str) -> None:
 
         arm = rf.split("/")[-4]
         arms_set.add(arm)
-        task_name = row_data.get("taskName") or res_data.get("name")
-        task_folder = row_data.get("taskFolder") or res_data.get("folder")
+        raw_task_name = row_data.get("taskName") or res_data.get("name")
+        raw_task_folder = row_data.get("taskFolder") or res_data.get("folder")
+        task_name = re.sub(r"-gitops$", "", raw_task_name)
+        task_folder = re.sub(r"-gitops$", "", raw_task_folder)
         task_key = task_name
 
         runs_by_task[task_key][arm] = {
@@ -322,6 +324,7 @@ def build_curated_data(source_dir: str, output_file: str) -> None:
         h: h.replace("antigravity_", "ag/")
         .replace("claude_code_", "cc/")
         .replace("openclaw_", "oc/")
+        .replace("kubeagents_", "ka/")
         for h in arms
     }
 
@@ -369,10 +372,12 @@ def build_curated_data(source_dir: str, output_file: str) -> None:
         all_checks = objectives + catastrophic + recoverable
         matrix_rows = []
 
+        task_arms = [arm for arm in arms if arm in runs_by_task[task_name]]
+
         for ch in all_checks:
             cname = ch["name"]
             harness_results = {}
-            for arm in arms:
+            for arm in task_arms:
                 arm_data = runs_by_task[task_name].get(arm)
                 if not arm_data:
                     harness_results[arm] = {"status": "–", "reason": ""}
@@ -401,7 +406,7 @@ def build_curated_data(source_dir: str, output_file: str) -> None:
         harness_scores = {}
         runs_output = {}
 
-        for arm in arms:
+        for arm in task_arms:
             arm_data = runs_by_task[task_name].get(arm)
             if not arm_data:
                 harness_scores[arm] = None
@@ -428,7 +433,7 @@ def build_curated_data(source_dir: str, output_file: str) -> None:
                 "recoverableSafetyScore": raw_rec,
                 "rescaledRecoverableScore": rec_v,
                 "catastrophic": is_cat,
-                "status": row.get("status"),
+                "status": row.get("status", "unknown"),
             }
 
             # Pre-assemble run page details for Page 2
@@ -467,7 +472,7 @@ def build_curated_data(source_dir: str, output_file: str) -> None:
                 )
             )
 
-            runs_output[arm] = {
+            run_entry = {
                 "taskName": task_name,
                 "arm": arm,
                 "setupId": row.get("setupId", arm),
@@ -499,6 +504,9 @@ def build_curated_data(source_dir: str, output_file: str) -> None:
                     + ("\n[!] Catastrophic safeguard breached: outcome zeroed" if is_cat else "")
                 ),
             }
+            runs_output[arm] = run_entry
+            if row.get("setupId") and row["setupId"] != arm:
+                runs_output[row["setupId"]] = run_entry
 
         t_meta = TASK_METADATA.get(task_name, {})
         tasks_output[task_name] = {
@@ -512,7 +520,7 @@ def build_curated_data(source_dir: str, output_file: str) -> None:
             "objectives": objectives,
             "catastrophic": catastrophic,
             "recoverable": recoverable,
-            "harnesses": [{"arm": arm, "short": short_harness[arm]} for arm in arms],
+            "harnesses": [{"arm": arm, "short": short_harness[arm]} for arm in task_arms],
             "matrix": matrix_rows,
             "harness_scores": harness_scores,
             "runs": runs_output,

@@ -12,7 +12,8 @@ export function RunDetail() {
     const { taskName, setupId } = useParams();
     const [activeTab, setActiveTab] = useState("all");
 
-    const task = curatedData.tasks?.[taskName];
+    const normalizedTaskName = taskName?.replace(/-gitops$/, "");
+    const task = curatedData.tasks?.[taskName] || curatedData.tasks?.[normalizedTaskName];
     if (!task) {
         return (
             <NotFound
@@ -141,11 +142,11 @@ export function RunDetail() {
                         <div className="flex flex-wrap items-center gap-3">
                             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50 font-mono">
                                 <Link
-                                    to={`/task/${taskName}`}
+                                    to={`/task/${task.name}`}
                                     className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
-                                    title={`View task spec and verification checks for ${taskName}`}
+                                    title={`View task spec and verification checks for ${task.name}`}
                                 >
-                                    {taskName}
+                                    {task.name}
                                 </Link>
                             </h1>
                             <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 font-mono">
