@@ -108,27 +108,27 @@ describe("Leaderboard", () => {
     });
 
     it("hides Scope toggle buttons when scope filter is disabled", () => {
-        renderPage();
-        expect(screen.queryByRole("button", { name: /Full Suite/i })).not.toBeInTheDocument();
-        expect(screen.queryByRole("button", { name: /Common Tasks/i })).not.toBeInTheDocument();
+        setScopeFilterEnabled(false);
+        try {
+            renderPage();
+            expect(screen.queryByRole("button", { name: /Full Suite/i })).not.toBeInTheDocument();
+            expect(screen.queryByRole("button", { name: /Common Tasks/i })).not.toBeInTheDocument();
+        } finally {
+            setScopeFilterEnabled(true);
+        }
     });
 
     it("renders Scope toggle buttons and switches between scopes when enabled", () => {
-        setScopeFilterEnabled(true);
-        try {
-            renderPage();
-            const fullBtn = screen.getByRole("button", { name: /Full Suite/i });
-            const commonBtn = screen.getByRole("button", { name: /Common Tasks/i });
-            expect(fullBtn).toBeInTheDocument();
-            expect(commonBtn).toBeInTheDocument();
-            expect(fullBtn).toHaveAttribute("aria-pressed", "true");
-            expect(commonBtn).toHaveAttribute("aria-pressed", "false");
+        renderPage();
+        const fullBtn = screen.getByRole("button", { name: /Full Suite/i });
+        const commonBtn = screen.getByRole("button", { name: /Common Tasks/i });
+        expect(fullBtn).toBeInTheDocument();
+        expect(commonBtn).toBeInTheDocument();
+        expect(fullBtn).toHaveAttribute("aria-pressed", "true");
+        expect(commonBtn).toHaveAttribute("aria-pressed", "false");
 
-            fireEvent.click(commonBtn);
-            expect(commonBtn).toHaveAttribute("aria-pressed", "true");
-            expect(fullBtn).toHaveAttribute("aria-pressed", "false");
-        } finally {
-            setScopeFilterEnabled(false);
-        }
+        fireEvent.click(commonBtn);
+        expect(commonBtn).toHaveAttribute("aria-pressed", "true");
+        expect(fullBtn).toHaveAttribute("aria-pressed", "false");
     });
 });

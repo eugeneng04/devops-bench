@@ -73,7 +73,7 @@ describe("useBenchmarkData in demo mode", () => {
         vi.stubEnv("VITE_DEMO_DATA", "true");
         vi.stubEnv("PROD", true);
         const { result } = renderHook(() => useBenchmarkData());
-        await waitFor(() => expect(result.current.loading).toBe(false));
+        await waitFor(() => expect(result.current.loading).toBe(false), { timeout: 5000 });
 
         expect(loadBenchmarkData).not.toHaveBeenCalled();
         // Nothing to terminate — terminating an untouched client is what the

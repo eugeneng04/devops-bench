@@ -12,7 +12,7 @@
  * When false, the leaderboard shows only full-suite runs (all 20 tasks),
  * hiding incomplete runs (like kube-agents) and hiding the Scope toggle buttons.
  */
-export let ENABLE_SCOPE_FILTER = false;
+export let ENABLE_SCOPE_FILTER = true;
 
 export function setScopeFilterEnabled(enabled) {
     ENABLE_SCOPE_FILTER = Boolean(enabled);
