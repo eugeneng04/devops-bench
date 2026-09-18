@@ -12,6 +12,7 @@ vi.mock("../context/BenchmarkContext.jsx", () => ({
 }));
 
 import { Detail } from "./Detail.jsx";
+import { setScopeFilterEnabled } from "../lib/taskScope.js";
 
 const SETUP_ID = "alpha-pro-gemini-cli-baseline";
 
@@ -404,51 +405,67 @@ describe("Detail", () => {
         expect(screen.queryByText(/Failure: Verification/i)).not.toBeInTheDocument();
     });
 
-    it("honors ?scope=common and switches task scope on click", () => {
-        renderAt(`/setup/${SETUP_ID}?scope=common`);
-        const commonBtn = screen.getByRole("button", { name: /Common Tasks/i });
-        const allBtn = screen.getByRole("button", { name: /All Tasks/i });
-        expect(commonBtn).toHaveAttribute("aria-pressed", "true");
-        expect(allBtn).toHaveAttribute("aria-pressed", "false");
-
-        fireEvent.click(allBtn);
-        expect(allBtn).toHaveAttribute("aria-pressed", "true");
-        expect(commonBtn).toHaveAttribute("aria-pressed", "false");
+    it("hides scope toggle buttons when scope filter is disabled", () => {
+        renderAt(`/setup/${SETUP_ID}`);
+        expect(screen.queryByRole("button", { name: /Common Tasks/i })).not.toBeInTheDocument();
+        expect(screen.queryByRole("button", { name: /All Tasks/i })).not.toBeInTheDocument();
     });
 
-    it("displays correct Common Tasks count regardless of currently active scope", () => {
-        benchmark = makeBenchmark({
-            setups: [
-                {
-                    id: SETUP_ID, order: 0, model: "alpha-pro", harness: "gemini-cli",
-                    augmentation: [], color: "#3b82f6",
-                    tasks: [
-                        { folder: "a", name: "Apple", scores: { composite: 60, pass1: 60 } },
-                        { folder: "b", name: "Banana", scores: { composite: 90, pass1: 90 } },
-                        { folder: "c", name: "Cherry", scores: { composite: 80, pass1: 80 } }
-                    ],
-                    history: []
-                },
-                {
-                    id: "setup-2", order: 1, model: "alpha-pro", harness: "gemini-cli",
-                    augmentation: [], color: "#ef4444",
-                    tasks: [
-                        { folder: "a", name: "Apple", scores: { composite: 50, pass1: 50 } }
-                    ],
-                    history: []
-                }
-            ]
-        });
+    it("honors ?scope=common and switches task scope on click when enabled", () => {
+        setScopeFilterEnabled(true);
+        try {
+            renderAt(`/setup/${SETUP_ID}?scope=common`);
+            const commonBtn = screen.getByRole("button", { name: /Common Tasks/i });
+            const allBtn = screen.getByRole("button", { name: /All Tasks/i });
+            expect(commonBtn).toHaveAttribute("aria-pressed", "true");
+            expect(allBtn).toHaveAttribute("aria-pressed", "false");
 
-        renderAt(`/setup/${SETUP_ID}`);
-        // In full suite view, All Tasks is 3 and Common Tasks is 1
-        expect(screen.getByRole("button", { name: "All Tasks (3)" })).toBeInTheDocument();
-        expect(screen.getByRole("button", { name: "Common Tasks (1)" })).toBeInTheDocument();
+            fireEvent.click(allBtn);
+            expect(allBtn).toHaveAttribute("aria-pressed", "true");
+            expect(commonBtn).toHaveAttribute("aria-pressed", "false");
+        } finally {
+            setScopeFilterEnabled(false);
+        }
+    });
 
-        // Clicking Common Tasks preserves the (1) count label
-        fireEvent.click(screen.getByRole("button", { name: "Common Tasks (1)" }));
-        expect(screen.getByRole("button", { name: "All Tasks (3)" })).toBeInTheDocument();
-        expect(screen.getByRole("button", { name: "Common Tasks (1)" })).toBeInTheDocument();
+    it("displays correct Common Tasks count regardless of currently active scope when enabled", () => {
+        setScopeFilterEnabled(true);
+        try {
+            benchmark = makeBenchmark({
+                setups: [
+                    {
+                        id: SETUP_ID, order: 0, model: "alpha-pro", harness: "gemini-cli",
+                        augmentation: [], color: "#3b82f6",
+                        tasks: [
+                            { folder: "a", name: "Apple", scores: { composite: 60, pass1: 60 } },
+                            { folder: "b", name: "Banana", scores: { composite: 90, pass1: 90 } },
+                            { folder: "c", name: "Cherry", scores: { composite: 80, pass1: 80 } }
+                        ],
+                        history: []
+                    },
+                    {
+                        id: "setup-2", order: 1, model: "alpha-pro", harness: "gemini-cli",
+                        augmentation: [], color: "#ef4444",
+                        tasks: [
+                            { folder: "a", name: "Apple", scores: { composite: 50, pass1: 50 } }
+                        ],
+                        history: []
+                    }
+                ]
+            });
+
+            renderAt(`/setup/${SETUP_ID}`);
+            // In full suite view, All Tasks is 3 and Common Tasks is 1
+            expect(screen.getByRole("button", { name: "All Tasks (3)" })).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "Common Tasks (1)" })).toBeInTheDocument();
+
+            // Clicking Common Tasks preserves the (1) count label
+            fireEvent.click(screen.getByRole("button", { name: "Common Tasks (1)" }));
+            expect(screen.getByRole("button", { name: "All Tasks (3)" })).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "Common Tasks (1)" })).toBeInTheDocument();
+        } finally {
+            setScopeFilterEnabled(false);
+        }
     });
 
     it("does not render generic Failure: Catastrophic when details and kinds are absent", () => {

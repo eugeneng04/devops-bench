@@ -6,6 +6,19 @@
 // =============================================================================
 
 /**
+ * FEATURE TOGGLE:
+ * Set to true to re-enable the Scope filter UI (Full Suite vs Common Tasks)
+ * on the Leaderboard and Setup Detail pages.
+ * When false, the leaderboard shows only full-suite runs (all 20 tasks),
+ * hiding incomplete runs (like kube-agents) and hiding the Scope toggle buttons.
+ */
+export let ENABLE_SCOPE_FILTER = false;
+
+export function setScopeFilterEnabled(enabled) {
+    ENABLE_SCOPE_FILTER = Boolean(enabled);
+}
+
+/**
  * @typedef {import('./schema').Setup} Setup
  * @typedef {import('./schema').TaskResult} TaskResult
  */

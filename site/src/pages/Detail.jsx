@@ -7,7 +7,7 @@ import { useParams, useSearchParams, Link, useNavigate } from "react-router-dom"
 import { useBenchmark } from "../context/BenchmarkContext.jsx";
 import { setupScore, setupLabel, scoreOf } from "../lib/accessors.js";
 import { METRICS, METRIC_LABELS, availableMetrics, formatMetric, metricBarFraction, isLowerBetter, metricMeta, TOKEN_BUCKET_COLORS } from "../lib/vocab.js";
-import { getCommonTaskKeys, normalizeTaskKey } from "../lib/taskScope.js";
+import { getCommonTaskKeys, normalizeTaskKey, ENABLE_SCOPE_FILTER } from "../lib/taskScope.js";
 import { SetupIdentity } from "../components/SetupIdentity.jsx";
 import { MetricToggle } from "../components/MetricToggle.jsx";
 import { NotFound, Loading, LoadError } from "../components/States.jsx";
@@ -378,6 +378,7 @@ export function Detail() {
 
     const queryScope = searchParams.get("scope");
     const [taskScope, setTaskScope] = useState(queryScope === "common" ? "common" : "full");
+    const activeScope = ENABLE_SCOPE_FILTER ? taskScope : "full";
 
     const setup = useMemo(() => setups.find(s => s.id === id) || null, [setups, id]);
     const commonTaskKeys = useMemo(() => getCommonTaskKeys(setups), [setups]);
@@ -385,7 +386,7 @@ export function Detail() {
 
     const effectiveSetup = useMemo(() => {
         if (!setup) return null;
-        if (taskScope !== "common") return setup;
+        if (activeScope !== "common") return setup;
         const scopedTasks = (setup.tasks || []).filter(t => commonSet.has(normalizeTaskKey(t)));
         const catastrophicCount = scopedTasks.filter(
             t => t.catastrophic || (t.catastrophicDetails && Object.keys(t.catastrophicDetails).length > 0)
@@ -395,7 +396,7 @@ export function Detail() {
             tasks: scopedTasks,
             catastrophicCount
         };
-    }, [setup, taskScope, commonSet]);
+    }, [setup, activeScope, commonSet]);
 
     function handleScopeChange(newScope) {
         setTaskScope(newScope);
@@ -522,7 +523,8 @@ export function Detail() {
                 </div>
 
                 {/* Task scope controls */}
-                {commonTaskKeys.length > 0 && (
+                {/* Task scope controls */}
+                {ENABLE_SCOPE_FILTER && commonTaskKeys.length > 0 && (
                     <div className="flex flex-wrap items-center justify-between gap-4 mt-2 px-1">
                         <div className="flex items-center gap-2">
                             <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
@@ -531,9 +533,9 @@ export function Detail() {
                             <button
                                 type="button"
                                 onClick={() => handleScopeChange("full")}
-                                aria-pressed={taskScope === "full"}
+                                aria-pressed={activeScope === "full"}
                                 className={`px-3 py-1 text-xs rounded-full border font-medium transition-colors ${
-                                    taskScope === "full"
+                                    activeScope === "full"
                                         ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
                                         : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
                                 }`}
@@ -543,9 +545,9 @@ export function Detail() {
                             <button
                                 type="button"
                                 onClick={() => handleScopeChange("common")}
-                                aria-pressed={taskScope === "common"}
+                                aria-pressed={activeScope === "common"}
                                 className={`px-3 py-1 text-xs rounded-full border font-medium transition-colors ${
-                                    taskScope === "common"
+                                    activeScope === "common"
                                         ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
                                         : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
                                 }`}
@@ -553,7 +555,7 @@ export function Detail() {
                                 Common Tasks ({commonTaskKeys.length})
                             </button>
                         </div>
-                        {taskScope === "common" && (
+                        {activeScope === "common" && (
                             <span className="text-xs text-slate-400 dark:text-slate-500 italic">
                                 Evaluated across the {commonTaskKeys.length} common benchmark task(s) ({commonTaskKeys.join(", ")})
                             </span>

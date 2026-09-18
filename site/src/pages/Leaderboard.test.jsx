@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
+import { setScopeFilterEnabled } from "../lib/taskScope.js";
 
 // Stub the chart (jsdom has no real canvas) and the data context.
 vi.mock("react-chartjs-2", () => ({ Line: () => null, Bar: () => null, Scatter: () => null }));
@@ -106,17 +107,28 @@ describe("Leaderboard", () => {
         expect(screen.queryByText(/⚠ \d+/)).not.toBeInTheDocument();
     });
 
-    it("renders Scope toggle buttons and switches between scopes", () => {
+    it("hides Scope toggle buttons when scope filter is disabled", () => {
         renderPage();
-        const fullBtn = screen.getByRole("button", { name: /Full Suite/i });
-        const commonBtn = screen.getByRole("button", { name: /Common Tasks/i });
-        expect(fullBtn).toBeInTheDocument();
-        expect(commonBtn).toBeInTheDocument();
-        expect(fullBtn).toHaveAttribute("aria-pressed", "true");
-        expect(commonBtn).toHaveAttribute("aria-pressed", "false");
+        expect(screen.queryByRole("button", { name: /Full Suite/i })).not.toBeInTheDocument();
+        expect(screen.queryByRole("button", { name: /Common Tasks/i })).not.toBeInTheDocument();
+    });
 
-        fireEvent.click(commonBtn);
-        expect(commonBtn).toHaveAttribute("aria-pressed", "true");
-        expect(fullBtn).toHaveAttribute("aria-pressed", "false");
+    it("renders Scope toggle buttons and switches between scopes when enabled", () => {
+        setScopeFilterEnabled(true);
+        try {
+            renderPage();
+            const fullBtn = screen.getByRole("button", { name: /Full Suite/i });
+            const commonBtn = screen.getByRole("button", { name: /Common Tasks/i });
+            expect(fullBtn).toBeInTheDocument();
+            expect(commonBtn).toBeInTheDocument();
+            expect(fullBtn).toHaveAttribute("aria-pressed", "true");
+            expect(commonBtn).toHaveAttribute("aria-pressed", "false");
+
+            fireEvent.click(commonBtn);
+            expect(commonBtn).toHaveAttribute("aria-pressed", "true");
+            expect(fullBtn).toHaveAttribute("aria-pressed", "false");
+        } finally {
+            setScopeFilterEnabled(false);
+        }
     });
 });

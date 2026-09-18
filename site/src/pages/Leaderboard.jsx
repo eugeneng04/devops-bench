@@ -8,7 +8,7 @@ import { useBenchmark } from "../context/BenchmarkContext.jsx";
 import { buildFilterGroups, getFilteredSetups, emptyFilterState } from "../lib/filters.js";
 import { setupScore } from "../lib/accessors.js";
 import { METRIC_LABELS, availableMetrics, metricDescription, isLowerBetter } from "../lib/vocab.js";
-import { getCommonTaskKeys, getMaxTaskCount, getScopedSetups } from "../lib/taskScope.js";
+import { getCommonTaskKeys, getMaxTaskCount, getScopedSetups, ENABLE_SCOPE_FILTER } from "../lib/taskScope.js";
 import { FilterBar } from "../components/FilterBar.jsx";
 import { LeaderboardRow } from "../components/LeaderboardRow.jsx";
 import { MetricToggle } from "../components/MetricToggle.jsx";
@@ -23,6 +23,7 @@ export function Leaderboard() {
 
     const queryScope = searchParams.get("scope");
     const [taskScope, setTaskScope] = useState(queryScope === "common" ? "common" : "full");
+    const activeScope = ENABLE_SCOPE_FILTER ? taskScope : "full";
 
     const commonTaskKeys = useMemo(() => getCommonTaskKeys(setups), [setups]);
     const fullTaskCount = useMemo(() => getMaxTaskCount(setups), [setups]);
@@ -39,8 +40,8 @@ export function Leaderboard() {
     }
 
     const scopedSetups = useMemo(
-        () => getScopedSetups(setups, taskScope, commonTaskKeys),
-        [setups, taskScope, commonTaskKeys]
+        () => getScopedSetups(setups, activeScope, commonTaskKeys),
+        [setups, activeScope, commonTaskKeys]
     );
 
     const groups = useMemo(() => buildFilterGroups(models, harnesses, scopedSetups), [models, harnesses, scopedSetups]);
@@ -110,8 +111,8 @@ export function Leaderboard() {
                         onClear={clearFilters}
                         shown={filtered.length}
                         total={scopedSetups.length}
-                        taskScope={taskScope}
-                        onScopeChange={handleScopeChange}
+                        taskScope={activeScope}
+                        onScopeChange={ENABLE_SCOPE_FILTER ? handleScopeChange : undefined}
                         fullTaskCount={fullTaskCount}
                         commonTaskCount={commonTaskCount}
                     />
@@ -171,7 +172,7 @@ export function Leaderboard() {
                                 harnesses={harnesses}
                                 metric={metric}
                                 metricMax={metricMax}
-                                taskScope={taskScope}
+                                taskScope={activeScope}
                             />
                         ))}
                 </div>
@@ -180,7 +181,7 @@ export function Leaderboard() {
                 {!loading && !error && sorted.length > 0 && (
                     <div className="px-6 py-2.5 bg-slate-50/50 dark:bg-slate-800/20 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-400 dark:text-slate-500 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">
                         <span>
-                            * {taskScope === "common"
+                            * {ENABLE_SCOPE_FILTER && activeScope === "common"
                                 ? `Common tasks view: all figures evaluated across the ${commonTaskCount} common task(s) (${commonTaskKeys.join(", ")}).`
                                 : "All leaderboard scores and efficiency figures represent task averages (mean across evaluated tasks)."}
                         </span>
