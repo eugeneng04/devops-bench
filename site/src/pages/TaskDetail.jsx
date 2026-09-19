@@ -293,7 +293,7 @@ export function TaskDetail() {
                                                     <td key={h.arm} className="py-3 px-2 text-center align-middle font-mono text-xs">
                                                         {outcome != null ? (
                                                             <span className={isCat ? "text-rose-600 dark:text-rose-400" : "text-slate-900 dark:text-slate-100"}>
-                                                                {Math.round(outcome * 100)}%
+                                                                {Number((outcome * 100).toFixed(1))}%
                                                             </span>
                                                         ) : (
                                                             <span className="text-slate-400">—</span>

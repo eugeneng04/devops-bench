@@ -203,7 +203,7 @@ export function RunDetail() {
                             Outcome Score
                         </span>
                         <span className="text-lg font-bold font-mono">
-                            {scores.outcome != null ? `${Math.round(scores.outcome * 100)}%` : "—"}
+                            {scores.outcome != null ? `${Number((scores.outcome * 100).toFixed(1))}%` : "—"}
                         </span>
                     </div>
                 </div>

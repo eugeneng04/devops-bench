@@ -58,4 +58,9 @@ describe("RunDetail", () => {
         renderRun("canary-promotion", "unknown-harness");
         expect(screen.getByText(/Run "unknown-harness" for task "canary-promotion" was not found/i)).toBeInTheDocument();
     });
+
+    it("displays 66.7% outcome score for claude-opus-5-kubeagents on incomplete-maintenance matching setup page", () => {
+        renderRun("incomplete-maintenance", "claude-opus-5-kubeagents");
+        expect(screen.getByText("66.7%")).toBeInTheDocument();
+    });
 });
