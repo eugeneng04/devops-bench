@@ -7,15 +7,7 @@ import { useParams, Link } from "react-router-dom";
 import curatedData from "../data/curated_tasks.json";
 import { AssertsRenderer } from "../components/AssertsRenderer.jsx";
 import { NotFound } from "../components/States.jsx";
-
-function modeTooltip(mode) {
-    if (mode === "converge") return "Converge: polled repeatedly until true within timeout budget";
-    if (mode === "assert") return "Assert: evaluated once instantaneously at the end of the run";
-    if (mode === "hold") return "Hold: sampled continuously in background — must stay true throughout";
-    if (mode === "judge") return "Judge: evaluated by LLM judge against prompt criteria";
-    if (mode === "audit") return "Audit: deterministic scan of shell commands and tool calls";
-    return mode;
-}
+import { CheckMeta, modeTooltip } from "../components/CheckMeta.jsx";
 
 export function RunDetail() {
     const { taskName, setupId } = useParams();
@@ -99,17 +91,13 @@ export function RunDetail() {
                                                 <span className="font-semibold text-slate-900 dark:text-slate-100 block">
                                                     {c.title || c.name}
                                                 </span>
-                                                <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">
-                                                    {c.title && c.title !== c.name ? `${c.name} · ` : ""}
-                                                    <Link
-                                                        to="/methodology#modes"
-                                                        className="hover:text-indigo-600 dark:hover:text-indigo-400 underline decoration-dotted underline-offset-2 cursor-help"
-                                                        title={modeTooltip(c.mode)}
-                                                    >
-                                                        {c.mode}
-                                                    </Link>
-                                                    {c.weight ? ` · ${c.weight} pts` : ""}
-                                                </span>
+                                                <CheckMeta
+                                                    id={c.title && c.title !== c.name ? c.name : null}
+                                                    mode={c.mode}
+                                                    weight={c.weight}
+                                                    group={c.group_title}
+                                                    isCatastrophic={isCatastrophic}
+                                                />
                                             </td>
                                             <td className="py-3 pr-4 align-top">
                                                 <AssertsRenderer asserts={c.description || c.asserts} />

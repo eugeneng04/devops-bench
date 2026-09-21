@@ -8,15 +8,7 @@ import { useParams, Link } from "react-router-dom";
 import curatedData from "../data/curated_tasks.json";
 import { AssertsRenderer, FormattedText } from "../components/AssertsRenderer.jsx";
 import { NotFound } from "../components/States.jsx";
-
-function modeTooltip(mode) {
-    if (mode === "converge") return "Converge: polled repeatedly until true within timeout budget";
-    if (mode === "assert") return "Assert: evaluated once instantaneously at the end of the run";
-    if (mode === "hold") return "Hold: sampled continuously in background — must stay true throughout";
-    if (mode === "judge") return "Judge: evaluated by LLM judge against prompt criteria";
-    if (mode === "audit") return "Audit: deterministic scan of shell commands and tool calls";
-    return mode;
-}
+import { CheckMeta, modeTooltip } from "../components/CheckMeta.jsx";
 
 export function TaskDetail() {
     const { taskName } = useParams();
@@ -275,11 +267,13 @@ export function TaskDetail() {
                                                     <span className="font-medium text-slate-900 dark:text-slate-100 block">
                                                         {row.title || row.check_name}
                                                     </span>
-                                                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">
-                                                        {row.title && row.title !== row.check_name ? `${row.check_name} · ` : ""}
-                                                        {row.severity || row.role}
-                                                        {row.group_title ? ` · ${row.group_title}` : ""}
-                                                    </span>
+                                                    <CheckMeta
+                                                        id={row.title && row.title !== row.check_name ? row.check_name : null}
+                                                        role={row.severity || row.role}
+                                                        group={row.group_title}
+                                                        mode={row.mode}
+                                                        isCatastrophic={row.severity === "catastrophic"}
+                                                    />
                                                 </td>
                                                 {harnesses.map(h => {
                                                     const res = row.results[h.arm];
@@ -375,11 +369,10 @@ export function TaskDetail() {
                                                     <span className="font-semibold text-slate-900 dark:text-slate-100 block">
                                                         {c.title || c.name}
                                                     </span>
-                                                    {c.title && c.title !== c.name && (
-                                                        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono block">
-                                                            {c.name}
-                                                        </span>
-                                                    )}
+                                                    <CheckMeta
+                                                        id={c.title && c.title !== c.name ? c.name : null}
+                                                        group={c.group_title}
+                                                    />
                                                 </td>
                                                 <td className="py-3 pr-4 align-top">
                                                     <AssertsRenderer asserts={c.description || c.asserts} />
@@ -449,11 +442,11 @@ export function TaskDetail() {
                                                         <span className="font-semibold text-xs text-rose-950 dark:text-rose-200 block">
                                                             {c.title || c.name}
                                                         </span>
-                                                        {c.title && c.title !== c.name && (
-                                                            <span className="text-[10px] text-rose-400 font-mono block">
-                                                                {c.name}
-                                                            </span>
-                                                        )}
+                                                        <CheckMeta
+                                                            id={c.title && c.title !== c.name ? c.name : null}
+                                                            group={c.group_title}
+                                                            isCatastrophic={true}
+                                                        />
                                                     </td>
                                                     <td className="py-3 pr-4 align-top">
                                                         <AssertsRenderer asserts={c.description || c.asserts} />
@@ -513,11 +506,10 @@ export function TaskDetail() {
                                                         <span className="font-semibold text-xs text-slate-900 dark:text-slate-100 block">
                                                             {c.title || c.name}
                                                         </span>
-                                                        {c.title && c.title !== c.name && (
-                                                            <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono block">
-                                                                {c.name}
-                                                            </span>
-                                                        )}
+                                                        <CheckMeta
+                                                            id={c.title && c.title !== c.name ? c.name : null}
+                                                            group={c.group_title}
+                                                        />
                                                     </td>
                                                     <td className="py-3 pr-4 align-top">
                                                         <AssertsRenderer asserts={c.description || c.asserts} />

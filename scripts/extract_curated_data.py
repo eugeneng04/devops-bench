@@ -628,6 +628,8 @@ def build_curated_data(source_dir: str, output_file: str) -> None:
                     "failure_hint": ch.get("failure_hint"),
                     "role": ch["role"],
                     "severity": ch["severity"],
+                    "mode": ch.get("mode"),
+                    "weight": ch.get("weight"),
                     "results": harness_results,
                 }
             )
