@@ -1,0 +1,162 @@
+{
+  "apiVersion": "devops-bench.k8s.io/v1alpha1",
+  "kind": "UsageSnapshot",
+  "formatVersion": 2,
+  "collectedAt": "2026-09-21T11:04:08Z",
+  "windowDays": 14,
+  "partial": false,
+  "skipped": [],
+  "provenance": {
+    "collectorSha": "eb9980170b51179062e93adc4c9e33707abf2f25",
+    "workflowRunUrl": "https://github.com/eugeneng04/devops-bench/actions/runs/35592053096",
+    "writtenAt": "2026-09-21T11:04:08Z"
+  },
+  "repos": {
+    "gke-labs/devops-bench": {
+      "repo": {
+        "value": null,
+        "unavailable": "repos/gke-labs/devops-bench: Bad credentials (HTTP 401)"
+      },
+      "traffic": {
+        "value": null,
+        "unavailable": "repos/gke-labs/devops-bench/traffic/views: Bad credentials (HTTP 401)"
+      },
+      "contributors": {
+        "value": null,
+        "unavailable": "repos/gke-labs/devops-bench/contributors?per_page=100&page=1: Bad credentials (HTTP 401)"
+      },
+      "pullRequests": {
+        "value": null,
+        "unavailable": "graphql: Bad credentials (HTTP 401)"
+      },
+      "issues": {
+        "value": null,
+        "unavailable": "graphql: Bad credentials (HTTP 401)"
+      },
+      "forks": {
+        "value": {
+          "countReported": null,
+          "countListed": 0,
+          "skippedByCap": 0,
+          "upstreamHeadSha": null,
+          "items": []
+        },
+        "unavailable": "repos/gke-labs/devops-bench/forks?sort=oldest&per_page=100&page=1: Bad credentials (HTTP 401)"
+      }
+    },
+    "kubernetes-sigs/devops-bench": {
+      "repo": {
+        "value": null,
+        "unavailable": "repos/kubernetes-sigs/devops-bench: Bad credentials (HTTP 401)"
+      },
+      "traffic": {
+        "value": null,
+        "unavailable": "repos/kubernetes-sigs/devops-bench/traffic/views: Bad credentials (HTTP 401)"
+      },
+      "contributors": {
+        "value": null,
+        "unavailable": "repos/kubernetes-sigs/devops-bench/contributors?per_page=100&page=1: Bad credentials (HTTP 401)"
+      },
+      "pullRequests": {
+        "value": null,
+        "unavailable": "graphql: Bad credentials (HTTP 401)"
+      },
+      "issues": {
+        "value": null,
+        "unavailable": "graphql: Bad credentials (HTTP 401)"
+      },
+      "forks": {
+        "value": {
+          "countReported": null,
+          "countListed": 0,
+          "skippedByCap": 0,
+          "upstreamHeadSha": null,
+          "items": []
+        },
+        "unavailable": "repos/kubernetes-sigs/devops-bench/forks?sort=oldest&per_page=100&page=1: Bad credentials (HTTP 401)"
+      }
+    }
+  },
+  "budget": {},
+  "apiCalls": 15,
+  "references": {
+    "control": {
+      "value": null,
+      "unavailable": "search/code?q=%22devops_bench%22+repo%3Agke-labs%2Fdevops-bench&per_page=100: Bad credentials (HTTP 401)"
+    },
+    "trustworthy": false,
+    "queries": [
+      {
+        "value": {
+          "query": "\"import devops_bench\""
+        },
+        "unavailable": "control query returned nothing; search is not trustworthy this run"
+      },
+      {
+        "value": {
+          "query": "\"from devops_bench\""
+        },
+        "unavailable": "control query returned nothing; search is not trustworthy this run"
+      },
+      {
+        "value": {
+          "query": "\"gke-labs/devops-bench\""
+        },
+        "unavailable": "control query returned nothing; search is not trustworthy this run"
+      },
+      {
+        "value": {
+          "query": "\"kubernetes-sigs/devops-bench\""
+        },
+        "unavailable": "control query returned nothing; search is not trustworthy this run"
+      }
+    ]
+  },
+  "affiliation": {
+    "insideLogins": [
+      "adrianchung",
+      "aishsundar",
+      "eugeneng04",
+      "fuxiao-gao",
+      "geojaz",
+      "gke-labs",
+      "itssimrank",
+      "janetkuo",
+      "jayantid",
+      "jessie1111101",
+      "justinsb",
+      "kubernetes-sigs",
+      "kweinmeister",
+      "lapis2002",
+      "noahlwest",
+      "pradeepvrd",
+      "priyankasaggu11929",
+      "richackard",
+      "yuwenma"
+    ],
+    "outsideLogins": [
+      "adamparco",
+      "ameukam",
+      "chinemeremchigbo",
+      "ginnyji",
+      "iliabo",
+      "isadominguez314",
+      "jegaths",
+      "qchong",
+      "ravisantoshgudimetla",
+      "ryanzhang-oss",
+      "toshiowang",
+      "zaid-fakhruddin"
+    ],
+    "overrides": {
+      "inside": [
+        "gke-labs",
+        "kubernetes-sigs"
+      ],
+      "outside": []
+    },
+    "source": "contributors API and commit authorship, overridden by affiliation.json, frozen at first sighting",
+    "carriedFrom": "2026-09-17",
+    "frozenAt": "2026-09-21"
+  }
+}

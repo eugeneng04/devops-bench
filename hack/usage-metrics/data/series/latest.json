@@ -2,11 +2,11 @@
   "apiVersion": "usage-metrics/v1",
   "kind": "UsageSeries",
   "formatVersion": 1,
-  "generatedAt": "2026-09-17T10:32:06Z",
+  "generatedAt": "2026-09-21T11:04:13Z",
   "provenance": {
-    "collectorSha": "9a30937e47b9cf604d94a826140af322583f7612",
-    "workflowRunUrl": "https://github.com/eugeneng04/devops-bench/actions/runs/35210227725",
-    "writtenAt": "2026-09-17T10:32:06Z"
+    "collectorSha": "eb9980170b51179062e93adc4c9e33707abf2f25",
+    "workflowRunUrl": "https://github.com/eugeneng04/devops-bench/actions/runs/35592053096",
+    "writtenAt": "2026-09-21T11:04:13Z"
   },
   "unreadable": [
     {
@@ -16,6 +16,10 @@
     {
       "date": "2026-09-07",
       "reason": "classification failed: KeyError('totalCount')"
+    },
+    {
+      "date": "2026-09-21",
+      "reason": "classification failed: TypeError(\"unsupported operand type(s) for -: 'NoneType' and 'int'\")"
     }
   ],
   "runs": [
