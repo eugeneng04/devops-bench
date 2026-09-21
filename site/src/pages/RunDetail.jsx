@@ -8,6 +8,15 @@ import curatedData from "../data/curated_tasks.json";
 import { AssertsRenderer } from "../components/AssertsRenderer.jsx";
 import { NotFound } from "../components/States.jsx";
 
+function modeTooltip(mode) {
+    if (mode === "converge") return "Converge: polled repeatedly until true within timeout budget";
+    if (mode === "assert") return "Assert: evaluated once instantaneously at the end of the run";
+    if (mode === "hold") return "Hold: sampled continuously in background — must stay true throughout";
+    if (mode === "judge") return "Judge: evaluated by LLM judge against prompt criteria";
+    if (mode === "audit") return "Audit: deterministic scan of shell commands and tool calls";
+    return mode;
+}
+
 export function RunDetail() {
     const { taskName, setupId } = useParams();
     const [activeTab, setActiveTab] = useState("all");
@@ -92,8 +101,14 @@ export function RunDetail() {
                                                 </span>
                                                 <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">
                                                     {c.title && c.title !== c.name ? `${c.name} · ` : ""}
-                                                    {c.mode} {c.weight ? `· ${c.weight} pts` : ""}
-                                                    {c.group_title ? ` · ${c.group_title}` : ""}
+                                                    <Link
+                                                        to="/methodology#modes"
+                                                        className="hover:text-indigo-600 dark:hover:text-indigo-400 underline decoration-dotted underline-offset-2 cursor-help"
+                                                        title={modeTooltip(c.mode)}
+                                                    >
+                                                        {c.mode}
+                                                    </Link>
+                                                    {c.weight ? ` · ${c.weight} pts` : ""}
                                                 </span>
                                             </td>
                                             <td className="py-3 pr-4 align-top">

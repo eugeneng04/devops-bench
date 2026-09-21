@@ -9,6 +9,15 @@ import curatedData from "../data/curated_tasks.json";
 import { AssertsRenderer, FormattedText } from "../components/AssertsRenderer.jsx";
 import { NotFound } from "../components/States.jsx";
 
+function modeTooltip(mode) {
+    if (mode === "converge") return "Converge: polled repeatedly until true within timeout budget";
+    if (mode === "assert") return "Assert: evaluated once instantaneously at the end of the run";
+    if (mode === "hold") return "Hold: sampled continuously in background — must stay true throughout";
+    if (mode === "judge") return "Judge: evaluated by LLM judge against prompt criteria";
+    if (mode === "audit") return "Audit: deterministic scan of shell commands and tool calls";
+    return mode;
+}
+
 export function TaskDetail() {
     const { taskName } = useParams();
     const [promptExpanded, setPromptExpanded] = useState(false);
@@ -348,7 +357,15 @@ export function TaskDetail() {
                                             <th className="pb-2.5 pr-4 w-1/4">Check</th>
                                             <th className="pb-2.5 pr-4 w-1/2">Asserts</th>
                                             <th className="pb-2.5 pr-4 w-24">Weight</th>
-                                            <th className="pb-2.5 w-28">Mode</th>
+                                            <th className="pb-2.5 w-28">
+                                                <Link
+                                                    to="/methodology#modes"
+                                                    className="inline-flex items-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                                                    title="Learn about check evaluation modes (converge, assert, hold, judge)"
+                                                >
+                                                    Mode <span className="text-[10px] text-indigo-500">ⓘ</span>
+                                                </Link>
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
@@ -358,10 +375,11 @@ export function TaskDetail() {
                                                     <span className="font-semibold text-slate-900 dark:text-slate-100 block">
                                                         {c.title || c.name}
                                                     </span>
-                                                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">
-                                                        {c.title && c.title !== c.name ? c.name : c.type}
-                                                        {c.group_title ? ` · ${c.group_title}` : ""}
-                                                    </span>
+                                                    {c.title && c.title !== c.name && (
+                                                        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono block">
+                                                            {c.name}
+                                                        </span>
+                                                    )}
                                                 </td>
                                                 <td className="py-3 pr-4 align-top">
                                                     <AssertsRenderer asserts={c.description || c.asserts} />
@@ -375,7 +393,10 @@ export function TaskDetail() {
                                                     )}
                                                 </td>
                                                 <td className="py-3 align-top">
-                                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                                                    <span
+                                                        className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 cursor-help"
+                                                        title={modeTooltip(c.mode)}
+                                                    >
                                                         {c.mode}
                                                     </span>
                                                 </td>
@@ -410,7 +431,15 @@ export function TaskDetail() {
                                             <tr className="border-b border-rose-100 dark:border-rose-950/60 text-[10px] font-semibold uppercase tracking-wider text-rose-400">
                                                 <th className="pb-2.5 pr-4 w-1/3">Check</th>
                                                 <th className="pb-2.5 pr-4 w-1/2">Asserts</th>
-                                                <th className="pb-2.5 w-28">Mode</th>
+                                                <th className="pb-2.5 w-28">
+                                                    <Link
+                                                        to="/methodology#modes"
+                                                        className="inline-flex items-center gap-1 hover:text-rose-600 dark:hover:text-rose-300 transition-colors"
+                                                        title="Learn about check evaluation modes"
+                                                    >
+                                                        Mode <span className="text-[10px]">ⓘ</span>
+                                                    </Link>
+                                                </th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-rose-50/60 dark:divide-rose-950/30">
@@ -430,7 +459,10 @@ export function TaskDetail() {
                                                         <AssertsRenderer asserts={c.description || c.asserts} />
                                                     </td>
                                                     <td className="py-3 align-top">
-                                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono bg-rose-100/70 dark:bg-rose-950 text-rose-700 dark:text-rose-300">
+                                                        <span
+                                                            className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono bg-rose-100/70 dark:bg-rose-950 text-rose-700 dark:text-rose-300 cursor-help"
+                                                            title={modeTooltip(c.mode)}
+                                                        >
                                                             {c.mode}
                                                         </span>
                                                     </td>
@@ -463,7 +495,15 @@ export function TaskDetail() {
                                             <tr className="border-b border-slate-200 dark:border-slate-800 text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                                                 <th className="pb-2.5 pr-4 w-1/3">Check</th>
                                                 <th className="pb-2.5 pr-4 w-1/2">Asserts</th>
-                                                <th className="pb-2.5 w-28">Mode</th>
+                                                <th className="pb-2.5 w-28">
+                                                    <Link
+                                                        to="/methodology#modes"
+                                                        className="inline-flex items-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                                                        title="Learn about check evaluation modes"
+                                                    >
+                                                        Mode <span className="text-[10px] text-indigo-500">ⓘ</span>
+                                                    </Link>
+                                                </th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -483,7 +523,10 @@ export function TaskDetail() {
                                                         <AssertsRenderer asserts={c.description || c.asserts} />
                                                     </td>
                                                     <td className="py-3 align-top">
-                                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                                                        <span
+                                                            className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 cursor-help"
+                                                            title={modeTooltip(c.mode)}
+                                                        >
                                                             {c.mode}
                                                         </span>
                                                     </td>

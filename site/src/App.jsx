@@ -7,6 +7,7 @@ import { Detail } from "./pages/Detail.jsx";
 import { Tasks } from "./pages/Tasks.jsx";
 import { TaskDetail } from "./pages/TaskDetail.jsx";
 import { RunDetail } from "./pages/RunDetail.jsx";
+import { Methodology } from "./pages/Methodology.jsx";
 import { TopBar } from "./components/TopBar.jsx";
 
 // A demo build is published to a static host with no rewrite rules, where
@@ -30,6 +31,8 @@ export default function App() {
                             <Route path="/" element={<Leaderboard />} />
                             <Route path="/tasks" element={<Tasks />} />
                             <Route path="/task" element={<Navigate to="/tasks" replace />} />
+                            <Route path="/methodology" element={<Methodology />} />
+                            <Route path="/guide" element={<Navigate to="/methodology" replace />} />
                             <Route path="/setup/:id" element={<Detail />} />
                             <Route path="/task/:taskName" element={<TaskDetail />} />
                             <Route path="/task/:taskName/run/:setupId" element={<RunDetail />} />
