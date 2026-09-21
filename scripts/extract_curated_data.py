@@ -762,9 +762,7 @@ def build_curated_data(source_dir: str, output_file: str) -> None:
             "name": task_name,
             "title": yaml_meta.get("title")
             or t_meta.get("title", task_name.replace("-", " ").title()),
-            "category": t_meta.get("category")
-            or (yaml_meta.get("category") or "").capitalize()
-            or "General",
+            "category": yaml_meta.get("category") or t_meta.get("category") or "general",
             "task_category": yaml_meta.get("category") or None,
             "summary": yaml_meta.get("summary")
             or t_meta.get("summary", prompt.strip().split("\n")[0]),

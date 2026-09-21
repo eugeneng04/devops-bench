@@ -39,7 +39,7 @@ describe("Tasks Page", () => {
         );
 
         const select = screen.getByRole("combobox");
-        fireEvent.change(select, { target: { value: "Security" } });
+        fireEvent.change(select, { target: { value: "secure" } });
 
         expect(screen.getByText("cve-remediation")).toBeInTheDocument();
         expect(screen.getByText("secret-rotation")).toBeInTheDocument();

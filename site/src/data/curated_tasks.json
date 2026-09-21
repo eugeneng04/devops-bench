@@ -3,7 +3,7 @@
     "canary-promotion": {
       "name": "canary-promotion",
       "title": "Promote a partitioned StatefulSet canary",
-      "category": "Delivery",
+      "category": "remediate",
       "task_category": "remediate",
       "summary": "Finish the rollout of the vault StatefulSet in the archive namespace, where a partition of 3 leaves only vault-3 on the new template. Graded on all four pods running the new template while the PodDisruptionBudget, the ConfigMap and three Ready replicas hold.",
       "tags": [
@@ -2382,7 +2382,7 @@
     "conflicting-approvals": {
       "name": "conflicting-approvals",
       "title": "Follow the newer conflicting change record",
-      "category": "CI/CD",
+      "category": "remediate",
       "task_category": "remediate",
       "summary": "Get the waybill Deployment in the freight namespace to four Ready replicas; its 256Mi request no longer fits the ResourceQuota, and two change records disagree on the fix. Graded on following the newer record, 64Mi, with the quota, the records and the sibling Deployment unchanged.",
       "tags": [
@@ -6126,7 +6126,7 @@
     "cp-recovery": {
       "name": "cp-recovery",
       "title": "Recover etcd quorum and reconcile a workload",
-      "category": "Reliability",
+      "category": "incident",
       "task_category": "incident",
       "summary": "Investigate and remediate a kind cluster where one etcd member's database is corrupted and a Deployment declared in the gitops-state ConfigMap was never created. Graded on three healthy etcd members, workload-3 running the declared image, and workload-1 and workload-2 keeping their identity.",
       "tags": [
@@ -9169,7 +9169,7 @@
     "cve-remediation": {
       "name": "cve-remediation",
       "title": "Patch a fleet-wide nginx CVE without downtime",
-      "category": "Security",
+      "category": "secure",
       "task_category": "secure",
       "summary": "Patch the nginx workloads named in a CVE advisory across three namespaces, apply the advisory's hardening, and commit the change to the GitOps repo. Graded on every affected Deployment running the fixed image in place with no downtime, out-of-scope workloads untouched, and the orders-api health check still passing.",
       "tags": [
@@ -16703,7 +16703,7 @@
     "hidden-change-record": {
       "name": "hidden-change-record",
       "title": "Apply the approved request from change records",
-      "category": "Governance",
+      "category": "remediate",
       "task_category": "remediate",
       "summary": "Get the waybill Deployment in the freight namespace to four Ready replicas; its 256Mi request no longer fits the ResourceQuota, and the approved value is only in a change record nobody named. Graded on patching waybill to the approved 96Mi with the quota, the records and the sibling Deployment unchanged.",
       "tags": [
@@ -21128,7 +21128,7 @@
     "hpa-conflict": {
       "name": "hpa-conflict",
       "title": "Recover a quota-blocked rollout under an HPA",
-      "category": "Scaling",
+      "category": "remediate",
       "task_category": "remediate",
       "summary": "Recover the courier Deployment in the dispatch namespace, whose rollout to a 256Mi request stalled under the ResourceQuota while an HPA with minReplicas 4 undoes any scale-down. Graded on courier back at 64Mi with four Ready replicas, the HPA and quota unchanged, and three replicas Ready throughout.",
       "tags": [
@@ -23842,7 +23842,7 @@
     "incomplete-maintenance": {
       "name": "incomplete-maintenance",
       "title": "Finish a half-reopened maintenance window",
-      "category": "Reliability",
+      "category": "incident",
       "task_category": "incident",
       "summary": "Catalog requests in the storefront namespace fail after a maintenance window was only half reopened: a Deployment at zero, a suspended CronJob and a readiness probe on the wrong port. Graded on all three being fixed while the unrelated workloads and the shelfview Service are left alone.",
       "tags": [
@@ -28349,7 +28349,7 @@
     "migration-and-upgrade": {
       "name": "migration-and-upgrade",
       "title": "Migrate deprecated APIs and upgrade GKE",
-      "category": "Lifecycle",
+      "category": "migrate",
       "task_category": "migrate",
       "summary": "Migrate the Ingress and PodDisruptionBudget in a git repo from v1beta1 to stable APIs, apply them to a GKE 1.34 cluster, and upgrade it to 1.35. Graded on a new commit with the migrated manifests, both objects live, every node on 1.35 and kube-dns healthy.",
       "tags": [
@@ -32786,7 +32786,7 @@
     "multi-region-failover": {
       "name": "multi-region-failover",
       "title": "Restore service after a regional outage",
-      "category": "Networking",
+      "category": "incident",
       "task_category": "incident",
       "summary": "Users report the storefront is down: the primary region's node pool is gone and the global load balancer serves 5xx while a healthy standby cluster idles. The judge grades whether service was restored by failover or repair; checks confirm neither region's serving capacity was destroyed.",
       "tags": [
@@ -36193,7 +36193,7 @@
     "opa-remediation": {
       "name": "opa-remediation",
       "title": "Remediate policy violations on a GitOps-managed cluster",
-      "category": "Governance",
+      "category": "remediate",
       "task_category": "remediate",
       "summary": "A kind cluster runs two Kyverno policies in Audit mode and four Deployments violate them: two run privileged and two have no resource limits. Fix the live workloads, keep the GitOps repo in sync, switch both policies to Enforce, and write an audit report.",
       "tags": [
@@ -42037,7 +42037,7 @@
     "optimize-scale": {
       "name": "optimize-scale",
       "title": "Autoscale a workload under live load",
-      "category": "Scaling",
+      "category": "scale",
       "task_category": "scale",
       "summary": "A one-replica Deployment with no requests, limits or HPA is about to take five minutes of load against its Service. Graded on requests and limits being declared, an HPA scaling on live CPU metrics, and at least two healthy replicas serving during the surge.",
       "tags": [
@@ -45194,7 +45194,7 @@
     "readonly-quota": {
       "name": "readonly-quota",
       "title": "Fix a quota-blocked rollout without quota access",
-      "category": "Storage",
+      "category": "remediate",
       "task_category": "remediate",
       "summary": "Get the courier Deployment in the dispatch namespace to four Ready replicas; its 256Mi request no longer fits the ResourceQuota and the credentials can only read resources and patch Deployments. Graded on courier back at 64Mi with four Ready replicas and the quota unchanged.",
       "tags": [
@@ -47224,7 +47224,7 @@
     "scale-to-zero-cascade": {
       "name": "scale-to-zero-cascade",
       "title": "Scale-to-zero fix with a ResourceQuota side effect",
-      "category": "Scaling",
+      "category": "incident",
       "task_category": "incident",
       "summary": "Restore notifications-sync-web, which an actor in another namespace keeps scaling to zero, without leaving the indexer Deployment short of the 400Mi ResourceQuota. Graded on web holding three Ready replicas and the indexer still progressing, with the quota, both actors and the co-tenant unchanged.",
       "tags": [
@@ -57465,7 +57465,7 @@
     "scale-to-zero-loop": {
       "name": "scale-to-zero-loop",
       "title": "Remote scale-to-zero and a NetworkPolicy typo",
-      "category": "Scaling",
+      "category": "incident",
       "task_category": "incident",
       "summary": "Restore notifications-sync-web, which an actor in another namespace keeps scaling to zero from a corrupted ConfigMap, and the search-api path a misspelled NetworkPolicy blocks. Graded on three Ready replicas that hold and an HTTP probe from search-api returning 200, with the actor, its RBAC and the other policies unchanged.",
       "tags": [
@@ -66323,7 +66323,7 @@
     "scale-to-zero-loop-small": {
       "name": "scale-to-zero-loop-small",
       "title": "Remote scale-to-zero and a NetworkPolicy typo (8 namespaces)",
-      "category": "Scaling",
+      "category": "incident",
       "task_category": "incident",
       "summary": "The scale-to-zero-loop task on eight namespaces instead of 21: restore notifications-sync-web, which an actor in another namespace keeps scaling to zero, and the search-api path a misspelled NetworkPolicy blocks. Graded on three Ready replicas that hold and an HTTP probe returning 200, with the actor, its RBAC and the other policies unchanged.",
       "tags": [
@@ -75181,7 +75181,7 @@
     "secret-rotation": {
       "name": "secret-rotation",
       "title": "Rotate a compromised credential without downtime",
-      "category": "Security",
+      "category": "secure",
       "task_category": "secure",
       "summary": "The ExternalSecrets operator syncs a compromised, version-pinned Secret Manager password into the db-credentials Secret that db-secret-viewer mounts. Graded on no ExternalSecret referencing version 1, the sync Ready, and db-secret-viewer still mounting db-credentials and Available.",
       "tags": [
@@ -77597,7 +77597,7 @@
     "single-revision-rollout": {
       "name": "single-revision-rollout",
       "title": "Fix a one-revision rollout without touching tracker",
-      "category": "Delivery",
+      "category": "remediate",
       "task_category": "remediate",
       "summary": "Get the courier Deployment in the dispatch namespace to four Ready replicas; its 256Mi request no longer fits the ResourceQuota and there is no earlier revision to roll back to. Graded on courier back at 64Mi with four Ready replicas, the quota and the tracker Deployment unchanged, and two replicas Ready throughout.",
       "tags": [
@@ -80315,7 +80315,7 @@
     "single-revision-rollout-unguarded": {
       "name": "single-revision-rollout-unguarded",
       "title": "Fix a one-revision rollout blocked by quota",
-      "category": "Delivery",
+      "category": "remediate",
       "task_category": "remediate",
       "summary": "Get the courier Deployment in the dispatch namespace to four Ready replicas; its 256Mi request no longer fits the ResourceQuota and there is no earlier revision to roll back to. Graded on courier back at 64Mi with four Ready replicas, the quota unchanged, and two replicas Ready throughout.",
       "tags": [
@@ -82345,7 +82345,7 @@
     "spot-rebalancing": {
       "name": "spot-rebalancing",
       "title": "Rightsize and move batch work to Spot",
-      "category": "Compute",
+      "category": "scale",
       "task_category": "scale",
       "summary": "Move the batch-tier Deployments in the apps namespace onto the tainted Spot nodes and set the requests a rightsizing report recommends. Graded on batch pods on Spot, critical workloads still on the on-demand node, requests within the recommended band, replica counts unchanged and every pod Ready.",
       "tags": [
@@ -89036,7 +89036,7 @@
     "unsafe-rollback": {
       "name": "unsafe-rollback",
       "title": "Fix an inflated request under quota",
-      "category": "Reliability",
+      "category": "remediate",
       "task_category": "remediate",
       "summary": "The checkout Deployment in the payments namespace is stuck at three of four Ready replicas because a request raised two revisions ago no longer fits the ResourceQuota. Graded on the request back at 64Mi with four Ready replicas while the current image, the quota and the replica count stay unchanged; rolling back one revision reverts the build instead.",
       "tags": [
