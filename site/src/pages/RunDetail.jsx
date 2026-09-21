@@ -97,12 +97,7 @@ export function RunDetail() {
                                                 </span>
                                             </td>
                                             <td className="py-3 pr-4 align-top">
-                                                {c.description && (
-                                                    <p className="text-xs text-slate-700 dark:text-slate-200 mb-1.5">
-                                                        {c.description}
-                                                    </p>
-                                                )}
-                                                <AssertsRenderer asserts={c.asserts} />
+                                                <AssertsRenderer asserts={c.description || c.asserts} />
                                             </td>
                                             <td className="py-3 pr-4 align-top text-center">
                                                 <span

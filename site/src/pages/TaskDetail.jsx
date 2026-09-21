@@ -364,17 +364,7 @@ export function TaskDetail() {
                                                     </span>
                                                 </td>
                                                 <td className="py-3 pr-4 align-top">
-                                                    {c.description && (
-                                                        <p className="text-xs text-slate-700 dark:text-slate-200 mb-1.5">
-                                                            {c.description}
-                                                        </p>
-                                                    )}
-                                                    <AssertsRenderer asserts={c.asserts} />
-                                                    {c.failure_hint && (
-                                                        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1.5 italic">
-                                                            Hint: {c.failure_hint}
-                                                        </p>
-                                                    )}
+                                                    <AssertsRenderer asserts={c.description || c.asserts} />
                                                 </td>
                                                 <td className="py-3 pr-4 align-top font-mono text-xs">
                                                     <span className="font-semibold text-slate-800 dark:text-slate-200">{c.weight} pts</span>
@@ -437,12 +427,7 @@ export function TaskDetail() {
                                                         )}
                                                     </td>
                                                     <td className="py-3 pr-4 align-top">
-                                                        {c.description && (
-                                                            <p className="text-xs text-slate-700 dark:text-slate-200 mb-1.5">
-                                                                {c.description}
-                                                            </p>
-                                                        )}
-                                                        <AssertsRenderer asserts={c.asserts} />
+                                                        <AssertsRenderer asserts={c.description || c.asserts} />
                                                     </td>
                                                     <td className="py-3 align-top">
                                                         <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono bg-rose-100/70 dark:bg-rose-950 text-rose-700 dark:text-rose-300">
@@ -495,12 +480,7 @@ export function TaskDetail() {
                                                         )}
                                                     </td>
                                                     <td className="py-3 pr-4 align-top">
-                                                        {c.description && (
-                                                            <p className="text-xs text-slate-700 dark:text-slate-200 mb-1.5">
-                                                                {c.description}
-                                                            </p>
-                                                        )}
-                                                        <AssertsRenderer asserts={c.asserts} />
+                                                        <AssertsRenderer asserts={c.description || c.asserts} />
                                                     </td>
                                                     <td className="py-3 align-top">
                                                         <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">

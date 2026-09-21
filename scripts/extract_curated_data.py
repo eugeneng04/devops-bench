@@ -384,11 +384,11 @@ def build_curated_data(source_dir: str, output_file: str) -> None:
                 if grp and isinstance(check_groups.get(grp), dict)
                 else None
             )
+            desc = (e.get("description") or yaml_e.get("description") or "").strip() or None
             item = {
                 "name": ename,
                 "title": (e.get("title") or yaml_e.get("title") or "").strip() or None,
-                "description": (e.get("description") or yaml_e.get("description") or "").strip()
-                or None,
+                "description": desc,
                 "group": grp,
                 "group_title": grp_title,
                 "failure_hint": (e.get("failure_hint") or yaml_e.get("failure_hint") or "").strip()
@@ -401,7 +401,7 @@ def build_curated_data(source_dir: str, output_file: str) -> None:
                 "weight_pct": round((float(e.get("weight") or 0.0) / total_weight) * 100, 1)
                 if total_weight > 0 and e.get("role") == "objective"
                 else None,
-                "asserts": describe(c),
+                "asserts": desc or describe(c),
                 "raw_check": c,
             }
             if e.get("role") == "objective":
