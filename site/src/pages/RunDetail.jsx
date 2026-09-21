@@ -88,13 +88,20 @@ export function RunDetail() {
                                         <tr key={c.name} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20">
                                             <td className="py-3 pr-4 align-top">
                                                 <span className="font-semibold text-slate-900 dark:text-slate-100 block">
-                                                    {c.name}
+                                                    {c.title || c.name}
                                                 </span>
                                                 <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">
+                                                    {c.title && c.title !== c.name ? `${c.name} · ` : ""}
                                                     {c.mode} {c.weight ? `· ${c.weight} pts` : ""}
+                                                    {c.group_title ? ` · ${c.group_title}` : ""}
                                                 </span>
                                             </td>
                                             <td className="py-3 pr-4 align-top">
+                                                {c.description && (
+                                                    <p className="text-xs text-slate-700 dark:text-slate-200 mb-1.5">
+                                                        {c.description}
+                                                    </p>
+                                                )}
                                                 <AssertsRenderer asserts={c.asserts} />
                                             </td>
                                             <td className="py-3 pr-4 align-top text-center">
@@ -116,6 +123,11 @@ export function RunDetail() {
                                                 {c.observed ? (
                                                     <div className="bg-slate-50 dark:bg-slate-950/70 p-2.5 rounded-lg border border-slate-200/60 dark:border-slate-800/80">
                                                         {c.observed}
+                                                        {isFail && c.failure_hint && (
+                                                            <div className="mt-1.5 pt-1.5 border-t border-slate-200/60 dark:border-slate-800/80 text-rose-600 dark:text-rose-400 font-sans italic">
+                                                                Hint: {c.failure_hint}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 ) : (
                                                     <span className="text-slate-400 dark:text-slate-500">—</span>
@@ -152,7 +164,30 @@ export function RunDetail() {
                             <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 font-mono">
                                 {harness} · {model}
                             </span>
+                            {task.category && (
+                                <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-mono">
+                                    {task.category}
+                                </span>
+                            )}
+                            {task.tags?.map(tag => (
+                                <span
+                                    key={tag}
+                                    className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
+                                >
+                                    {tag}
+                                </span>
+                            ))}
                         </div>
+                        {task.title && (
+                            <p className="text-sm font-semibold text-slate-700 dark:text-slate-200 mt-1.5">
+                                {task.title}
+                            </p>
+                        )}
+                        {task.summary && (
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 max-w-4xl">
+                                {task.summary}
+                            </p>
+                        )}
                     </div>
 
                     {scores.catastrophic && (
@@ -225,12 +260,17 @@ export function RunDetail() {
                         <div className="flex items-center gap-2 pb-2.5 border-b border-slate-200/60 dark:border-slate-800/80">
                             <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">Formula:</span>
                             <code className="font-mono text-xs font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50/70 dark:bg-indigo-950/40 px-2 py-0.5 rounded border border-indigo-100 dark:border-indigo-900/50">
-                                outcome_score = cat_v × √(c × rec_v)
+                                {scores.raw_rec != null ? "outcome_score = cat_v × √(c × rec_v)" : "outcome_score = cat_v × c"}
                             </code>
                         </div>
                         {scores.catastrophic && (
                             <div className="p-2.5 rounded-lg bg-rose-50/80 dark:bg-rose-950/40 border border-rose-200/80 dark:border-rose-900/60 text-xs text-rose-700 dark:text-rose-300 font-medium">
                                 Catastrophic safeguard breached: outcome score is zeroed.
+                                {scores.catastrophic_reason && (
+                                    <span className="block mt-1 font-mono text-[11px] opacity-90">
+                                        IntegrityCatastrophic — {scores.catastrophic_reason}
+                                    </span>
+                                )}
                             </div>
                         )}
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
@@ -240,11 +280,11 @@ export function RunDetail() {
                             </div>
                             <div>
                                 <span className="text-slate-400 dark:text-slate-500 block text-[10px] uppercase font-semibold">Raw Safety Fraction:</span>
-                                <span className="font-bold text-slate-800 dark:text-slate-200">{scores.raw_rec != null ? Number(scores.raw_rec).toFixed(3) : "1.000"}</span>
+                                <span className="font-bold text-slate-800 dark:text-slate-200">{scores.raw_rec != null ? Number(scores.raw_rec).toFixed(3) : "N/A"}</span>
                             </div>
                             <div>
                                 <span className="text-slate-400 dark:text-slate-500 block text-[10px] uppercase font-semibold">Rescaled Safety (rec_v):</span>
-                                <span className="font-bold text-slate-800 dark:text-slate-200">{(scores.rec_v ?? 1.0).toFixed(3)}</span>
+                                <span className="font-bold text-slate-800 dark:text-slate-200">{scores.rec_v != null ? Number(scores.rec_v).toFixed(3) : "N/A"}</span>
                             </div>
                             <div>
                                 <span className="text-slate-400 dark:text-slate-500 block text-[10px] uppercase font-semibold">Catastrophic Gate (cat_v):</span>

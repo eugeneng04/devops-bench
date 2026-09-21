@@ -11,6 +11,7 @@ import { getCommonTaskKeys, normalizeTaskKey, ENABLE_SCOPE_FILTER } from "../lib
 import { SetupIdentity } from "../components/SetupIdentity.jsx";
 import { MetricToggle } from "../components/MetricToggle.jsx";
 import { NotFound, Loading, LoadError } from "../components/States.jsx";
+import curatedData from "../data/curated_tasks.json";
 
 function median(nums) {
     const s = [...nums].sort((a, b) => a - b);
@@ -238,6 +239,7 @@ function TaskTable({ setup, metric }) {
 
                         const metricParam = metric ? `&metric=${encodeURIComponent(metric)}` : "";
                         const taskKey = task.name?.replace(/-gitops$/, "") || task.folder?.replace(/-gitops$/, "");
+                        const curatedTask = curatedData.tasks?.[taskKey] || curatedData.tasks?.[task.name];
                         const runUrl = `/task/${taskKey}/run/${setup.id}?from=setup${metricParam}`;
                         const fromState = { from: `/setup/${setup.id}${metricParam ? `?${metricParam.slice(1)}` : ""}` };
 
@@ -248,16 +250,21 @@ function TaskTable({ setup, metric }) {
                                 className="border-t border-slate-100 dark:border-slate-800 hover:bg-slate-50/70 dark:hover:bg-slate-800/40 cursor-pointer transition-colors group"
                             >
                                 <td className="py-3 pr-4 align-top overflow-hidden">
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex flex-col gap-0.5">
                                         <Link
                                             to={runUrl}
                                             state={fromState}
                                             onClick={(e) => e.stopPropagation()}
-                                            className="font-semibold text-slate-800 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 text-sm block truncate transition-colors"
+                                            className="font-semibold font-mono text-slate-800 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 text-sm block truncate transition-colors"
                                             title="View verification report and rubric results for this run"
                                         >
-                                            {task.name}
+                                            {taskKey}
                                         </Link>
+                                        {curatedTask?.title && (
+                                            <span className="text-xs text-slate-500 dark:text-slate-400 truncate block">
+                                                {curatedTask.title}
+                                            </span>
+                                        )}
                                     </div>
                                     {badgeable && task.catastrophic && (
                                         <div onClick={(e) => e.stopPropagation()}>

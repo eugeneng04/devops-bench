@@ -301,8 +301,20 @@ class VerificationEntry(BaseModel):
     is for (``role``), how badly it matters when it fails (``severity``), how
     much it counts (``weight``), and how it is evaluated (``mode``).
 
+    The display fields (``title``, ``description``, ``group``, ``failure_hint``)
+    exist so a result viewer can say what a failed check means without reading
+    the check tree. They never affect scoring or matching: ``name`` remains the
+    identity a chaos ``verify:`` resolves against. ``Task`` enforces the
+    cross-cutting rules on them (no placeholders, ``group`` declared under the
+    task's ``check_groups``, required once the task is validated).
+
     Attributes:
         name: Unique label for this entry within its task.
+        title: Short human label, e.g. ``"team-alpha/web has a CPU limit"``.
+        description: One sentence stating the condition a passing run satisfies.
+        group: Slug of the task-level ``check_groups`` entry this check belongs to.
+        failure_hint: What a failure usually means, from the author who knows
+            the common wrong paths.
         role: ``"objective"`` (a state the agent is working toward) or
             ``"safeguard"`` (a state that must never be entered).
         severity: Required for safeguards; unset for objectives.
@@ -338,6 +350,10 @@ class VerificationEntry(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     name: str
+    title: str | None = None
+    description: str | None = None
+    group: str | None = None
+    failure_hint: str | None = None
     role: Literal["objective", "safeguard"]
     severity: Literal["recoverable", "catastrophic"] | None = None
     mode: Literal["converge", "assert", "hold"] | None = None
@@ -345,6 +361,12 @@ class VerificationEntry(BaseModel):
     check: Any
     hold_poll_interval_sec: float | None = Field(default=None, gt=0, allow_inf_nan=False)
     hold_window_sec: float | None = Field(default=None, gt=0, allow_inf_nan=False)
+
+    @field_validator("title", "description", "group", "failure_hint", mode="before")
+    @classmethod
+    def _strip_display_text(cls, value: Any) -> Any:
+        """Strip display text so it is compared and rendered the same as task fields."""
+        return value.strip() if isinstance(value, str) else value
 
     @field_validator("check", mode="before")
     @classmethod
@@ -388,6 +410,15 @@ class VerificationEntry(BaseModel):
                     "is 'hold': a safeguard hold's window is always the agent's turn, "
                     "so this field would be silently ignored"
                 )
+            if (
+                self.hold_window_sec is not None
+                and self.hold_poll_interval_sec is not None
+                and self.hold_poll_interval_sec >= self.hold_window_sec
+            ):
+                raise ValueError(
+                    "hold_poll_interval_sec must be smaller than hold_window_sec: a window that "
+                    "fits a single sample is an assert, not a hold"
+                )
         return self
 
     @property
@@ -409,6 +440,31 @@ class VerificationEntry(BaseModel):
         return "converge" if self.role == "objective" else "assert"
 
 
+# What an entry that never evaluated still gets to say about itself on the
+# record: how it was meant to score, and how the author described it.
+_DECLARED_ERROR_FIELDS = ("role", "severity", "title", "description", "group", "failure_hint")
+
+
+def _declared_fields(item: Any) -> dict[str, str]:
+    """The scoring and display fields an unparseable entry declared as strings.
+
+    Read off the raw mapping because the entry never became a model. Anything
+    that is not a string is left out rather than guessed at.
+    """
+    if not isinstance(item, dict):
+        return {}
+    return {key: item[key] for key in _DECLARED_ERROR_FIELDS if isinstance(item.get(key), str)}
+
+
+def _entry_fields(entry: VerificationEntry) -> dict[str, str]:
+    """The same fields as :func:`_declared_fields`, from an entry that did parse."""
+    return {
+        key: value
+        for key in _DECLARED_ERROR_FIELDS
+        if isinstance(value := getattr(entry, key), str)
+    }
+
+
 def parse_entries(raw: Any) -> tuple[list[VerificationEntry], list[dict[str, str]]]:
     """Parse a task's raw ``verification_spec`` into entries plus per-entry errors.
 
@@ -422,7 +478,11 @@ def parse_entries(raw: Any) -> tuple[list[VerificationEntry], list[dict[str, str
 
     Returns:
         A ``(entries, errors)`` pair. Each error is a ``{"name", "reason"}``
-        mapping, matching the shape already written to result records.
+        mapping, matching the shape already written to result records, plus
+        the entry's declared ``role``, ``severity``, and display fields
+        (``title``, ``description``, ``group``, ``failure_hint``) when it
+        stated them as strings, so a result can still say what the check that
+        never evaluated was for.
     """
     if raw is None:
         return [], []
@@ -447,13 +507,20 @@ def parse_entries(raw: Any) -> tuple[list[VerificationEntry], list[dict[str, str
         try:
             entry = VerificationEntry.model_validate(item)
         except ValidationError as exc:
-            errors.append({"name": label, "reason": _clean_validation_message(exc)})
+            errors.append(
+                {
+                    "name": label,
+                    "reason": _clean_validation_message(exc),
+                    **_declared_fields(item),
+                }
+            )
             continue
         if entry.name in seen:
             errors.append(
                 {
                     "name": entry.name,
                     "reason": f"duplicate verification entry name {entry.name!r}",
+                    **_entry_fields(entry),
                 }
             )
             continue

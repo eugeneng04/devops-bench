@@ -29,6 +29,8 @@ export function TaskDetail() {
 
     const {
         title,
+        summary,
+        tags = [],
         category,
         prompt,
         environment,
@@ -54,7 +56,25 @@ export function TaskDetail() {
                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/60 font-mono">
                                 {category || "Kubernetes"}
                             </span>
+                            {tags.map(tag => (
+                                <span
+                                    key={tag}
+                                    className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
+                                >
+                                    {tag}
+                                </span>
+                            ))}
                         </div>
+                        {title && (
+                            <p className="text-sm font-semibold text-slate-700 dark:text-slate-200 mt-1.5">
+                                {title}
+                            </p>
+                        )}
+                        {summary && (
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 max-w-4xl">
+                                {summary}
+                            </p>
+                        )}
                     </div>
                 </header>
 
@@ -204,13 +224,13 @@ export function TaskDetail() {
 
                 {/* Table Content */}
                 <div>
-                    {/* Table 4: Results Across 9 Harnesses */}
+                    {/* Table 4: Results Across Harnesses */}
                     {(activeTab === "matrix" || activeTab === "all") && (
                         <div className="p-6">
                             <div className="mb-3 flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
                                 <div>
                                     <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-800 dark:text-slate-200">
-                                        Results Across All 9 Harnesses
+                                        Results Across All {harnesses.length} Harnesses
                                     </h2>
                                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                                         Down a column reveals failure root cause; across a row reveals check discrimination. Click any cell to view run details.
@@ -244,10 +264,12 @@ export function TaskDetail() {
                                             <tr key={row.check_name} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/30">
                                                 <td className="py-2.5 pr-4 align-middle">
                                                     <span className="font-medium text-slate-900 dark:text-slate-100 block">
-                                                        {row.check_name}
+                                                        {row.title || row.check_name}
                                                     </span>
                                                     <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">
+                                                        {row.title && row.title !== row.check_name ? `${row.check_name} · ` : ""}
                                                         {row.severity || row.role}
+                                                        {row.group_title ? ` · ${row.group_title}` : ""}
                                                     </span>
                                                 </td>
                                                 {harnesses.map(h => {
@@ -334,14 +356,25 @@ export function TaskDetail() {
                                             <tr key={c.name} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20">
                                                 <td className="py-3 pr-4 align-top">
                                                     <span className="font-semibold text-slate-900 dark:text-slate-100 block">
-                                                        {c.name}
+                                                        {c.title || c.name}
                                                     </span>
                                                     <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">
-                                                        {c.type}
+                                                        {c.title && c.title !== c.name ? c.name : c.type}
+                                                        {c.group_title ? ` · ${c.group_title}` : ""}
                                                     </span>
                                                 </td>
                                                 <td className="py-3 pr-4 align-top">
+                                                    {c.description && (
+                                                        <p className="text-xs text-slate-700 dark:text-slate-200 mb-1.5">
+                                                            {c.description}
+                                                        </p>
+                                                    )}
                                                     <AssertsRenderer asserts={c.asserts} />
+                                                    {c.failure_hint && (
+                                                        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1.5 italic">
+                                                            Hint: {c.failure_hint}
+                                                        </p>
+                                                    )}
                                                 </td>
                                                 <td className="py-3 pr-4 align-top font-mono text-xs">
                                                     <span className="font-semibold text-slate-800 dark:text-slate-200">{c.weight} pts</span>
@@ -395,10 +428,20 @@ export function TaskDetail() {
                                                 <tr key={c.name} className="hover:bg-rose-50/30 dark:hover:bg-rose-950/10">
                                                     <td className="py-3 pr-4 align-top">
                                                         <span className="font-semibold text-xs text-rose-950 dark:text-rose-200 block">
-                                                            {c.name}
+                                                            {c.title || c.name}
                                                         </span>
+                                                        {c.title && c.title !== c.name && (
+                                                            <span className="text-[10px] text-rose-400 font-mono block">
+                                                                {c.name}
+                                                            </span>
+                                                        )}
                                                     </td>
                                                     <td className="py-3 pr-4 align-top">
+                                                        {c.description && (
+                                                            <p className="text-xs text-slate-700 dark:text-slate-200 mb-1.5">
+                                                                {c.description}
+                                                            </p>
+                                                        )}
                                                         <AssertsRenderer asserts={c.asserts} />
                                                     </td>
                                                     <td className="py-3 align-top">
@@ -443,10 +486,20 @@ export function TaskDetail() {
                                                 <tr key={c.name} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20">
                                                     <td className="py-3 pr-4 align-top">
                                                         <span className="font-semibold text-xs text-slate-900 dark:text-slate-100 block">
-                                                            {c.name}
+                                                            {c.title || c.name}
                                                         </span>
+                                                        {c.title && c.title !== c.name && (
+                                                            <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono block">
+                                                                {c.name}
+                                                            </span>
+                                                        )}
                                                     </td>
                                                     <td className="py-3 pr-4 align-top">
+                                                        {c.description && (
+                                                            <p className="text-xs text-slate-700 dark:text-slate-200 mb-1.5">
+                                                                {c.description}
+                                                            </p>
+                                                        )}
                                                         <AssertsRenderer asserts={c.asserts} />
                                                     </td>
                                                     <td className="py-3 align-top">
@@ -471,12 +524,22 @@ export function TaskDetail() {
                             </h2>
                             <div className="space-y-2.5 font-mono text-xs max-w-xl">
                                 {environment && Object.keys(environment).length > 0 ? (
-                                    Object.entries(environment).map(([k, v]) => (
-                                        <div key={k} className="flex items-center justify-between py-1 border-b border-slate-100 dark:border-slate-800/60 last:border-0">
-                                            <span className="text-slate-500 dark:text-slate-400">{k}</span>
-                                            <span className="font-semibold text-slate-800 dark:text-slate-200">{String(v)}</span>
-                                        </div>
-                                    ))
+                                    Object.entries(environment).map(([k, v]) => {
+                                        const formattedVal =
+                                            v && typeof v === "object" && !Array.isArray(v)
+                                                ? Object.entries(v)
+                                                      .map(([subK, subV]) => `${subK}=${subV}`)
+                                                      .join(", ")
+                                                : Array.isArray(v)
+                                                ? v.join(", ")
+                                                : String(v);
+                                        return (
+                                            <div key={k} className="flex items-center justify-between py-1 border-b border-slate-100 dark:border-slate-800/60 last:border-0 gap-4">
+                                                <span className="text-slate-500 dark:text-slate-400 shrink-0">{k}</span>
+                                                <span className="font-semibold text-slate-800 dark:text-slate-200 text-right break-all">{formattedVal}</span>
+                                            </div>
+                                        );
+                                    })
                                 ) : (
                                     <div className="text-slate-400 dark:text-slate-500">No environment metadata declared.</div>
                                 )}

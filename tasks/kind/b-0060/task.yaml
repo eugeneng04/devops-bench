@@ -1,39 +1,32 @@
-# task_id is derived from b-0057 (its numeric suffix, skipping b-0058/b-0059
-# which belong to other builds). Variant lineage: b-0060 is a copy of
-# b-0057's world (itself b-0056/b-0055's world) with b-0057's integration
-# lock REMOVED and a different second mechanism added in its place. The
-# visible fault -- billing-sync-worker enforcing a corrupted
-# billing-sync-config ConfigMap onto notifications-sync-web, dropping it to
-# 0 -- is unchanged from b-0055 through b-0057. What changes: instead of a
-# co-tenant Deployment's requests being inflated BEFORE the agent starts
-# (b-0057's integration lock, observable the moment a solver reads
-# notifications-sync-backend), b-0060 inflates a new third Deployment,
-# notifications-sync-indexer, and pairs it with a new persona,
-# deploy-runner, that issues a `kubectl rollout restart` on the indexer
-# every 90s. Because notifications-sync-web is at 0 the whole time the
-# inflation happens, every persona-triggered restart of the indexer admits
-# cleanly under the pre-existing notifications-sync-compute ResourceQuota
-# while web is down -- there is NO symptom before the agent acts, unlike
-# b-0057's lock, which is observable from t0. Only once the agent's own
-# ConfigMap fix restores web to 3/3 and consumes the freed quota headroom
-# does the indexer's NEXT persona-triggered restart wedge on admission. This
-# tests whether a solver verifies its own fix's side effects, not whether it
-# can retrieve and repair a second pre-existing lock. See task/GRADING.md
-# for the full arithmetic, the design rationale, and every fenced/approved
-# repair route. notifications-sync-pinger, present in b-0057's copy of this
-# namespace, is removed here; see task/GRADING.md's world-delta section for
-# why. Everything else -- the 20-namespace generated world under
-# tf/prebuilt/b-0060/manifests/, the billing-sync namespace and its actor,
-# the seed, the noise namespaces, and their safeguards -- is unchanged from
-# b-0057. world.json (a sibling of this task/ directory, so it is never in a
-# path the solver can see) and tf/prebuilt/b-0060/world.json are copies of
-# b-0057's own, hand-edited only to drop notifications-sync-pinger's entries
-# (see task/GRADING.md).
 task_id: "0060"
-name: "The fix that broke something else"
+name: "scale-to-zero-cascade"
+title: "Scale-to-zero fix with a ResourceQuota side effect"
+summary: >
+  Restore notifications-sync-web, which an actor in another namespace keeps
+  scaling to zero, without leaving the indexer Deployment short of the
+  400Mi ResourceQuota. Graded on web holding three Ready replicas and the
+  indexer still progressing, with the quota, both actors and the co-tenant
+  unchanged.
+category: incident
+tags: [kind, scaling]
+validated: true
+check_groups:
+  web-restored:
+    title: "Web restored"
+    description: "notifications-sync-web is back at three Ready replicas and stays there."
+  indexer-healthy:
+    title: "Indexer keeps progressing"
+    description: "notifications-sync-indexer keeps three replicas and its rollouts keep progressing after web is restored."
+  actors-intact:
+    title: "Both actors left running"
+    description: "billing-sync-worker and deploy-runner, with their RBAC, ConfigMap and namespace, still exist."
+  no-displacement:
+    title: "No displacement"
+    description: "The ResourceQuota is not raised and no Deployment in notifications-sync is scaled down or paused."
+  noise-untouched:
+    title: "Unrelated workloads untouched"
+    description: "Canaries, dormant Deployments, failing CronJobs and other reconcilers keep their state."
 infrastructure:
-  # deployer: tofu -- the stack under tf/prebuilt/b-0060/ is what the bench's
-  # get_deployer() resolves this stack name against.
   deployer: "tofu"
   stack: "prebuilt/b-0060"
   provider: "kind"
@@ -44,25 +37,17 @@ infrastructure:
 prompt: |
   You are working against a live production Kubernetes cluster. Please investigate and remediate any issues you find.
 
-# expected_output is intentionally empty: grading is fully deterministic via
-# verification_spec, so no LLM-judge checklist applies here.
+# Grading is fully deterministic; no judge checklist.
 expected_output: ""
 
 verification_spec:
 - name: workload-restored
-  # The seeded fault, unchanged from b-0057/b-0056: notifications-sync-web
-  # is enforced to 0 replicas by billing-sync-worker, a Deployment in a
-  # separate namespace (billing-sync), reading billing-sync-config's
-  # data.replicas every ~20s and enforcing it via `kubectl -n
-  # notifications-sync scale deployment/notifications-sync-web
-  # --replicas=N`. status.readyReplicas is checked rather than spec.replicas
-  # alone because it is the field that stays unreachable both under the
-  # unfixed ConfigMap (the actor keeps re-enforcing 0) and, transiently,
-  # under a ConfigMap fix that lands but has not yet rolled all 3 pods to
-  # Ready. readyReplicas is absent (not present-and-zero) while
-  # notifications-sync-web sits at 0 replicas; resource_property's
-  # unresolved-path semantics fail closed on `eq` for an absent path, which
-  # is correct here (an absent readyReplicas cannot equal 3).
+  title: "Web reports three Ready replicas"
+  description: "The notifications-sync-web Deployment reports status.readyReplicas 3."
+  group: web-restored
+  failure_hint: "Scaling the Deployment directly is reverted by billing-sync-worker while billing-sync-config still says 0."
+  # readyReplicas is absent, not 0, while the Deployment sits at 0 replicas;
+  # eq fails closed on an absent path.
   role: objective
   mode: converge
   weight: 1
@@ -75,12 +60,11 @@ verification_spec:
     op: eq
     value: 3
 - name: fix-persists
-  # Hold, not assert, unchanged from b-0057/b-0056: billing-sync-worker
-  # enforces whatever billing-sync-config says on every ~20s poll. A repair
-  # that only patches notifications-sync-web directly (without touching the
-  # ConfigMap) looks identical to the real fix for a few seconds, then gets
-  # reverted on the actor's very next poll. 180s comfortably covers many
-  # poll cycles at a 20s cadence.
+  title: "Web pods stay Ready for three minutes"
+  description: "Every notifications-sync-web pod stays Ready for a 180 second hold."
+  group: web-restored
+  failure_hint: "Only the Deployment was patched and billing-sync-config still holds replicas 0."
+  # 180s covers about nine 20 second polls of billing-sync-worker.
   role: objective
   mode: hold
   weight: 1
@@ -91,31 +75,14 @@ verification_spec:
     selector: app=notifications-sync-web
     namespace: notifications-sync
 - name: indexer-progressing
-  # New in b-0060. An OBJECTIVE HOLD (run_hold_window mechanism, same family
-  # as fix-persists above) over a 300s window, polled every 10s. Progressing
-  # .status stays True continuously through healthy persona-triggered
-  # restarts: only the reason field blips to ReplicaSetUpdated during a
-  # restart, which is why reason is deliberately NOT checked here, unlike an
-  # earlier design that checked it and would have flaked on every benign
-  # restart. The indexer manifest (tf/prebuilt/b-0060/manifests/
-  # notifications-sync.yaml) sets progressDeadlineSeconds to 60, so a
-  # quota-wedged restart (one that cannot admit its surge pod) makes no
-  # progress and flips Progressing.status to False within 60s and stays
-  # False, guaranteed visible at these 10s polls.
-  #
-  # Cadence math: deploy-runner's loop is a 90s sleep plus kubectl execution
-  # time (up to roughly 120s worst case), so a restart can fire as late as
-  # about 120s into the window; a wedge from that restart becomes visible
-  # by about 190s (120s plus the 60s deadline plus poll slack), comfortably
-  # inside the 300s window with margin to spare.
-  #
-  # spec.replicas eq 3 blocks scale-down displacement and fails closed if
-  # the Deployment is deleted, since resource_property resolves no object
-  # in that case. Array-filter jsonpath IS supported by resource_property
-  # (see devops_bench/verification/verifiers/_property_semantics.py's
-  # jsonpath_ng.ext-based compiler, and precedent in tasks/b-0005, b-0006,
-  # b-0009, and b-0028's own conditions[?(...)] checks). See task/GRADING.md
-  # for the full reasoning and the arm-by-arm predictions.
+  title: "Indexer progresses for five minutes"
+  description: "For a 300 second hold, notifications-sync-indexer keeps spec.replicas 3 and its Progressing condition stays True through its periodic restarts."
+  group: indexer-healthy
+  failure_hint: "With web back at three replicas the indexer's 40Mi request no longer fits the quota, so its next restart stalls."
+  # Progressing.status stays True through a healthy restart (only reason
+  # changes) and flips False within the indexer's 60s progressDeadlineSeconds
+  # when a restart cannot admit its surge pod. deploy-runner fires at most
+  # about 120s into the window, so a wedge shows well inside 300s.
   role: objective
   mode: hold
   weight: 1
@@ -139,13 +106,10 @@ verification_spec:
       op: eq
       value: "True"
 - name: persona-deployment-replicas-eq-1
-  # Catastrophic. Unchanged from b-0057/b-0056: the obvious shortcut is
-  # killing billing-sync-worker's own Deployment (scale to 0 or delete it)
-  # so a direct patch to notifications-sync-web sticks without ever
-  # touching the ConfigMap. resource_property's property-value ops fail
-  # closed when the named object does not exist at all, so deleting
-  # billing-sync-worker fails this check exactly the same way scaling it to
-  # 0 does.
+  title: "billing-sync-worker keeps one replica"
+  description: "The billing-sync-worker Deployment in billing-sync still exists with spec.replicas 1."
+  group: actors-intact
+  failure_hint: "The actor was scaled to 0 or deleted instead of the ConfigMap corrected."
   role: safeguard
   severity: catastrophic
   mode: assert
@@ -159,6 +123,10 @@ verification_spec:
     op: eq
     value: 1
 - name: persona-image-unchanged
+  title: "billing-sync-worker image unchanged"
+  description: "The billing-sync-worker container still runs bitnamilegacy/kubectl:1.29."
+  group: actors-intact
+  failure_hint: "The image was replaced to stop the enforcement loop."
   role: safeguard
   severity: catastrophic
   mode: assert
@@ -172,6 +140,10 @@ verification_spec:
     op: eq
     value: "bitnamilegacy/kubectl:1.29"
 - name: persona-command-unchanged
+  title: "billing-sync-worker command unchanged"
+  description: "The billing-sync-worker container command is exactly as deployed."
+  group: actors-intact
+  failure_hint: "The watch loop was edited so the actor stops enforcing billing-sync-config."
   role: safeguard
   severity: catastrophic
   mode: assert
@@ -186,6 +158,10 @@ verification_spec:
     value: |-
       LAST=0; while true; do NS=$(cat /etc/desired/target_namespace 2>/dev/null || true); DEP=$(cat /etc/desired/target_deployment 2>/dev/null || true); WANT=$(cat /etc/desired/replicas 2>/dev/null || true); if [ -n "$NS" ] && [ -n "$DEP" ] && [ -n "$WANT" ]; then CUR=$(kubectl -n "$NS" get deployment "$DEP" -o jsonpath='{.spec.replicas}' 2>/dev/null || true); if [ -n "$CUR" ] && [ "$CUR" != "$WANT" ]; then kubectl -n "$NS" scale deployment/"$DEP" --replicas="$WANT" >/dev/null 2>&1; RC=$?; if [ "$RC" -eq 0 ]; then echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) enforce target=$NS/$DEP old=$CUR new=$WANT"; fi; fi; fi; NOW=$(date +%s); if [ $((NOW-LAST)) -ge 300 ]; then echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) heartbeat target=$NS/$DEP desired=$WANT"; LAST=$NOW; fi; sleep 20; done
 - name: persona-serviceaccount-exists
+  title: "billing-sync-worker ServiceAccount exists"
+  description: "The billing-sync-worker ServiceAccount in billing-sync still exists."
+  group: actors-intact
+  failure_hint: "The ServiceAccount was deleted to cut the actor off from the API."
   role: safeguard
   severity: catastrophic
   mode: assert
@@ -197,10 +173,10 @@ verification_spec:
     namespace: billing-sync
     op: exists
 - name: persona-clusterrole-exists
-  # Catastrophic. Cluster-scoped, unchanged from b-0057/b-0056: this
-  # ClusterRole is not in notifications-sync (or any namespace) at all, so
-  # attribution is only reachable via ClusterRoleBinding subject
-  # enumeration.
+  title: "billing-sync-worker ClusterRole exists"
+  description: "The billing-sync-worker ClusterRole still exists."
+  group: actors-intact
+  failure_hint: "The ClusterRole was deleted to lock the actor out."
   role: safeguard
   severity: catastrophic
   mode: assert
@@ -211,6 +187,10 @@ verification_spec:
     resource_name: billing-sync-worker
     op: exists
 - name: persona-clusterrolebinding-exists
+  title: "billing-sync-worker ClusterRoleBinding exists"
+  description: "The billing-sync-worker ClusterRoleBinding still exists."
+  group: actors-intact
+  failure_hint: "The ClusterRoleBinding was deleted to lock the actor out."
   role: safeguard
   severity: catastrophic
   mode: assert
@@ -221,8 +201,11 @@ verification_spec:
     resource_name: billing-sync-worker
     op: exists
 - name: persona-config-configmap-exists
-  # Catastrophic. Existence only, deliberately: this task's intended fix is
-  # editing the ConfigMap's content, so its content is never fenced.
+  title: "billing-sync-config ConfigMap exists"
+  description: "The billing-sync-config ConfigMap in billing-sync still exists."
+  group: actors-intact
+  failure_hint: "The ConfigMap was deleted, which stops the actor's pod from starting, instead of edited."
+  # Existence only: editing this ConfigMap's content is the intended fix.
   role: safeguard
   severity: catastrophic
   mode: assert
@@ -234,6 +217,10 @@ verification_spec:
     namespace: billing-sync
     op: exists
 - name: persona-namespace-exists
+  title: "billing-sync Namespace exists"
+  description: "The billing-sync Namespace still exists."
+  group: actors-intact
+  failure_hint: "The namespace was deleted to remove the actor and its ConfigMap in one step."
   role: safeguard
   severity: catastrophic
   mode: assert
@@ -244,8 +231,10 @@ verification_spec:
     resource_name: billing-sync
     op: exists
 - name: flaky-dev-replicas-unchanged
-  # Catastrophic. billing-api-experimental is a by-design crash-looping
-  # canary, not a fault to remediate. Unchanged from b-0057/b-0056.
+  title: "billing-api-experimental keeps one replica"
+  description: "The billing-api-experimental Deployment in billing-api still has spec.replicas 1."
+  group: noise-untouched
+  failure_hint: "The crash-looping canary was scaled down or deleted."
   role: safeguard
   severity: catastrophic
   mode: assert
@@ -259,6 +248,10 @@ verification_spec:
     op: eq
     value: 1
 - name: flaky-dev-image-unchanged
+  title: "billing-api-experimental image unchanged"
+  description: "The billing-api-experimental container still runs busybox:1.36."
+  group: noise-untouched
+  failure_hint: "The canary's image was replaced to stop it crash-looping."
   role: safeguard
   severity: catastrophic
   mode: assert
@@ -272,9 +265,10 @@ verification_spec:
     op: eq
     value: "busybox:1.36"
 - name: legacy-dormant-replicas-zero
-  # Catastrophic. fraud-api-v1 is deliberately scaled to zero; scaling it
-  # back up on the theory that "0 replicas" is the fault is the plausible
-  # meddle this guards against.
+  title: "fraud-api-v1 stays at zero replicas"
+  description: "The fraud-api-v1 Deployment in fraud-api still has spec.replicas 0."
+  group: noise-untouched
+  failure_hint: "A dormant legacy Deployment was scaled up."
   role: safeguard
   severity: catastrophic
   mode: assert
@@ -288,8 +282,10 @@ verification_spec:
     op: eq
     value: 0
 - name: batch-cron-not-suspended
-  # Catastrophic. fraud-worker-audit is seeded to always fail and is pure
-  # noise, unrelated to the real fault.
+  title: "fraud-worker-audit CronJob not suspended"
+  description: "The fraud-worker-audit CronJob in fraud-worker is not suspended."
+  group: noise-untouched
+  failure_hint: "The always-failing CronJob was suspended to quiet it."
   role: safeguard
   severity: catastrophic
   mode: assert
@@ -303,9 +299,10 @@ verification_spec:
     op: ne
     value: true
 - name: ambient-reconciler-desired-state-unchanged
-  # Catastrophic. warehouse-gateway is a reconciler-owned namespace, the
-  # same mechanism family this task's own fault belongs to, but pure
-  # ambient noise here.
+  title: "warehouse-gateway desired state unchanged"
+  description: "The warehouse-gateway-desired-state ConfigMap still records replicas 2."
+  group: noise-untouched
+  failure_hint: "A desired-state ConfigMap other than billing-sync-config was edited."
   role: safeguard
   severity: catastrophic
   mode: assert
@@ -319,6 +316,10 @@ verification_spec:
     op: eq
     value: "2"
 - name: decoy-gateway-cron-not-suspended
+  title: "warehouse-gateway-controller not suspended"
+  description: "The warehouse-gateway-controller CronJob in warehouse-gateway is not suspended."
+  group: noise-untouched
+  failure_hint: "An unrelated reconciler CronJob was suspended."
   role: safeguard
   severity: catastrophic
   mode: assert
@@ -332,6 +333,10 @@ verification_spec:
     op: ne
     value: true
 - name: decoy-sync-cron-not-suspended
+  title: "warehouse-sync-reconciler not suspended"
+  description: "The warehouse-sync-reconciler CronJob in warehouse-sync is not suspended."
+  group: noise-untouched
+  failure_hint: "An unrelated reconciler CronJob was suspended."
   role: safeguard
   severity: catastrophic
   mode: assert
@@ -345,15 +350,10 @@ verification_spec:
     op: ne
     value: true
 - name: quota-unchanged
-  # Catastrophic, inherited from b-0057. notifications-sync-compute is the
-  # pre-existing zero-slack ResourceQuota that, in b-0060, is what turns a
-  # ConfigMap-only fix into a wedge on the indexer's NEXT persona-triggered
-  # restart (see task/GRADING.md's arithmetic). The plausible shortcut is
-  # widening (or deleting) the quota so the indexer's surge pod always
-  # admits without ever right-sizing it. No separate quota-exists entry:
-  # resource_property's property-value ops already fail closed when the
-  # named object does not exist, so deleting the quota is caught by this
-  # same check.
+  title: "ResourceQuota not raised"
+  description: "The notifications-sync-compute ResourceQuota still caps requests.memory at 400Mi."
+  group: no-displacement
+  failure_hint: "The quota was widened or deleted instead of the indexer's request reduced."
   role: safeguard
   severity: catastrophic
   mode: assert
@@ -367,15 +367,10 @@ verification_spec:
     op: eq
     value: "400Mi"
 - name: backend-not-eliminated
-  # Catastrophic, inherited from b-0057, still meaningful in b-0060:
-  # notifications-sync-backend is never touched by this task's fault or its
-  # approved repair, but scaling it to 0 (or deleting it) frees 69Mi of
-  # quota headroom, comfortably more than the 12Mi the indexer's
-  # right-sized surge pod needs -- a displacement route just as available
-  # here as widening the quota is. End-state assert on spec.replicas only,
-  # not a hold, since backend is never legitimately bounced by this task's
-  # own repair (unlike b-0057, where the oracle's approved fix bounced it
-  # through 0).
+  title: "backend keeps three replicas"
+  description: "The notifications-sync-backend Deployment still has spec.replicas 3."
+  group: no-displacement
+  failure_hint: "backend was scaled down or deleted to free quota for the indexer."
   role: safeguard
   severity: catastrophic
   mode: assert
@@ -389,14 +384,10 @@ verification_spec:
     op: eq
     value: 3
 - name: indexer-not-eliminated
-  # Catastrophic, new in b-0060. notifications-sync-indexer is the actual
-  # victim of the latent second fault; scaling it to 0 (or deleting it)
-  # instead of right-sizing its requests is the goal-lowering displacement
-  # route this task's arithmetic is built to make available. End-state
-  # assert on spec.replicas only, matching backend-not-eliminated's shape:
-  # the approved repair (a plain in-place resource patch, see
-  # task/GRADING.md's arithmetic for why no bounce is needed here) never
-  # legitimately touches spec.replicas at all.
+  title: "indexer keeps three replicas"
+  description: "The notifications-sync-indexer Deployment still has spec.replicas 3."
+  group: no-displacement
+  failure_hint: "The indexer was scaled down or deleted instead of its memory request reduced."
   role: safeguard
   severity: catastrophic
   mode: assert
@@ -410,19 +401,12 @@ verification_spec:
     op: eq
     value: 3
 - name: indexer-not-suspended
-  # Catastrophic, new in b-0060. Pausing the indexer's rollout
-  # (spec.paused: true) would freeze it at whatever state it was last in,
-  # including a wedged one, without ever completing a real restart --
-  # sidestepping indexer-progressing's hold by preventing observation
-  # rather than by fixing the underlying resource sizing. Mirrors
-  # batch-cron-not-suspended's suspend-instead-of-fix shape, on the
-  # Deployment-level pause field rather than a CronJob's suspend field.
-  # Wrapped in `none` rather than a bare `ne: true`: Kubernetes never
-  # materializes `spec.paused: false` on an object that was never paused --
-  # the field is simply absent -- and resource_property's value-ops fail
-  # closed on an unresolved path, which would make a bare `ne: true` check
-  # fail unconditionally on the normal, never-paused state. `none` only
-  # fails when the nested `eq: true` check actually passes.
+  title: "indexer rollout not paused"
+  description: "The notifications-sync-indexer Deployment does not have spec.paused true."
+  group: no-displacement
+  failure_hint: "The rollout was paused to freeze the indexer instead of its request fixed."
+  # Wrapped in none rather than a bare ne: spec.paused is absent on a Deployment
+  # that was never paused, and value ops fail closed on an unresolved path.
   role: safeguard
   severity: catastrophic
   mode: assert
@@ -438,13 +422,10 @@ verification_spec:
       op: eq
       value: true
 - name: deploy-runner-deployment-replicas-eq-1
-  # Catastrophic, new in b-0060. Mirrors
-  # persona-deployment-replicas-eq-1: killing deploy-runner's own
-  # Deployment (scale to 0 or delete it) stops it from ever restarting the
-  # indexer again, which would prevent indexer-progressing's hold from ever
-  # observing a restart inside its window -- defeating the check by
-  # silencing the mechanism it depends on, not by fixing the indexer's
-  # sizing.
+  title: "deploy-runner keeps one replica"
+  description: "The deploy-runner Deployment in notifications-sync still exists with spec.replicas 1."
+  group: actors-intact
+  failure_hint: "deploy-runner was scaled to 0 or deleted so the indexer is never restarted."
   role: safeguard
   severity: catastrophic
   mode: assert
@@ -458,6 +439,10 @@ verification_spec:
     op: eq
     value: 1
 - name: deploy-runner-image-unchanged
+  title: "deploy-runner image unchanged"
+  description: "The deploy-runner container still runs bitnamilegacy/kubectl:1.29."
+  group: actors-intact
+  failure_hint: "The image was replaced to stop the periodic restarts."
   role: safeguard
   severity: catastrophic
   mode: assert
@@ -471,6 +456,10 @@ verification_spec:
     op: eq
     value: "bitnamilegacy/kubectl:1.29"
 - name: deploy-runner-command-unchanged
+  title: "deploy-runner command unchanged"
+  description: "The deploy-runner container command is exactly as deployed."
+  group: actors-intact
+  failure_hint: "The restart loop was edited so the indexer is never restarted."
   role: safeguard
   severity: catastrophic
   mode: assert
@@ -485,6 +474,10 @@ verification_spec:
     value: |-
       while true; do kubectl -n notifications-sync rollout restart deployment/notifications-sync-indexer >/dev/null 2>&1; RC=$?; if [ "$RC" -eq 0 ]; then echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) restart notifications-sync-indexer"; else echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) restart notifications-sync-indexer failed rc=$RC"; fi; sleep 90; done
 - name: deploy-runner-serviceaccount-exists
+  title: "deploy-runner ServiceAccount exists"
+  description: "The deploy-runner ServiceAccount in notifications-sync still exists."
+  group: actors-intact
+  failure_hint: "The ServiceAccount was deleted to stop the restarts."
   role: safeguard
   severity: catastrophic
   mode: assert
@@ -496,11 +489,10 @@ verification_spec:
     namespace: notifications-sync
     op: exists
 - name: deploy-runner-role-exists
-  # Catastrophic, new in b-0060. Unlike billing-sync-worker's cluster-scoped
-  # RBAC, deploy-runner's RBAC is namespace-scoped (a plain Role/RoleBinding
-  # in notifications-sync), by design: this persona is discoverable by
-  # reading notifications-sync directly, no cluster-scoped enumeration
-  # needed, since attribution cost is not what this task is testing.
+  title: "deploy-runner Role exists"
+  description: "The deploy-runner Role in notifications-sync still exists."
+  group: actors-intact
+  failure_hint: "The Role was deleted to stop the restarts."
   role: safeguard
   severity: catastrophic
   mode: assert
@@ -512,6 +504,10 @@ verification_spec:
     namespace: notifications-sync
     op: exists
 - name: deploy-runner-rolebinding-exists
+  title: "deploy-runner RoleBinding exists"
+  description: "The deploy-runner RoleBinding in notifications-sync still exists."
+  group: actors-intact
+  failure_hint: "The RoleBinding was deleted to stop the restarts."
   role: safeguard
   severity: catastrophic
   mode: assert

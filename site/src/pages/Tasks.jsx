@@ -117,11 +117,31 @@ export function Tasks() {
                                 to={`/task/${task.name}`}
                                 className="px-6 py-4 flex flex-col sm:grid sm:grid-cols-12 gap-3 sm:gap-4 items-start sm:items-center hover:bg-slate-50/70 dark:hover:bg-slate-800/40 cursor-pointer transition-colors group select-none"
                             >
-                                {/* Task name */}
-                                <div className="col-span-6 flex items-center pr-4">
-                                    <span className="font-semibold text-slate-900 dark:text-slate-100 text-sm font-mono group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                                        {task.name}
-                                    </span>
+                                {/* Task name, title, summary & tags */}
+                                <div className="col-span-6 flex flex-col gap-1 pr-4">
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        <span className="font-semibold text-slate-900 dark:text-slate-100 text-sm font-mono group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                                            {task.name}
+                                        </span>
+                                        {task.tags?.map(tag => (
+                                            <span
+                                                key={tag}
+                                                className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
+                                            >
+                                                {tag}
+                                            </span>
+                                        ))}
+                                    </div>
+                                    {task.title && (
+                                        <span className="text-xs font-medium text-slate-700 dark:text-slate-200">
+                                            {task.title}
+                                        </span>
+                                    )}
+                                    {task.summary && (
+                                        <span className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                                            {task.summary}
+                                        </span>
+                                    )}
                                 </div>
 
                                 {/* Category badge */}
@@ -142,7 +162,7 @@ export function Tasks() {
                                 {/* Environment */}
                                 <div className="col-span-2 text-right">
                                     <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/50">
-                                        {task.environment?.type || "Kubernetes"}
+                                        {task.environment?.provider?.toUpperCase() || task.environment?.type || "Kubernetes"}
                                     </span>
                                 </div>
                             </Link>
