@@ -11,15 +11,8 @@ RUN if [ "$MODE" = "dev" ]; then npm run build:dev; elif [ "$MODE" = "staging" ]
 
 # Stage 2: Serve static files with Nginx
 FROM nginx:alpine
-RUN rm -rf /docker-entrypoint.d /docker-entrypoint.sh && \
-    printf 'server {\n\
-    listen 8080;\n\
-    root /usr/share/nginx/html;\n\
-    index index.html;\n\
-    location / {\n\
-        try_files $uri $uri/ /index.html;\n\
-    }\n\
-}\n' > /etc/nginx/conf.d/default.conf
+RUN rm -rf /docker-entrypoint.d /docker-entrypoint.sh
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 COPY --from=builder /app/dist /usr/share/nginx/html
 EXPOSE 8080
