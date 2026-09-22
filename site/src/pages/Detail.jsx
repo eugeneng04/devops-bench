@@ -149,6 +149,21 @@ function CatastrophicDetails({ task }) {
     );
 }
 
+export function resolveTaskKey(task) {
+    if (!task) return "";
+    const nameClean = task.name?.replace(/-gitops$/, "");
+    const folderClean = task.folder?.replace(/-gitops$/, "");
+    if (nameClean && curatedData.tasks?.[nameClean]) return nameClean;
+    if (folderClean && curatedData.tasks?.[folderClean]) return folderClean;
+    for (const [key, t] of Object.entries(curatedData.tasks || {})) {
+        const tNameClean = t.name?.replace(/-gitops$/, "");
+        const tFolderClean = t.folder?.replace(/-gitops$/, "");
+        if (nameClean && (key === nameClean || tNameClean === nameClean)) return key;
+        if (folderClean && (key === folderClean || tFolderClean === folderClean)) return key;
+    }
+    return nameClean || folderClean || task.name || task.folder || "";
+}
+
 function TaskTable({ setup, metric }) {
     const navigate = useNavigate();
     const [sort, setSort] = useState({ key: "score", dir: "asc" });
@@ -248,7 +263,7 @@ function TaskTable({ setup, metric }) {
                             : undefined;
 
                         const metricParam = metric ? `&metric=${encodeURIComponent(metric)}` : "";
-                        const taskSlug = task.folder?.replace(/-gitops$/, "") || task.name?.replace(/-gitops$/, "");
+                        const taskSlug = resolveTaskKey(task);
                         const curatedTask = curatedData.tasks?.[taskSlug] || curatedData.tasks?.[task.name] || curatedData.tasks?.[task.folder];
                         const runUrl = `/task/${taskSlug}/run/${setup.id}?from=setup${metricParam}`;
                         const fromState = { from: `/setup/${setup.id}${metricParam ? `?${metricParam.slice(1)}` : ""}` };

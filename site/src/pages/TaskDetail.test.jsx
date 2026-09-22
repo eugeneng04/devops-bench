@@ -95,4 +95,19 @@ describe("TaskDetail", () => {
         renderTask("non-existent-task");
         expect(screen.getByText(/Task "non-existent-task" was not found/i)).toBeInTheDocument();
     });
+
+    it("resolves legacy task folder codes (e.g. b-0032) to canonical task", () => {
+        renderTask("b-0032");
+        expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("single-revision-rollout-unguarded");
+    });
+
+    it("renders run details directly when accessed via legacy task folder and setupId", () => {
+        renderTask("b-0032", "/task/b-0032/run/gemini-3-8-flash-high-antigravity?from=setup&metric=composite");
+        expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("single-revision-rollout-unguarded");
+        expect(screen.getByText(/Run details:/i)).toBeInTheDocument();
+        expect(screen.getByText("Latency")).toBeInTheDocument();
+        expect(screen.getByText("Tokens")).toBeInTheDocument();
+        expect(screen.getByText("Tool Calls")).toBeInTheDocument();
+        expect(screen.getByText(/Score Breakdown & Verdict/i)).toBeInTheDocument();
+    });
 });

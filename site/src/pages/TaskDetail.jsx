@@ -40,10 +40,45 @@ export function TaskDetail() {
         } else {
             setSelectedArm(null);
         }
-    }, [setupId]);
+    }, [setupId, searchParams]);
 
     const normalizedTaskName = taskName?.replace(/-gitops$/, "");
-    const task = curatedData.tasks?.[taskName] || curatedData.tasks?.[normalizedTaskName];
+    let canonicalTaskKey = null;
+    let task = null;
+
+    if (curatedData.tasks) {
+        if (curatedData.tasks[taskName]) {
+            canonicalTaskKey = taskName;
+            task = curatedData.tasks[taskName];
+        } else if (normalizedTaskName && curatedData.tasks[normalizedTaskName]) {
+            canonicalTaskKey = normalizedTaskName;
+            task = curatedData.tasks[normalizedTaskName];
+        } else {
+            const entry = Object.entries(curatedData.tasks).find(([key, t]) => {
+                const folderClean = t.folder?.replace(/-gitops$/, "");
+                const nameClean = t.name?.replace(/-gitops$/, "");
+                return key === taskName ||
+                    key === normalizedTaskName ||
+                    t.folder === taskName ||
+                    folderClean === normalizedTaskName ||
+                    t.name === taskName ||
+                    nameClean === normalizedTaskName;
+            });
+            if (entry) {
+                canonicalTaskKey = entry[0];
+                task = entry[1];
+            }
+        }
+    }
+
+    // Auto-upgrade legacy or folder task URLs to canonical task name
+    useEffect(() => {
+        if (canonicalTaskKey && taskName !== canonicalTaskKey) {
+            const currentPath = location.pathname;
+            const newPath = currentPath.replace(`/task/${taskName}`, `/task/${canonicalTaskKey}`);
+            navigate(`${newPath}${location.search}`, { replace: true, state: location.state });
+        }
+    }, [taskName, canonicalTaskKey, location.pathname, location.search, location.state, navigate]);
 
     if (!task) {
         return (
@@ -106,7 +141,7 @@ export function TaskDetail() {
         const query = location.search;
         const state = location.state;
 
-        if (selectedArm === arm && !checkName) {
+        if ((selectedArm === arm || canonicalArm === arm) && !checkName) {
             setSelectedArm(null);
             navigate(`/task/${task.name}${query}`, { state, replace: true });
         } else {

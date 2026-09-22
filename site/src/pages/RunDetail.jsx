@@ -14,7 +14,22 @@ export function RunDetail() {
     const [activeTab, setActiveTab] = useState("all");
 
     const normalizedTaskName = taskName?.replace(/-gitops$/, "");
-    const task = curatedData.tasks?.[taskName] || curatedData.tasks?.[normalizedTaskName];
+    let task = curatedData.tasks?.[taskName] || curatedData.tasks?.[normalizedTaskName];
+    if (!task && curatedData.tasks) {
+        const entry = Object.entries(curatedData.tasks).find(([key, t]) => {
+            const folderClean = t.folder?.replace(/-gitops$/, "");
+            const nameClean = t.name?.replace(/-gitops$/, "");
+            return key === taskName ||
+                key === normalizedTaskName ||
+                t.folder === taskName ||
+                folderClean === normalizedTaskName ||
+                t.name === taskName ||
+                nameClean === normalizedTaskName;
+        });
+        if (entry) {
+            task = entry[1];
+        }
+    }
     if (!task) {
         return (
             <NotFound
