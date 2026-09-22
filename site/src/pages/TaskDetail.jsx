@@ -4,7 +4,7 @@
 // the Run Inspection panel directly below the matrix on the same page.
 // The Scenario Prompt and Matrix remain visible at all times.
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useSearchParams, useNavigate, useLocation, Link } from "react-router-dom";
 import curatedData from "../data/curated_tasks.json";
 import { AssertsRenderer, FormattedText } from "../components/AssertsRenderer.jsx";
@@ -24,8 +24,12 @@ export function TaskDetail() {
     // Initialize selected arm from route param (:setupId) or query param (?run=...)
     const initialArm = setupId || searchParams.get("run") || null;
     const [selectedArm, setSelectedArm] = useState(initialArm);
+    const prevTaskRef = useRef(null);
 
     useEffect(() => {
+        const isNewTask = prevTaskRef.current !== taskName;
+        prevTaskRef.current = taskName;
+
         const targetArm = setupId || searchParams.get("run");
         if (targetArm) {
             setSelectedArm(targetArm);
@@ -39,8 +43,11 @@ export function TaskDetail() {
             return () => clearTimeout(timer);
         } else {
             setSelectedArm(null);
+            if (isNewTask && typeof window.scrollTo === "function") {
+                window.scrollTo(0, 0);
+            }
         }
-    }, [setupId, searchParams]);
+    }, [setupId, searchParams, taskName]);
 
     const normalizedTaskName = taskName?.replace(/-gitops$/, "");
     let canonicalTaskKey = null;

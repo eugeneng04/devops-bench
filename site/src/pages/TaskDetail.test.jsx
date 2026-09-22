@@ -1,7 +1,8 @@
-import { describe, it, expect } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
-import { MemoryRouter, Routes, Route } from "react-router-dom";
+import { describe, it, expect, vi } from "vitest";
+import { render, screen, fireEvent, act } from "@testing-library/react";
+import { MemoryRouter, Routes, Route, useNavigate } from "react-router-dom";
 import { TaskDetail } from "./TaskDetail.jsx";
+import { ScrollToTop } from "../App.jsx";
 
 describe("TaskDetail", () => {
     function renderTask(taskName = "canary-promotion", initialPath = `/task/${taskName}`) {
@@ -109,5 +110,46 @@ describe("TaskDetail", () => {
         expect(screen.getByText("Tokens")).toBeInTheDocument();
         expect(screen.getByText("Tool Calls")).toBeInTheDocument();
         expect(screen.getByText(/Score Breakdown & Verdict/i)).toBeInTheDocument();
+    });
+
+    it("scrolls window to top when navigating to a task page without run parameter", () => {
+        const scrollToSpy = vi.spyOn(window, "scrollTo").mockImplementation(() => {});
+        renderTask("single-revision-rollout-unguarded");
+        expect(scrollToSpy).toHaveBeenCalledWith(0, 0);
+        scrollToSpy.mockRestore();
+    });
+});
+
+describe("ScrollToTop component", () => {
+    it("scrolls window to top on base route change, but not on run sub-route within the same task", () => {
+        let navigateFn;
+        function NavTester() {
+            navigateFn = useNavigate();
+            return <ScrollToTop />;
+        }
+
+        const scrollToSpy = vi.spyOn(window, "scrollTo").mockImplementation(() => {});
+        render(
+            <MemoryRouter initialEntries={["/tasks"]}>
+                <NavTester />
+            </MemoryRouter>
+        );
+        expect(scrollToSpy).toHaveBeenCalledWith(0, 0);
+        scrollToSpy.mockClear();
+
+        // Navigating to task detail changes baseRoute, so it should scroll to top
+        act(() => {
+            navigateFn("/task/single-revision-rollout-unguarded");
+        });
+        expect(scrollToSpy).toHaveBeenCalledWith(0, 0);
+        scrollToSpy.mockClear();
+
+        // Inspecting a run on the same task does not change baseRoute, so it should NOT reset to top
+        act(() => {
+            navigateFn("/task/single-revision-rollout-unguarded/run/gemini-3-8-flash-high-antigravity");
+        });
+        expect(scrollToSpy).not.toHaveBeenCalled();
+
+        scrollToSpy.mockRestore();
     });
 });
