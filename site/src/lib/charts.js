@@ -9,7 +9,7 @@
 // components stay presentation.
 // =============================================================================
 
-import { setupLabel, setupScore, setupValue } from "./accessors.js";
+import { setupLabel, setupScore, setupValue, scoreOf } from "./accessors.js";
 import { augmentationLabel, isLowerBetter } from "./vocab.js";
 
 /**
@@ -231,8 +231,8 @@ export function harnessComparisons(setups, metric, models, harnesses) {
  */
 export function taskValues(setup, metric) {
     return setup.tasks
-        .map(t => ({ value: t.scores[metric], task: t.name || t.folder }))
-        .filter(d => Number.isFinite(d.value));
+        .map(t => ({ value: scoreOf(t.scores, metric), task: t.name || t.folder }))
+        .filter(d => d.value != null && Number.isFinite(d.value));
 }
 
 // Interpolating between the two order statistics a quantile falls between,

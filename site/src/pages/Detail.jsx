@@ -19,12 +19,22 @@ function median(nums) {
     return s.length % 2 ? s[mid] : (s[mid - 1] + s[mid]) / 2;
 }
 
-function StatCard({ label, value, sub }) {
+function StatCard({ label, value, sub, alert = false }) {
     return (
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm p-4 flex flex-col gap-1">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">{label}</span>
-            <span className="text-xl font-bold text-slate-900 dark:text-slate-100">{value}</span>
-            {sub ? <span className="text-[10px] text-slate-400 dark:text-slate-500">{sub}</span> : null}
+        <div className={`rounded-xl border shadow-sm p-4 flex flex-col gap-1 ${
+            alert
+                ? "bg-rose-50/40 dark:bg-rose-950/20 border-rose-200/80 dark:border-rose-900/60"
+                : "bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800"
+        }`}>
+            <span className={`text-[10px] font-semibold uppercase tracking-wider ${
+                alert ? "text-rose-500 dark:text-rose-400" : "text-slate-400 dark:text-slate-500"
+            }`}>{label}</span>
+            <span className={`text-xl font-bold ${
+                alert ? "text-rose-600 dark:text-rose-400" : "text-slate-900 dark:text-slate-100"
+            }`}>{value}</span>
+            {sub ? <span className={`text-[10px] ${
+                alert ? "text-rose-500/80 dark:text-rose-400/80" : "text-slate-400 dark:text-slate-500"
+            }`}>{sub}</span> : null}
         </div>
     );
 }
@@ -238,14 +248,18 @@ function TaskTable({ setup, metric }) {
                             : undefined;
 
                         const metricParam = metric ? `&metric=${encodeURIComponent(metric)}` : "";
-                        const taskKey = task.name?.replace(/-gitops$/, "") || task.folder?.replace(/-gitops$/, "");
-                        const curatedTask = curatedData.tasks?.[taskKey] || curatedData.tasks?.[task.name];
-                        const runUrl = `/task/${taskKey}/run/${setup.id}?from=setup${metricParam}`;
+                        const taskSlug = task.folder?.replace(/-gitops$/, "") || task.name?.replace(/-gitops$/, "");
+                        const curatedTask = curatedData.tasks?.[taskSlug] || curatedData.tasks?.[task.name] || curatedData.tasks?.[task.folder];
+                        const runUrl = `/task/${taskSlug}/run/${setup.id}?from=setup${metricParam}`;
                         const fromState = { from: `/setup/${setup.id}${metricParam ? `?${metricParam.slice(1)}` : ""}` };
+                        const displayName = task.name || task.folder;
+                        const subtitle = curatedTask?.title && curatedTask.title !== displayName
+                            ? curatedTask.title
+                            : (task.folder && task.folder !== displayName ? task.folder : null);
 
                         return (
                             <tr
-                                key={task.folder}
+                                key={task.folder || task.name}
                                 onClick={() => navigate(runUrl, { state: fromState })}
                                 className="border-t border-slate-100 dark:border-slate-800 hover:bg-slate-50/70 dark:hover:bg-slate-800/40 cursor-pointer transition-colors group"
                             >
@@ -255,14 +269,14 @@ function TaskTable({ setup, metric }) {
                                             to={runUrl}
                                             state={fromState}
                                             onClick={(e) => e.stopPropagation()}
-                                            className="font-semibold font-mono text-slate-800 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 text-sm block truncate transition-colors"
+                                            className="font-semibold text-slate-800 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 text-sm block truncate transition-colors"
                                             title="View verification report and rubric results for this run"
                                         >
-                                            {taskKey}
+                                            {displayName}
                                         </Link>
-                                        {curatedTask?.title && (
+                                        {subtitle && (
                                             <span className="text-xs text-slate-500 dark:text-slate-400 truncate block">
-                                                {curatedTask.title}
+                                                {subtitle}
                                             </span>
                                         )}
                                     </div>
@@ -415,6 +429,16 @@ export function Detail() {
         }, { replace: true });
     }
 
+    function handleMetricChange(newMetric) {
+        setMetric(newMetric);
+        setSearchParams(prev => {
+            const next = new URLSearchParams(prev);
+            if (newMetric && newMetric !== "composite") next.set("metric", newMetric);
+            else next.delete("metric");
+            return next;
+        }, { replace: true });
+    }
+
     const available = useMemo(() => (effectiveSetup ? availableMetrics([effectiveSetup]) : []), [effectiveSetup]);
 
     useEffect(() => {
@@ -489,12 +513,12 @@ export function Detail() {
                                 {metric === "cost" ? "Avg Cost / Task" : METRIC_LABELS[metric]}
                             </span>
                         </div>
-                        <MetricToggle value={metric} onChange={setMetric} available={available} />
+                        <MetricToggle value={metric} onChange={handleMetricChange} available={available} />
                     </div>
                 </div>
 
                 {/* Summary cards */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 w-full">
+                <div className={`grid grid-cols-2 sm:grid-cols-3 ${metricMeta(metric).percentage ? "lg:grid-cols-5" : "lg:grid-cols-4"} gap-3 w-full`}>
                     <StatCard label="Best Task" value={pct(best)} sub={METRIC_LABELS[metric]} />
                     <StatCard label="Average" value={pct(avg)} sub={`over ${vals.length} tasks`} />
                     <StatCard label="Median" value={pct(med)} sub={METRIC_LABELS[metric]} />
@@ -508,6 +532,7 @@ export function Detail() {
                         <StatCard
                             label="Catastrophic"
                             value={String(effectiveSetup.catastrophicCount ?? 0)}
+                            alert={Boolean(effectiveSetup.catastrophicCount)}
                             // "outcome zeroed", not "task zeroed": the task still ran
                             // and still has its other measurements; what a
                             // catastrophic violation zeroes is the Outcome score.
@@ -529,7 +554,6 @@ export function Detail() {
                     ) : null}
                 </div>
 
-                {/* Task scope controls */}
                 {/* Task scope controls */}
                 {ENABLE_SCOPE_FILTER && commonTaskKeys.length > 0 && (
                     <div className="flex flex-wrap items-center justify-between gap-4 mt-2 px-1">

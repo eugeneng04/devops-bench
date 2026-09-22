@@ -32,7 +32,7 @@ export default function App() {
                             <Route path="/task" element={<Navigate to="/tasks" replace />} />
                             <Route path="/setup/:id" element={<Detail />} />
                             <Route path="/task/:taskName" element={<TaskDetail />} />
-                            <Route path="/task/:taskName/run/:setupId" element={<RunDetail />} />
+                            <Route path="/task/:taskName/run/:setupId" element={<TaskDetail />} />
                         </Routes>
                     </div>
                 </div>

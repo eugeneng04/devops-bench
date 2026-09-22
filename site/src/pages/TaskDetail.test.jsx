@@ -4,11 +4,12 @@ import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { TaskDetail } from "./TaskDetail.jsx";
 
 describe("TaskDetail", () => {
-    function renderTask(taskName = "canary-promotion") {
+    function renderTask(taskName = "canary-promotion", initialPath = `/task/${taskName}`) {
         return render(
-            <MemoryRouter initialEntries={[`/task/${taskName}`]}>
+            <MemoryRouter initialEntries={[initialPath]}>
                 <Routes>
                     <Route path="/task/:taskName" element={<TaskDetail />} />
+                    <Route path="/task/:taskName/run/:setupId" element={<TaskDetail />} />
                 </Routes>
             </MemoryRouter>
         );
@@ -60,6 +61,34 @@ describe("TaskDetail", () => {
         const redScores = container.querySelectorAll(".text-rose-600");
         expect(redScores.length).toBeGreaterThan(0);
         expect(redScores[0]).toHaveTextContent("0%");
+    });
+
+    it("preserves prompt and reveals run details below matrix when clicking a harness, and closes inspection", () => {
+        renderTask("canary-promotion");
+        expect(screen.getByText(/Instruction/i)).toBeInTheDocument();
+        expect(screen.getByText(/Results Across All 9 Harnesses/i)).toBeInTheDocument();
+        expect(screen.queryByText(/Run details:/i)).not.toBeInTheDocument();
+
+        // Click a harness header button to inspect run
+        const inspectBtn = screen.getByRole("button", { name: /ag\/gemini-3\.7-flash-high/i });
+        fireEvent.click(inspectBtn);
+
+        // Run details should now be visible below matrix with prompt and matrix still present
+        expect(screen.getByText(/Run details:/i)).toBeInTheDocument();
+        expect(screen.getByText("Latency")).toBeInTheDocument();
+        expect(screen.getByText("Tokens")).toBeInTheDocument();
+        expect(screen.getByText("Tool Calls")).toBeInTheDocument();
+        expect(screen.getByText(/Score Breakdown & Verdict/i)).toBeInTheDocument();
+        expect(screen.getByText(/Instruction/i)).toBeInTheDocument();
+        expect(screen.getByText(/Results Across All 9 Harnesses/i)).toBeInTheDocument();
+
+        // Click close
+        const closeBtn = screen.getByRole("button", { name: /Close/i });
+        fireEvent.click(closeBtn);
+
+        // Inspection panel is closed, matrix remains
+        expect(screen.queryByText(/Run details:/i)).not.toBeInTheDocument();
+        expect(screen.getByText(/Results Across All 9 Harnesses/i)).toBeInTheDocument();
     });
 
     it("renders not found state for unknown task", () => {

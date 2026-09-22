@@ -54,7 +54,7 @@ export function TopBar() {
                     </Link>
 
                     {/* Divider */}
-                    <span className="text-slate-200 dark:text-slate-800 hidden sm:inline">|</span>
+                    <span className="text-slate-200 dark:text-slate-700 hidden sm:inline">|</span>
 
                     {/* Primary Navigation Tabs */}
                     <nav className="flex items-center gap-1 shrink-0">
@@ -64,8 +64,8 @@ export function TopBar() {
                                 isLeaderboard && pathname === "/"
                                     ? "bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/80"
                                     : isLeaderboard
-                                    ? "text-indigo-600 dark:text-indigo-400 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800/50"
-                                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50"
+                                    ? "text-indigo-600 dark:text-indigo-400 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800/50 border border-transparent"
+                                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 border border-transparent"
                             }`}
                         >
                             Leaderboard
@@ -76,8 +76,8 @@ export function TopBar() {
                                 isTasks && pathname === "/tasks"
                                     ? "bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/80"
                                     : isTasks
-                                    ? "text-indigo-600 dark:text-indigo-400 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800/50"
-                                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50"
+                                    ? "text-indigo-600 dark:text-indigo-400 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800/50 border border-transparent"
+                                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 border border-transparent"
                             }`}
                         >
                             Tasks
@@ -89,11 +89,11 @@ export function TopBar() {
                         <div className="flex items-center pl-2 sm:pl-3 border-l border-slate-200 dark:border-slate-800">
                             <Link
                                 to={backButton.to}
-                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100/90 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-200/70 dark:hover:bg-slate-800 border border-slate-200/60 dark:border-slate-700/60 transition-colors shrink-0"
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100/90 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-200/70 dark:hover:bg-slate-800 border border-slate-200/60 dark:border-slate-700/60 transition-colors shrink-0"
                                 title={backButton.title}
                             >
                                 <span className="text-slate-400 dark:text-slate-500">←</span>
-                                <span className="truncate max-w-[120px] sm:max-w-[200px] font-mono text-[11px]">{backButton.label}</span>
+                                <span className="truncate max-w-[120px] sm:max-w-[200px] text-xs font-medium">{backButton.label}</span>
                             </Link>
                         </div>
                     )}

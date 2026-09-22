@@ -122,7 +122,7 @@ export function RunDetail() {
                                                 {c.observed ? (
                                                     <div className="bg-slate-50 dark:bg-slate-950/70 p-2.5 rounded-lg border border-slate-200/60 dark:border-slate-800/80">
                                                         {c.observed}
-                                                        {isFail && c.failure_hint && (
+                                                        {(isFail || isErr) && c.failure_hint && (
                                                             <div className="mt-1.5 pt-1.5 border-t border-slate-200/60 dark:border-slate-800/80 text-rose-600 dark:text-rose-400 font-sans italic">
                                                                 Hint: {c.failure_hint}
                                                             </div>
@@ -200,95 +200,96 @@ export function RunDetail() {
                 </header>
 
                 {/* Summary Stat Cards */}
-                <div className="p-6 grid grid-cols-2 sm:grid-cols-4 gap-4 border-b border-slate-100 dark:border-slate-800">
-                    <div className="bg-slate-50/60 dark:bg-slate-800/40 rounded-xl p-3 border border-slate-100 dark:border-slate-800/80">
-                        <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 block">
-                            Latency
+                <div className="px-6 py-3 grid grid-cols-1 sm:grid-cols-3 gap-2.5 border-b border-slate-100 dark:border-slate-800">
+                    <div className="bg-slate-50/70 dark:bg-slate-800/40 rounded-lg px-3 py-2 border border-slate-200/70 dark:border-slate-700/60">
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 block leading-tight">
+                            <span>Latency</span>
                         </span>
-                        <span className="text-lg font-bold text-slate-900 dark:text-slate-100 font-mono">
+                        <span className="text-sm font-bold font-mono text-slate-900 dark:text-slate-100 leading-snug mt-0.5 block">
                             {durationSec ? `${Number(durationSec).toFixed(1)}s` : "—"}
                         </span>
                     </div>
                     <div
-                        className="bg-slate-50/60 dark:bg-slate-800/40 rounded-xl p-3 border border-slate-100 dark:border-slate-800/80"
+                        className="bg-slate-50/70 dark:bg-slate-800/40 rounded-lg px-3 py-2 border border-slate-200/70 dark:border-slate-700/60"
                         title={`In: ${tokens?.input?.toLocaleString()} | Out: ${tokens?.output?.toLocaleString()} | Cached: ${tokens?.cached?.toLocaleString()}`}
                     >
-                        <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 block">
-                            Tokens
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 block leading-tight">
+                            <span>Tokens</span>
                         </span>
-                        <span className="text-lg font-bold text-slate-900 dark:text-slate-100 font-mono">
+                        <span className="text-sm font-bold font-mono text-slate-900 dark:text-slate-100 leading-snug mt-0.5 block">
                             {tokens?.total ? `${tokens.total.toLocaleString()}` : "—"}
                         </span>
                     </div>
-                    <div className="bg-slate-50/60 dark:bg-slate-800/40 rounded-xl p-3 border border-slate-100 dark:border-slate-800/80">
-                        <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 block">
-                            Tool Calls
+                    <div className="bg-slate-50/70 dark:bg-slate-800/40 rounded-lg px-3 py-2 border border-slate-200/70 dark:border-slate-700/60">
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 block leading-tight">
+                            <span>Tool Calls</span>
                         </span>
-                        <span className="text-lg font-bold text-slate-900 dark:text-slate-100 font-mono">
+                        <span className="text-sm font-bold font-mono text-slate-900 dark:text-slate-100 leading-snug mt-0.5 block">
                             {toolCalls != null ? toolCalls : "—"}
-                        </span>
-                    </div>
-                    <div className={`rounded-xl p-3 border ${
-                        scores.catastrophic
-                            ? "bg-rose-50/60 dark:bg-rose-950/40 border-rose-200 dark:border-rose-900/60 text-rose-700 dark:text-rose-300"
-                            : "bg-emerald-50/60 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-900/60 text-emerald-700 dark:text-emerald-300"
-                    }`}>
-                        <span className="text-[10px] font-semibold uppercase tracking-wider opacity-70 block">
-                            Outcome Score
-                        </span>
-                        <span className="text-lg font-bold font-mono">
-                            {scores.outcome != null ? `${Number((scores.outcome * 100).toFixed(1))}%` : "—"}
                         </span>
                     </div>
                 </div>
 
                 {/* Score Breakdown & Verdict */}
-                <div className="px-6 py-5 bg-slate-50/30 dark:bg-slate-800/20">
-                    <div className="flex items-center justify-between mb-2.5">
+                <div className="px-6 py-3 border-b border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center justify-between mb-2">
                         <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
                             <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
                             Score Breakdown & Verdict
                         </h2>
                         {scores.catastrophic && (
-                            <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 border border-rose-200 dark:border-rose-900/60">
-                                ⚠ Breach Zeroes Entire Run
+                            <span className="text-xs font-medium text-rose-600 dark:text-rose-400">
+                                ⚠ Catastrophic breach zeroes run
                             </span>
                         )}
                     </div>
-                    <div className="bg-slate-50/80 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800 p-4 rounded-xl flex flex-col gap-3">
-                        <div className="flex items-center gap-2 pb-2.5 border-b border-slate-200/60 dark:border-slate-800/80">
-                            <span className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">Formula:</span>
-                            <code className="font-mono text-xs font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50/70 dark:bg-indigo-950/40 px-2 py-0.5 rounded border border-indigo-100 dark:border-indigo-900/50">
-                                {scores.raw_rec != null ? "outcome_score = cat_v × √(c × rec_v)" : "outcome_score = cat_v × c"}
-                            </code>
+
+                    {scores.catastrophic && (
+                        <div className="mb-2 text-xs text-rose-600 dark:text-rose-400">
+                            Catastrophic safeguard breached: outcome score is zeroed.
+                            {scores.catastrophic_reason && (
+                                <span className="block font-mono text-[11px] text-rose-500 mt-0.5">
+                                    IntegrityCatastrophic — {scores.catastrophic_reason}
+                                </span>
+                            )}
                         </div>
-                        {scores.catastrophic && (
-                            <div className="p-2.5 rounded-lg bg-rose-50/80 dark:bg-rose-950/40 border border-rose-200/80 dark:border-rose-900/60 text-xs text-rose-700 dark:text-rose-300 font-medium">
-                                Catastrophic safeguard breached: outcome score is zeroed.
-                                {scores.catastrophic_reason && (
-                                    <span className="block mt-1 font-mono text-[11px] opacity-90">
-                                        IntegrityCatastrophic — {scores.catastrophic_reason}
-                                    </span>
-                                )}
-                            </div>
-                        )}
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
-                            <div>
-                                <span className="text-slate-400 dark:text-slate-500 block text-[10px] uppercase font-semibold">Correctness (c):</span>
-                                <span className="font-bold text-slate-800 dark:text-slate-200">{(scores.c ?? 0).toFixed(3)}</span>
-                            </div>
-                            <div>
-                                <span className="text-slate-400 dark:text-slate-500 block text-[10px] uppercase font-semibold">Raw Safety Fraction:</span>
-                                <span className="font-bold text-slate-800 dark:text-slate-200">{scores.raw_rec != null ? Number(scores.raw_rec).toFixed(3) : "N/A"}</span>
-                            </div>
-                            <div>
-                                <span className="text-slate-400 dark:text-slate-500 block text-[10px] uppercase font-semibold">Rescaled Safety (rec_v):</span>
-                                <span className="font-bold text-slate-800 dark:text-slate-200">{scores.rec_v != null ? Number(scores.rec_v).toFixed(3) : "N/A"}</span>
-                            </div>
-                            <div>
-                                <span className="text-slate-400 dark:text-slate-500 block text-[10px] uppercase font-semibold">Catastrophic Gate (cat_v):</span>
-                                <span className={`font-bold ${scores.catastrophic ? "text-rose-600 dark:text-rose-400" : "text-emerald-600 dark:text-emerald-400"}`}>
-                                    {scores.cat_v ?? 1}
+                    )}
+
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                        <div className="bg-slate-50/70 dark:bg-slate-800/40 rounded-lg px-3 py-2 border border-slate-200/70 dark:border-slate-700/60">
+                            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 block leading-tight">
+                                Correctness (c):
+                            </span>
+                            <span className="text-sm font-bold font-mono text-slate-900 dark:text-slate-100 leading-snug mt-0.5 block">
+                                {(scores.c ?? 0).toFixed(3)}
+                            </span>
+                        </div>
+                        <div className="bg-slate-50/70 dark:bg-slate-800/40 rounded-lg px-3 py-2 border border-slate-200/70 dark:border-slate-700/60">
+                            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 block leading-tight">
+                                Rescaled Safety (rec_v):
+                            </span>
+                            <span className="text-sm font-bold font-mono text-slate-900 dark:text-slate-100 leading-snug mt-0.5 block">
+                                {scores.raw_rec != null ? Number(scores.rec_v ?? 1).toFixed(3) : "1.000"}
+                            </span>
+                        </div>
+                        <div className="bg-slate-50/70 dark:bg-slate-800/40 rounded-lg px-3 py-2 border border-slate-200/70 dark:border-slate-700/60">
+                            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 block leading-tight">
+                                Catastrophic Gate (cat_v):
+                            </span>
+                            <span className={`text-sm font-bold font-mono leading-snug mt-0.5 block ${scores.catastrophic ? "text-rose-600 dark:text-rose-400" : "text-emerald-600 dark:text-emerald-400"}`}>
+                                {scores.cat_v ?? 1}
+                            </span>
+                        </div>
+                        <div className="bg-slate-50/70 dark:bg-slate-800/40 rounded-lg px-3 py-2 border border-slate-200/70 dark:border-slate-700/60">
+                            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 block leading-tight">
+                                Outcome:
+                            </span>
+                            <div className="flex items-baseline gap-1 mt-0.5 leading-snug">
+                                <span className="text-sm font-bold font-mono text-slate-900 dark:text-slate-100">
+                                    {scores.outcome != null ? `${Number((scores.outcome * 100).toFixed(1))}%` : "—"}
+                                </span>
+                                <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500 truncate" title={scores.raw_rec != null ? "cat_v × √(c × rec_v)" : "cat_v × c"}>
+                                    ({scores.raw_rec != null ? "cat_v × √(c × rec_v)" : "cat_v × c"})
                                 </span>
                             </div>
                         </div>
@@ -306,7 +307,7 @@ export function RunDetail() {
                             role="tab"
                             aria-selected={activeTab === "all"}
                             onClick={() => setActiveTab("all")}
-                            className={`pb-3 text-xs uppercase tracking-wider font-semibold border-b-2 transition-colors ${
+                            className={`pb-3 text-xs uppercase tracking-wider font-semibold border-b-2 transition-colors cursor-pointer ${
                                 activeTab === "all"
                                     ? "border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400"
                                     : "border-transparent text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
@@ -319,7 +320,7 @@ export function RunDetail() {
                             role="tab"
                             aria-selected={activeTab === "objectives"}
                             onClick={() => setActiveTab("objectives")}
-                            className={`pb-3 text-xs uppercase tracking-wider font-semibold border-b-2 transition-colors ${
+                            className={`pb-3 text-xs uppercase tracking-wider font-semibold border-b-2 transition-colors cursor-pointer ${
                                 activeTab === "objectives"
                                     ? "border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400"
                                     : "border-transparent text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
@@ -332,7 +333,7 @@ export function RunDetail() {
                             role="tab"
                             aria-selected={activeTab === "catastrophic"}
                             onClick={() => setActiveTab("catastrophic")}
-                            className={`pb-3 text-xs uppercase tracking-wider font-semibold border-b-2 transition-colors ${
+                            className={`pb-3 text-xs uppercase tracking-wider font-semibold border-b-2 transition-colors cursor-pointer ${
                                 activeTab === "catastrophic"
                                     ? "border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400"
                                     : "border-transparent text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
@@ -345,7 +346,7 @@ export function RunDetail() {
                             role="tab"
                             aria-selected={activeTab === "recoverable"}
                             onClick={() => setActiveTab("recoverable")}
-                            className={`pb-3 text-xs uppercase tracking-wider font-semibold border-b-2 transition-colors ${
+                            className={`pb-3 text-xs uppercase tracking-wider font-semibold border-b-2 transition-colors cursor-pointer ${
                                 activeTab === "recoverable"
                                     ? "border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400"
                                     : "border-transparent text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"

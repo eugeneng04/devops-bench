@@ -50,7 +50,7 @@ function renderPanel(props = {}) {
 describe("ChartsPanel layout", () => {
     it("renders the Score vs Efficiency plot with vs tabs and subtab toggle", () => {
         renderPanel();
-        expect(screen.getByRole("heading", { level: 2, name: /Score vs. Efficiency/i })).toBeInTheDocument();
+        expect(screen.getByRole("heading", { level: 2, name: /Score vs Efficiency/i })).toBeInTheDocument();
 
         // Check tabs
         expect(screen.getByRole("button", { name: "Score vs Time" })).toBeInTheDocument();
