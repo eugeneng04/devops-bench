@@ -93,6 +93,7 @@ export function RunDetail() {
                                                 </span>
                                                 <CheckMeta
                                                     id={c.title && c.title !== c.name ? c.name : null}
+                                                    role={c.severity || c.role}
                                                     mode={c.mode}
                                                     weight={c.weight}
                                                     group={c.group_title}

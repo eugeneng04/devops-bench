@@ -371,6 +371,7 @@ export function TaskDetail() {
                                                     </span>
                                                     <CheckMeta
                                                         id={c.title && c.title !== c.name ? c.name : null}
+                                                        role={c.role || "objective"}
                                                         group={c.group_title}
                                                     />
                                                 </td>
@@ -444,6 +445,7 @@ export function TaskDetail() {
                                                         </span>
                                                         <CheckMeta
                                                             id={c.title && c.title !== c.name ? c.name : null}
+                                                            role="catastrophic"
                                                             group={c.group_title}
                                                             isCatastrophic={true}
                                                         />
@@ -508,6 +510,7 @@ export function TaskDetail() {
                                                         </span>
                                                         <CheckMeta
                                                             id={c.title && c.title !== c.name ? c.name : null}
+                                                            role="safeguard"
                                                             group={c.group_title}
                                                         />
                                                     </td>
