@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 
 export function modeTooltip(mode) {
     if (mode === "converge") return "Converge: polled repeatedly until true within timeout budget";
@@ -63,13 +62,12 @@ export function CheckMeta({
                 <span key={item.key} className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded ${pillBase}`}>
                     <span className={keyLabel}>{item.key}:</span>
                     {item.isMode ? (
-                        <Link
-                            to="/methodology#modes"
-                            className="hover:text-indigo-600 dark:hover:text-indigo-400 underline decoration-dotted underline-offset-2 cursor-help"
+                        <span
+                            className="cursor-help"
                             title={modeTooltip(item.value)}
                         >
                             {item.value}
-                        </Link>
+                        </span>
                     ) : (
                         <span>{item.value}</span>
                     )}

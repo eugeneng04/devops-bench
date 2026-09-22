@@ -17,7 +17,6 @@ export function TopBar() {
 
     const isLeaderboard = pathname === "/" || pathname.startsWith("/setup") || Boolean(runMatch && fromSetup);
     const isTasks = !isLeaderboard && (pathname.startsWith("/tasks") || pathname.startsWith("/task"));
-    const isMethodology = pathname.startsWith("/methodology");
 
     // Contextual single back button for navigating back to the immediate parent view
     let backButton = null;
@@ -82,16 +81,6 @@ export function TopBar() {
                             }`}
                         >
                             Tasks
-                        </Link>
-                        <Link
-                            to="/methodology"
-                            className={`px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                                isMethodology
-                                    ? "bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/80"
-                                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50"
-                            }`}
-                        >
-                            Methodology
                         </Link>
                     </nav>
 

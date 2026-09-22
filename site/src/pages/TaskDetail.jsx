@@ -351,15 +351,7 @@ export function TaskDetail() {
                                             <th className="pb-2.5 pr-4 w-1/4">Check</th>
                                             <th className="pb-2.5 pr-4 w-1/2">Asserts</th>
                                             <th className="pb-2.5 pr-4 w-24">Weight</th>
-                                            <th className="pb-2.5 w-28">
-                                                <Link
-                                                    to="/methodology#modes"
-                                                    className="inline-flex items-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
-                                                    title="Learn about check evaluation modes (converge, assert, hold, judge)"
-                                                >
-                                                    Mode <span className="text-[10px] text-indigo-500">ⓘ</span>
-                                                </Link>
-                                            </th>
+                                            <th className="pb-2.5 w-28">Mode</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
@@ -425,15 +417,7 @@ export function TaskDetail() {
                                             <tr className="border-b border-rose-100 dark:border-rose-950/60 text-[10px] font-semibold uppercase tracking-wider text-rose-400">
                                                 <th className="pb-2.5 pr-4 w-1/3">Check</th>
                                                 <th className="pb-2.5 pr-4 w-1/2">Asserts</th>
-                                                <th className="pb-2.5 w-28">
-                                                    <Link
-                                                        to="/methodology#modes"
-                                                        className="inline-flex items-center gap-1 hover:text-rose-600 dark:hover:text-rose-300 transition-colors"
-                                                        title="Learn about check evaluation modes"
-                                                    >
-                                                        Mode <span className="text-[10px]">ⓘ</span>
-                                                    </Link>
-                                                </th>
+                                                <th className="pb-2.5 w-28">Mode</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-rose-50/60 dark:divide-rose-950/30">
@@ -490,15 +474,7 @@ export function TaskDetail() {
                                             <tr className="border-b border-slate-200 dark:border-slate-800 text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                                                 <th className="pb-2.5 pr-4 w-1/3">Check</th>
                                                 <th className="pb-2.5 pr-4 w-1/2">Asserts</th>
-                                                <th className="pb-2.5 w-28">
-                                                    <Link
-                                                        to="/methodology#modes"
-                                                        className="inline-flex items-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
-                                                        title="Learn about check evaluation modes"
-                                                    >
-                                                        Mode <span className="text-[10px] text-indigo-500">ⓘ</span>
-                                                    </Link>
-                                                </th>
+                                                <th className="pb-2.5 w-28">Mode</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
