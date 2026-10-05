@@ -2,11 +2,11 @@
   "apiVersion": "usage-metrics/v1",
   "kind": "UsageSeries",
   "formatVersion": 1,
-  "generatedAt": "2026-10-01T11:47:18Z",
+  "generatedAt": "2026-10-05T12:35:32Z",
   "provenance": {
-    "collectorSha": "e2260cdea4a8667c011792f9720932c512865499",
-    "workflowRunUrl": "https://github.com/eugeneng04/devops-bench/actions/runs/36857522835",
-    "writtenAt": "2026-10-01T11:47:18Z"
+    "collectorSha": "15e9b3ec64a8931dfa114a389b8f78f821e1d5f9",
+    "workflowRunUrl": "https://github.com/eugeneng04/devops-bench/actions/runs/37310573074",
+    "writtenAt": "2026-10-05T12:35:32Z"
   },
   "unreadable": [
     {
@@ -31,6 +31,10 @@
     },
     {
       "date": "2026-10-01",
+      "reason": "classification failed: TypeError(\"unsupported operand type(s) for -: 'NoneType' and 'int'\")"
+    },
+    {
+      "date": "2026-10-05",
       "reason": "classification failed: TypeError(\"unsupported operand type(s) for -: 'NoneType' and 'int'\")"
     }
   ],
